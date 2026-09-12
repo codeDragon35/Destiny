@@ -12,6 +12,8 @@ const SCALES: Record<string, { root: number; steps: number[] }> = {
   crane: { root: 220.0, steps: [0, 2, 3, 7, 8] },
   // Indian raga-like: flat second and flat sixth.
   peacock: { root: 174.61, steps: [0, 1, 4, 7, 8] },
+  // Lydian-ish colour for Italy: bright, with a raised fourth.
+  laurel: { root: 261.63, steps: [0, 2, 4, 6, 7, 11] },
   // Western major pentatonic.
   default: { root: 196.0, steps: [0, 2, 4, 7, 9] },
 };

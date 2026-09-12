@@ -1,0 +1,160 @@
+import type { SeedCountry } from "./types";
+
+const japan: SeedCountry = {
+  code: "JP",
+  name: "Japan",
+  slug: "japan",
+  wikidataId: "Q17",
+  motif: "crane",
+  emoji: "🇯🇵",
+  summary:
+    "Neon capitals and cedar-shaded shrines — Japan holds its old and new lives side by side.",
+  cities: [
+    {
+      name: "Tokyo",
+      slug: "tokyo",
+      wikidataId: "Q1490",
+      summary: "Thirteen million people, endless neighbourhoods, and shrines between the towers.",
+      lat: 35.6762,
+      lng: 139.6503,
+      places: [
+        {
+          name: "Sensō-ji",
+          slug: "senso-ji",
+          wikidataId: "Q615183",
+          kind: "culture",
+          summary: "Tokyo's oldest temple, approached through a lantern-hung shopping street.",
+          lat: 35.7148,
+          lng: 139.7967,
+          visitMinutes: 120,
+          bestMonths: [3, 4, 10, 11],
+          seasonNote: "Arrive before 8am to walk Nakamise-dōri before the crowds.",
+          collectibles: [
+            {
+              name: "Goshuin temple seal",
+              slug: "goshuin",
+              kind: "stamp",
+              description:
+                "Hand-brushed calligraphy and vermilion seal, written into a goshuinchō book while you wait.",
+              whereToGet: "Goshuin desk beside the main hall",
+              cost: 500,
+            },
+          ],
+          events: [
+            {
+              name: "Sanja Matsuri",
+              slug: "sanja-matsuri",
+              description:
+                "Asakusa's biggest festival: portable shrines carried through the streets by thousands of participants.",
+              startMonth: 5,
+            },
+          ],
+        },
+        {
+          name: "Meiji Jingū",
+          slug: "meiji-jingu",
+          wikidataId: "Q287165",
+          kind: "culture",
+          summary: "Shinto shrine inside a planted forest of 100,000 donated trees.",
+          lat: 35.6764,
+          lng: 139.6993,
+          visitMinutes: 90,
+          bestMonths: [3, 4, 5, 10, 11],
+          seasonNote: "The forest walk is coolest in the morning; irises flower in June.",
+        },
+        {
+          name: "Shinjuku Gyoen",
+          slug: "shinjuku-gyoen",
+          wikidataId: "Q776863",
+          kind: "nature",
+          summary: "Imperial garden blending English, French and Japanese landscape styles.",
+          lat: 35.6852,
+          lng: 139.71,
+          visitMinutes: 120,
+          bestMonths: [3, 4, 11],
+          seasonNote: "One of Tokyo's best cherry blossom spots, and late-turning maples in November.",
+          events: [
+            {
+              name: "Cherry blossom season",
+              slug: "hanami",
+              description:
+                "Over a thousand cherry trees of varying species, so the bloom lasts longer here than elsewhere in Tokyo.",
+              startMonth: 3,
+              endMonth: 4,
+            },
+          ],
+        },
+      ],
+    },
+    {
+      name: "Kyoto",
+      slug: "kyoto",
+      wikidataId: "Q34600",
+      summary: "Eleven centuries of capital city: temples, machiya townhouses and bamboo.",
+      lat: 35.0116,
+      lng: 135.7681,
+      places: [
+        {
+          name: "Fushimi Inari-taisha",
+          slug: "fushimi-inari",
+          wikidataId: "Q714828",
+          kind: "attraction",
+          summary: "Thousands of vermilion torii gates climbing the wooded slope of Mount Inari.",
+          lat: 34.9671,
+          lng: 135.7727,
+          visitMinutes: 180,
+          bestMonths: [3, 4, 10, 11],
+          seasonNote: "Go at dawn or after dusk — the lower gates are shoulder-to-shoulder by 10am.",
+          collectibles: [
+            {
+              name: "Fox omamori charm",
+              slug: "fox-omamori",
+              kind: "souvenir",
+              description:
+                "Embroidered charm bearing Inari's fox messenger, sold only at the shrine.",
+              whereToGet: "Shrine office near the main gate",
+              cost: 800,
+            },
+          ],
+        },
+        {
+          name: "Kinkaku-ji",
+          slug: "kinkaku-ji",
+          wikidataId: "Q270983",
+          kind: "culture",
+          summary: "Gold-leafed Zen pavilion mirrored in its reflecting pond.",
+          lat: 35.0394,
+          lng: 135.7292,
+          visitMinutes: 75,
+          bestMonths: [1, 4, 11],
+          seasonNote: "Extraordinary under snow in January, and framed by maples in November.",
+        },
+        {
+          name: "Arashiyama Bamboo Grove",
+          slug: "arashiyama-bamboo",
+          wikidataId: "Q23579173",
+          kind: "nature",
+          summary: "Path through towering bamboo that creaks and rattles in the wind.",
+          lat: 35.0095,
+          lng: 135.6669,
+          visitMinutes: 90,
+          bestMonths: [4, 5, 11],
+          seasonNote: "Best just after sunrise; the grove is a tunnel of people by mid-morning.",
+        },
+        {
+          name: "Nishiki Market",
+          slug: "nishiki-market",
+          wikidataId: "Q11650434",
+          kind: "food",
+          summary: "Five covered blocks of pickles, tofu, knives and street food.",
+          lat: 35.005,
+          lng: 135.7649,
+          visitMinutes: 90,
+          seasonNote: "Covered, so it works in any weather; many stalls close by 6pm.",
+        },
+      ],
+    },
+  ],
+};
+
+export default japan;

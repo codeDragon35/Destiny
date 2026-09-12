@@ -2,8 +2,11 @@ import { sql } from "drizzle-orm";
 import { client, db } from "./client";
 import type { SeedCountry } from "./seed-data/types";
 import china from "./seed-data/china";
+import japan from "./seed-data/japan";
+import india from "./seed-data/india";
+import italy from "./seed-data/italy";
 
-const COUNTRIES: SeedCountry[] = [china];
+const COUNTRIES: SeedCountry[] = [china, japan, india, italy];
 
 async function seedCountry(
   tx: Parameters<Parameters<typeof db.transaction>[0]>[0],

@@ -119,6 +119,15 @@ Step 4 of the product journey — the "special things" a traveller would otherwi
 off a place (`src/modules/souvenir/queries.ts`) and surface in two places: a "Don't miss" section on the city
 page, and inline under each place in a generated itinerary, so the plan says what to collect and where.
 
+Seed data lives in `src/db/seed-data/<country>.ts`, one file per country, collected in `seed.ts`. Adding a
+country is a new file plus one array entry.
+
+**Verify every Wikidata QID against its label and description before seeding it.** Name search is actively
+dangerous here: "Agra" returns a genus of insects, "Taj Mahal" a 1968 album, and plausible-looking guesses
+resolved to a German band, a French commune and a Swedish novelist. The SPARQL endpoint
+(`query.wikidata.org/sparql`) matching on `rdfs:label` with `wdt:P18` is far more reliable than
+`wbsearchentities`, and returns descriptions you can check.
+
 Seeded collectibles must be **real and verifiable** — a stamp table that does not exist sends someone
 hunting for it on the day. Each carries `where_to_get` for that reason. Kinds are stamp / passport /
 souvenir / book / badge.
@@ -175,9 +184,10 @@ render is not a security boundary.
 
 ## Country motifs
 
-`countries.motif` names a cultural decoration rendered by `src/components/Motif.tsx` — China is `dragon`, an
-animated SVG that draws itself in, then breathes. Adding a country's motif means adding a case in that one
-component; the pages that render it do not change.
+`countries.motif` names a cultural decoration rendered by `src/components/Motif.tsx`: `dragon` (China),
+`crane` (Japan), `peacock` (India), `laurel` (Italy). Each is an animated SVG that draws itself in. Adding a
+country's motif means adding a case in that one component; the pages that render it do not change. The same
+key also picks the ambient scale in `SoundToggle`, so a new motif needs an entry in both.
 
 `motif` belongs to **countries only**. A careless edit once added `c.motif` to `listCitiesForCountry`, where
 `c` aliases `cities`, and every country and passport page 500'd — beware shared table aliases when editing
