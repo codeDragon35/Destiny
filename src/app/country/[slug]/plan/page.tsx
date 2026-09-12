@@ -8,6 +8,7 @@ import {
 } from "@/modules/destination/queries";
 import { planTrip, type Interest } from "@/modules/trip/planner";
 import { saveTrip } from "@/modules/trip/queries";
+import { auth } from "@/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,7 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
 
     const plan = planTrip({ days, interests, placesByCity });
     const tripSlug = randomUUID().slice(0, 8);
+    const session = await auth();
     await saveTrip({
       countryId: target.id,
       slug: tripSlug,
@@ -54,6 +56,7 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
       dietary,
       budget,
       plan,
+      userId: session?.user?.id ?? null,
     });
 
     redirect(`/trip/${tripSlug}`);

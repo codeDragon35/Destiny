@@ -1,5 +1,6 @@
 import Link from "next/link";
 import GlobeShell from "@/components/GlobeShell";
+import AuthNav from "@/components/AuthNav";
 import { listCountries } from "@/modules/destination/queries";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +13,7 @@ export default async function HomePage() {
 
   return (
     <main className="relative h-dvh w-full overflow-hidden bg-space">
+      <AuthNav />
       <div className="absolute inset-0">
         <GlobeShell available={available} />
       </div>

@@ -22,9 +22,10 @@ export async function saveTrip(input: {
   dietary: string | null;
   budget: number | null;
   plan: unknown;
+  userId?: string | null;
 }) {
   await db.execute(sql`
-    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan)
+    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan, user_id)
     VALUES (
       ${input.countryId},
       ${input.slug},
@@ -32,9 +33,38 @@ export async function saveTrip(input: {
       ${sql`ARRAY[${sql.join(input.interests.map((i) => sql`${i}`), sql`, `)}]::trip_interest[]`},
       ${input.dietary},
       ${input.budget},
-      ${JSON.stringify(input.plan)}::jsonb
+      ${JSON.stringify(input.plan)}::jsonb,
+      ${input.userId ?? null}
     )
   `);
+}
+
+export async function listTripsForUser(userId: string) {
+  const rows = await db.execute<{
+    slug: string;
+    days: number;
+    countryName: string;
+    countryEmoji: string | null;
+    createdAt: string;
+    visited: number;
+    collected: number;
+  }>(sql`
+    SELECT
+      t.slug,
+      t.days,
+      c.name AS "countryName",
+      c.emoji AS "countryEmoji",
+      t.created_at AS "createdAt",
+      COUNT(pr.place_id)::int AS visited,
+      COUNT(pr.collectible_id)::int AS collected
+    FROM trips t
+    JOIN countries c ON c.id = t.country_id
+    LEFT JOIN trip_progress pr ON pr.trip_id = t.id
+    WHERE t.user_id = ${userId}
+    GROUP BY t.id, c.name, c.emoji
+    ORDER BY t.created_at DESC
+  `);
+  return [...rows];
 }
 
 export async function getTripBySlug(slug: string): Promise<SavedTrip | null> {

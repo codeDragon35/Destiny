@@ -112,6 +112,22 @@ Seeded collectibles must be **real and verifiable** — a stamp table that does 
 hunting for it on the day. Each carries `where_to_get` for that reason. Kinds are stamp / passport /
 souvenir / book / badge.
 
+## Auth
+
+Auth.js v5 with email magic links (`src/auth.ts`), sessions in Postgres via the Drizzle adapter. Trips carry
+`user_id`, and `/trips` lists a signed-in user's own trips.
+
+- **No SMTP needed locally**: without `EMAIL_SERVER_HOST`, `sendVerificationRequest` prints the sign-in link
+  to the server console instead of sending mail. Grab it from the dev log to sign in.
+- `AUTH_SECRET` lives in `.env.local` (gitignored). `.env.example` documents it with a blank value.
+- `next-auth@5 beta` pins `nodemailer` to **v7/v8** — installing v10 fails with an ERESOLVE conflict.
+- Auth tables use Auth.js's own camelCase column names (`userId`, `sessionToken`, `emailVerified`), unlike
+  the snake_case used everywhere else. They are defined separately in `src/db/auth-schema.ts`; do not
+  "fix" the casing.
+
+Trips planned while signed out still work and have a null `user_id` — anyone with the URL can open them.
+`trip_progress` is likewise keyed by trip, not user.
+
 ## Journey Book / passport
 
 Two steps, deliberately separate:
