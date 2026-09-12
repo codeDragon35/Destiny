@@ -1,0 +1,130 @@
+import { sql } from "drizzle-orm";
+import { db } from "@/db/client";
+
+export type Country = {
+  id: string;
+  code: string;
+  name: string;
+  slug: string;
+  summary: string | null;
+  emoji: string | null;
+};
+
+export type City = {
+  id: string;
+  name: string;
+  slug: string;
+  summary: string | null;
+  lat: number;
+  lng: number;
+  placeCount: number;
+};
+
+export type Place = {
+  id: string;
+  name: string;
+  slug: string;
+  kind: string;
+  summary: string | null;
+  lat: number;
+  lng: number;
+  visitMinutes: number | null;
+};
+
+export async function listCountries(): Promise<Country[]> {
+  const rows = await db.execute<Country>(sql`
+    SELECT id, code, name, slug, summary, emoji
+    FROM countries
+    ORDER BY name
+  `);
+  return [...rows];
+}
+
+export async function getCountryBySlug(slug: string): Promise<Country | null> {
+  const rows = await db.execute<Country>(sql`
+    SELECT id, code, name, slug, summary, emoji
+    FROM countries
+    WHERE slug = ${slug}
+    LIMIT 1
+  `);
+  return rows[0] ?? null;
+}
+
+export async function listCitiesForCountry(countryId: string): Promise<City[]> {
+  const rows = await db.execute<City>(sql`
+    SELECT
+      c.id,
+      c.name,
+      c.slug,
+      c.summary,
+      ST_Y(c.location) AS lat,
+      ST_X(c.location) AS lng,
+      COUNT(p.id)::int AS "placeCount"
+    FROM cities c
+    LEFT JOIN places p ON p.city_id = c.id
+    WHERE c.country_id = ${countryId}
+    GROUP BY c.id
+    ORDER BY c.name
+  `);
+  return [...rows];
+}
+
+export async function getCityBySlug(countryId: string, slug: string) {
+  const rows = await db.execute<Omit<City, "placeCount">>(sql`
+    SELECT
+      id,
+      name,
+      slug,
+      summary,
+      ST_Y(location) AS lat,
+      ST_X(location) AS lng
+    FROM cities
+    WHERE country_id = ${countryId} AND slug = ${slug}
+    LIMIT 1
+  `);
+  return rows[0] ?? null;
+}
+
+export async function listPlacesForCity(cityId: string): Promise<Place[]> {
+  const rows = await db.execute<Place>(sql`
+    SELECT
+      id,
+      name,
+      slug,
+      kind,
+      summary,
+      ST_Y(location) AS lat,
+      ST_X(location) AS lng,
+      visit_minutes AS "visitMinutes"
+    FROM places
+    WHERE city_id = ${cityId}
+    ORDER BY name
+  `);
+  return [...rows];
+}
+
+/** Places within `radiusMeters` of a point, nearest first. Backs map-driven discovery. */
+export async function listPlacesNear(
+  lat: number,
+  lng: number,
+  radiusMeters = 50_000,
+  limit = 20,
+): Promise<(Place & { distanceMeters: number })[]> {
+  const rows = await db.execute<Place & { distanceMeters: number }>(sql`
+    SELECT
+      id,
+      name,
+      slug,
+      kind,
+      summary,
+      ST_Y(location) AS lat,
+      ST_X(location) AS lng,
+      visit_minutes AS "visitMinutes",
+      ST_Distance(location::geography, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography) AS "distanceMeters"
+    FROM places
+    WHERE ST_DWithin(location::geography, ST_SetSRID(ST_MakePoint(${lng}, ${lat}), 4326)::geography, ${radiusMeters})
+    ORDER BY "distanceMeters"
+    LIMIT ${limit}
+  `);
+  return [...rows];
+}
