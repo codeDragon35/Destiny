@@ -47,7 +47,15 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
-        <h2 className="text-xs uppercase tracking-[0.35em] text-jade">Where to go</h2>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 className="text-xs uppercase tracking-[0.35em] text-jade">Where to go</h2>
+          <Link
+            href={`/country/${country.slug}/plan`}
+            className="rounded-full bg-jade px-6 py-2.5 text-sm font-medium text-space transition hover:bg-jade/90"
+          >
+            Plan a trip
+          </Link>
+        </div>
 
         <div className="mt-10 grid gap-6 md:grid-cols-6">
           {cities.map((city, i) => {

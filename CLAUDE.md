@@ -98,6 +98,23 @@ uniform card grid reads as a database table and was explicitly rejected.
 - Tailwind cannot see interpolated class names: `group-hover:${x}` silently produces no CSS. Store complete
   class strings (see the `KIND` map in the city page) instead of building them from fragments.
 
+## Trip planner
+
+`src/modules/trip/planner.ts` is deliberately **rules-based, not an LLM** — it packs places into days
+deterministically so the itinerary, schema and UI are testable without an API key or per-request cost. The
+LLM-backed orchestrator described below slots in behind the same `planTrip` interface when one is chosen.
+
+Rules the algorithm enforces, each of which is easy to regress:
+- A day never spans two cities, and never exceeds 8 hours of sightseeing.
+- No place appears twice in one trip.
+- Cities are ordered by how well they match the stated interests, so "nature" opens in Zhangjiajie and
+  "culture" opens in Beijing.
+- When the seeded places cannot fill the requested days, the plan reports `unfilledDays` and the UI says so
+  rather than silently returning a shorter trip.
+
+Generated plans are denormalised into `trips.plan` as JSON, so a saved itinerary stays stable even if the
+underlying places change.
+
 ## Product concept
 
 An AI-powered travel app that takes a user through discover → plan → experience → remember for a trip,

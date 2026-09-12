@@ -1,5 +1,6 @@
 import {
   geometry,
+  jsonb,
   index,
   integer,
   pgEnum,
@@ -15,6 +16,13 @@ import {
  * Distance/radius queries cast to ::geography so results come back in metres.
  */
 const point = (name: string) => geometry(name, { type: "point", srid: 4326 });
+
+export const tripInterest = pgEnum("trip_interest", [
+  "nature",
+  "culture",
+  "food",
+  "hidden_gem",
+]);
 
 export const placeKind = pgEnum("place_kind", [
   "attraction",
@@ -97,4 +105,23 @@ export const places = pgTable(
     index("places_location_idx").using("gist", t.location),
     index("places_kind_idx").on(t.kind),
   ],
+);
+
+export const trips = pgTable(
+  "trips",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    countryId: uuid("country_id")
+      .notNull()
+      .references(() => countries.id, { onDelete: "cascade" }),
+    slug: text("slug").notNull(),
+    days: integer("days").notNull(),
+    interests: tripInterest("interests").array().notNull(),
+    dietary: text("dietary"),
+    budget: integer("budget"),
+    /** Generated plan: [{ day, placeIds[] }]. Denormalised so a saved trip is stable. */
+    plan: jsonb("plan").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("trips_slug_idx").on(t.slug)],
 );
