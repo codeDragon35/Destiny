@@ -42,10 +42,20 @@ export default async function CityPage({
   if (!city) notFound();
 
   const places = await listPlacesForCity(city.id);
-  const [hero, ...placePhotos] = await Promise.all([
+  const [cityPhoto, ...placePhotos] = await Promise.all([
     getPhoto("cities", city.id, `${city.name}, ${country.name}`, city.wikidataId),
     ...places.map((p) => getPhoto("places", p.id, `${p.name}, ${city.name}`, p.wikidataId)),
   ]);
+
+  // A city's own Wikidata image is often a generic street or skyline shot; the
+  // landscape and landmark photos sell the destination far better.
+  const HERO_PRIORITY = ["nature", "attraction", "culture"];
+  const heroIndex = HERO_PRIORITY.flatMap((kind) =>
+    places.flatMap((p, i) => (p.kind === kind && placePhotos[i] ? [i] : [])),
+  )[0];
+  // Cards always keep their own photo: showing a city street shot on a mountain
+  // is worse than the hero repeating one image below it.
+  const hero = heroIndex === undefined ? cityPhoto : placePhotos[heroIndex];
 
   const totalHours = places.reduce((n, p) => n + (p.visitMinutes ?? 0), 0) / 60;
 
