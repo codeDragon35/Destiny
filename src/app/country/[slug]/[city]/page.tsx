@@ -85,7 +85,7 @@ export default async function CityPage({
           <div className="animate-float-in">
             <Link
               href={`/country/${country.slug}`}
-              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-jade"
+              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-ivory"
             >
               <span aria-hidden>←</span> {country.name}
             </Link>
@@ -105,7 +105,7 @@ export default async function CityPage({
       )}
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
-        <h2 className="flex items-center gap-4 text-xs uppercase tracking-[0.35em] text-jade">
+        <h2 className={`flex items-center gap-4 text-xs uppercase tracking-[0.35em] ${accent.text}`}>
           What to see
           <span className="h-px w-16 bg-gradient-to-r from-jade/60 to-transparent" />
         </h2>
