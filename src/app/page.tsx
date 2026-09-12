@@ -1,43 +1,47 @@
 import Link from "next/link";
+import GlobeShell from "@/components/GlobeShell";
 import { listCountries } from "@/modules/destination/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
   const countries = await listCountries();
+  const available = countries
+    .filter((c) => c.lat !== null && c.lng !== null)
+    .map((c) => ({ code: c.code, slug: c.slug, lat: c.lat!, lng: c.lng! }));
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <p className="text-sm uppercase tracking-[0.2em] text-jade">Destiny</p>
-      <h1 className="mt-3 text-4xl font-semibold text-ivory">Choose a country</h1>
-      <p className="mt-3 max-w-xl text-soft-gray">
-        Pick a destination to explore its cities, landmarks and hidden places.
-      </p>
+    <main className="relative h-dvh w-full overflow-hidden bg-space">
+      <div className="absolute inset-0">
+        <GlobeShell available={available} />
+      </div>
 
-      {countries.length === 0 ? (
-        <p className="mt-12 rounded-lg border border-midnight bg-midnight/40 p-6 text-soft-gray">
-          No countries seeded yet. Run <code className="text-gold">npm run db:seed</code>.
+      <div className="pointer-events-none absolute inset-x-0 top-0 p-6 sm:p-10">
+        <p className="text-xs uppercase tracking-[0.3em] text-jade">Destiny</p>
+        <h1 className="mt-3 max-w-md text-3xl font-semibold leading-tight text-ivory sm:text-4xl">
+          Choose a country
+        </h1>
+        <p className="mt-2 max-w-sm text-sm text-soft-gray">
+          Spin the globe and pick a destination to start your journey.
         </p>
-      ) : (
-        <ul className="mt-12 grid gap-4 sm:grid-cols-2">
+      </div>
+
+      {/* Keyboard-accessible equivalent of clicking the globe. */}
+      <nav className="absolute inset-x-0 bottom-0 p-6 sm:p-10">
+        <ul className="flex flex-wrap gap-3">
           {countries.map((country) => (
             <li key={country.id}>
               <Link
                 href={`/country/${country.slug}`}
-                className="block rounded-xl border border-white/5 bg-midnight p-6 transition hover:border-jade/60"
+                className="inline-flex items-center gap-2 rounded-full border border-jade/30 bg-midnight/80 px-4 py-2 text-sm text-ivory backdrop-blur transition hover:border-jade"
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{country.emoji}</span>
-                  <h2 className="text-xl font-medium text-ivory">{country.name}</h2>
-                </div>
-                {country.summary && (
-                  <p className="mt-3 text-sm leading-relaxed text-soft-gray">{country.summary}</p>
-                )}
+                <span>{country.emoji}</span>
+                {country.name}
               </Link>
             </li>
           ))}
         </ul>
-      )}
+      </nav>
     </main>
   );
 }

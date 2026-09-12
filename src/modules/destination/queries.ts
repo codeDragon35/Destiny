@@ -8,6 +8,9 @@ export type Country = {
   slug: string;
   summary: string | null;
   emoji: string | null;
+  /** Centroid of the country's cities; null until cities are seeded. */
+  lat: number | null;
+  lng: number | null;
 };
 
 export type City = {
@@ -33,9 +36,19 @@ export type Place = {
 
 export async function listCountries(): Promise<Country[]> {
   const rows = await db.execute<Country>(sql`
-    SELECT id, code, name, slug, summary, emoji
-    FROM countries
-    ORDER BY name
+    SELECT
+      c.id,
+      c.code,
+      c.name,
+      c.slug,
+      c.summary,
+      c.emoji,
+      ST_Y(ST_Centroid(ST_Collect(ct.location))) AS lat,
+      ST_X(ST_Centroid(ST_Collect(ct.location))) AS lng
+    FROM countries c
+    LEFT JOIN cities ct ON ct.country_id = c.id
+    GROUP BY c.id
+    ORDER BY c.name
   `);
   return [...rows];
 }

@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status
 
-The Destination slice is implemented and running: country list → country explore → city places, backed by
-PostgreSQL + PostGIS and seeded with China (Beijing, Xi'an, Zhangjiajie). Everything else described below —
-3D map, AI planning, passport, media, souvenirs — is still target architecture, not built yet.
+The Destination slice is implemented and running: a 3D globe home page → country explore → city places,
+backed by PostgreSQL + PostGIS and seeded with China (Beijing, Xi'an, Zhangjiajie). Everything else described
+below — AI planning, passport, media, souvenirs — is still target architecture, not built yet.
 
 ## Commands
 
@@ -53,6 +53,26 @@ The palette is defined once as Tailwind tokens in `tailwind.config.ts`; use the 
 | `mist` | `#DCE7E5` | Light backgrounds |
 
 The app is dark-first: `bg-space` + `text-ivory` are set on `body` in `globals.css`.
+
+## Globe
+
+The home page is a `react-globe.gl` / Three.js globe (`src/components/Globe.tsx`), loaded through
+`GlobeShell.tsx` with `dynamic(..., { ssr: false })` — Three.js touches `window`, so it must never render on
+the server. That indirection is also what keeps Three.js out of the initial bundle (home page is ~1.4 kB /
+108 kB First Load); import `Globe` directly and you lose that.
+
+- Country shapes come from `public/geo/countries.geojson` — Natural Earth 110m, stripped to `code` + `name` +
+  geometry and rounded to 2dp (819 KB → 169 KB). Regenerate rather than hand-edit if it needs changing.
+- Countries are matched to the DB by **ISO 3166-1 alpha-2** (`ISO_A2` → `countries.code`). Seeded countries
+  render in jade and are clickable; the rest are grey and inert.
+- The camera opens on the centroid of the first available country's cities (`ST_Centroid(ST_Collect(...))` in
+  `listCountries`), not the 0°/0° default — otherwise the only clickable country faces away from the user.
+- The globe canvas is not keyboard-accessible, so the bottom nav carries a plain `<Link>` per country as an
+  equivalent path. Keep it in step with what the globe offers.
+
+**Testing globe clicks:** Three.js's raycaster treats an instantaneous press+release as a drag, so
+`page.mouse.click()` in Puppeteer silently does nothing. Use `mouse.down()` → ~80ms pause → `mouse.up()`, and
+allow ~4-5s for the transition before concluding it failed.
 
 ## Product concept
 
