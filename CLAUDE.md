@@ -70,6 +70,11 @@ the server. That indirection is also what keeps Three.js out of the initial bund
 - The globe canvas is not keyboard-accessible, so the bottom nav carries a plain `<Link>` per country as an
   equivalent path. Keep it in step with what the globe offers.
 
+Props that take a Three.js object must be real instances, not object literals — `globeMaterial` is disposed
+on unmount, so a plain `{ color, opacity }` crashes with `material.dispose is not a function` the moment you
+navigate away. Build it with `new MeshPhongMaterial(...)` in a `useMemo`. Resist `as never`/`as any` on these
+props; the cast is what hides the error until runtime.
+
 **Testing globe clicks:** Three.js's raycaster treats an instantaneous press+release as a drag, so
 `page.mouse.click()` in Puppeteer silently does nothing. Use `mouse.down()` → ~80ms pause → `mouse.up()`, and
 allow ~4-5s for the transition before concluding it failed.

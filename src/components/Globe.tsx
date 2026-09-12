@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import GlobeGL, { type GlobeMethods } from "react-globe.gl";
+import { MeshPhongMaterial } from "three";
 
 type CountryFeature = {
   properties: { code: string; name: string };
@@ -22,6 +23,12 @@ export default function Globe({ available }: { available: GlobeCountry[] }) {
   const [features, setFeatures] = useState<CountryFeature[]>([]);
   const [hovered, setHovered] = useState<CountryFeature | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
+
+  // Must be a real Material: react-globe.gl calls .dispose() on unmount.
+  const globeMaterial = useMemo(
+    () => new MeshPhongMaterial({ color: MIDNIGHT, opacity: 0.95, transparent: true }),
+    [],
+  );
 
   const slugByCode = useMemo(
     () => new Map(available.map((c) => [c.code, c.slug])),
@@ -69,7 +76,7 @@ export default function Globe({ available }: { available: GlobeCountry[] }) {
           atmosphereColor={JADE}
           atmosphereAltitude={0.18}
           showGlobe
-          globeMaterial={{ color: MIDNIGHT, opacity: 0.95, transparent: true } as never}
+          globeMaterial={globeMaterial}
           polygonsData={features}
           polygonCapColor={(f) => {
             const feat = f as CountryFeature;
