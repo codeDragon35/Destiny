@@ -86,12 +86,16 @@ card spans full width), per-category colour, and hover lift. Keep that register 
 uniform card grid reads as a database table and was explicitly rejected.
 
 - **Photos** come from Wikimedia Commons via Wikidata (`src/modules/media/wikimedia.ts`) — no API key, no
-  usage cost. Each row caches its resolved `image_url` and `photo_fetched_at`, so a warm row makes no network
+  usage cost. They are served through `/api/image`, which refetches with a descriptive `User-Agent`:
+  Wikimedia answers hotlinking browsers with a ~2KB placeholder JPEG rather than an error, so images look
+  silently broken if the page links `commons.wikimedia.org` directly. The proxy only accepts
+  `https://commons.wikimedia.org/wiki/Special:FilePath/` URLs, never an arbitrary host. Each row caches its resolved `image_url` and `photo_fetched_at`, so a warm row makes no network
   call; refresh is every 30 days. A subject with no image records the attempt so it is not retried per render.
-- **Always seed `wikidata_id` for new places.** Name search is ambiguous and silently returns the wrong
-  subject — a bare "Muslim Quarter" resolves to *Jerusalem*, and "Jingshan Park" once resolved to an entity
-  meaning "inauguration". Look the QID up and verify its label/description before adding it. Rows without a
-  QID fall back to a deterministic gradient, which is correct behaviour — a wrong photo is worse than none.
+- **Always seed `wikidata_id` for new places.** Photos resolve *only* by explicit QID — name search is
+  ambiguous and silently returns the wrong subject ("Muslim Quarter" → *Jerusalem*, "Jingshan Park" → an
+  entity meaning "inauguration"), so that fallback was removed after it shipped a Jerusalem photo to a Xi'an
+  place. Look the QID up and verify its label before adding it; a row without one shows a gradient, which is
+  the correct outcome.
 - **Motion** is progressive enhancement only. `Reveal` starts *visible* and hides itself solely for elements
   below the fold — so content still renders if JS never runs, and nothing flickers on load. It also respects
   `prefers-reduced-motion`.

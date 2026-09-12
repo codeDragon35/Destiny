@@ -12,7 +12,9 @@ type Table = "places" | "cities" | "countries";
 
 function commonsUrl(file: string, width = 1600) {
   const name = encodeURIComponent(file.replace(/ /g, "_"));
-  return `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=${width}`;
+  const direct = `https://commons.wikimedia.org/wiki/Special:FilePath/${name}?width=${width}`;
+  // Proxied: Wikimedia returns a placeholder image to browsers hotlinking directly.
+  return `/api/image?url=${encodeURIComponent(direct)}`;
 }
 
 async function wd<T>(url: string): Promise<T | null> {
@@ -38,19 +40,6 @@ async function imageFileFor(qid: string) {
 }
 
 /**
- * Resolves a Wikidata QID by search. Queries must stay geographically qualified —
- * a bare "Muslim Quarter" resolves to Jerusalem, not Xi'an.
- */
-async function findQid(query: string) {
-  const data = await wd<{ search?: { id: string }[] }>(
-    `https://www.wikidata.org/w/api.php?action=wbsearchentities&search=${encodeURIComponent(
-      query,
-    )}&language=en&format=json&limit=1&origin=*`,
-  );
-  return data?.search?.[0]?.id ?? null;
-}
-
-/**
  * Returns a Wikimedia Commons photo for one row, resolved at most once every
  * REFRESH_AFTER_DAYS. Results are cached in the row, so warm rows make no network call.
  * `wikidataId` skips the ambiguous search step entirely when known.
@@ -58,7 +47,7 @@ async function findQid(query: string) {
 export async function getPhoto(
   table: Table,
   id: string,
-  query: string,
+  _query: string,
   wikidataId?: string | null,
 ): Promise<Photo | null> {
   const rows = await db.execute<{
@@ -82,7 +71,10 @@ export async function getPhoto(
     return { url: row.image_url, credit: row.image_credit };
   }
 
-  const qid = wikidataId ?? (await findQid(query));
+  // Only ever resolve by explicit QID. Name search silently returns the wrong
+  // subject — "Muslim Quarter" resolves to Jerusalem — and a confidently wrong
+  // photo is worse than none.
+  const qid = wikidataId ?? null;
   const file = qid ? await imageFileFor(qid) : null;
 
   if (!file) {
