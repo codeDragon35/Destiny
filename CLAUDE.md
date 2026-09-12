@@ -178,18 +178,23 @@ these queries.
 **off by default and opt-in**, persisted in `localStorage`: browsers block autoplay, and unrequested sound is
 hostile. Keep it that way.
 
-## Planned: seasonality and events
+## Seasonality and events
 
-Requested, not yet built. Two related ideas:
+Trips carry an optional `start_date`; its month drives two things in the itinerary:
 
-- **Best time to visit** — each place should carry which months are worth going (the Great Wall in autumn,
-  Zhangjiajie outside monsoon). The trip planner already takes trip dates implicitly via `days`; it should
-  take an actual travel date and warn or reorder when a place is badly timed.
-- **Events** — places should carry dated events (festivals, seasonal openings, light shows), surfaced on the
-  place and city pages and folded into the itinerary for the user's dates.
+- **Timing warnings** — a place whose `best_months` excludes the travel month shows "Better in ..." with its
+  `season_note`. A July trip to China raises 8 warnings; an October one raises none.
+- **Catchable events** — `events` rows are filtered to those overlapping the travel month, so an October trip
+  surfaces autumn foliage while a July trip surfaces nothing.
 
-Present both the way the rest of the app presents things: real photography, sparkle/reveal animation, and the
-gold accent used for collectibles — not a bare table of dates.
+City pages show all events regardless of date under "While you're there".
+
+`monthInRange` handles ranges that **wrap the new year** (a Dec–Feb festival must match January). Keep that
+behaviour if you touch it — the obvious `start <= m && m <= end` comparison silently breaks those events.
+
+Seeded seasons and events must be **real**: sending someone to a festival that does not exist, or telling
+them to avoid a month for no reason, is worse than saying nothing. Places without a genuine season simply
+omit `best_months`.
 
 ## Trip planner
 

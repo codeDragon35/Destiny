@@ -3,6 +3,13 @@ import { notFound } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import { getTripBySlug } from "@/modules/trip/queries";
 import { collectiblesByPlaceIds } from "@/modules/souvenir/queries";
+import {
+  eventsForPlaces,
+  seasonalityForPlaces,
+  formatRange,
+  monthInRange,
+  monthName,
+} from "@/modules/destination/seasons";
 import { kindOf } from "@/components/CollectibleBadge";
 
 export const dynamic = "force-dynamic";
@@ -38,6 +45,15 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
     days.flatMap((d) => d.places.map((p) => p.id)),
   );
   const collectibleCount = [...collectibles.values()].reduce((n, list) => n + list.length, 0);
+
+  const placeIds = days.flatMap((d) => d.places.map((p) => p.id));
+  const [seasons, events] = await Promise.all([
+    seasonalityForPlaces(placeIds),
+    eventsForPlaces(placeIds),
+  ]);
+
+  // Month of travel drives both the "bad timing" warnings and which events are catchable.
+  const travelMonth = trip.startDate ? new Date(trip.startDate).getUTCMonth() + 1 : null;
   const totalPlaces = days.reduce((n, d) => n + d.places.length, 0);
   const cities = [...new Set(days.map((d) => d.cityName))];
 
@@ -64,6 +80,19 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
             <>
               <span className="text-soft-gray/40">·</span>
               <span className="text-gold">{collectibleCount} to collect</span>
+            </>
+          )}
+          {trip.startDate && (
+            <>
+              <span className="text-soft-gray/40">·</span>
+              <span className="text-mist">
+                {new Date(trip.startDate).toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                  timeZone: "UTC",
+                })}
+              </span>
             </>
           )}
           {trip.dietary && (
@@ -122,6 +151,39 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                             {place.summary}
                           </p>
                         )}
+                        {travelMonth &&
+                          (() => {
+                            const season = seasons.get(place.id);
+                            const best = season?.bestMonths;
+                            if (!best || best.length === 0 || best.includes(travelMonth)) return null;
+                            return (
+                              <p className="mt-2 text-sm text-coral">
+                                <span aria-hidden>△</span> Better in{" "}
+                                {best.map(monthName).join(", ")}
+                                {season?.seasonNote && (
+                                  <span className="block text-xs text-soft-gray">
+                                    {season.seasonNote}
+                                  </span>
+                                )}
+                              </p>
+                            );
+                          })()}
+
+                        {(events.get(place.id) ?? [])
+                          .filter(
+                            (ev) =>
+                              travelMonth === null ||
+                              monthInRange(travelMonth, ev.startMonth, ev.endMonth),
+                          )
+                          .map((ev) => (
+                            <p key={ev.id} className="mt-2 text-sm text-jade">
+                              <span aria-hidden>✦</span> {ev.name}{" "}
+                              <span className="text-xs text-soft-gray">
+                                {formatRange(ev.startMonth, ev.endMonth)}
+                              </span>
+                            </p>
+                          ))}
+
                         {(collectibles.get(place.id) ?? []).map((item) => (
                           <p
                             key={item.id}

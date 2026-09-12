@@ -13,6 +13,7 @@ export type SavedTrip = {
   countryName: string;
   countrySlug: string;
   userId: string | null;
+  startDate: string | null;
 };
 
 export async function saveTrip(input: {
@@ -24,9 +25,10 @@ export async function saveTrip(input: {
   budget: number | null;
   plan: unknown;
   userId?: string | null;
+  startDate?: string | null;
 }) {
   await db.execute(sql`
-    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan, user_id)
+    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan, user_id, start_date)
     VALUES (
       ${input.countryId},
       ${input.slug},
@@ -35,7 +37,8 @@ export async function saveTrip(input: {
       ${input.dietary},
       ${input.budget},
       ${JSON.stringify(input.plan)}::jsonb,
-      ${input.userId ?? null}
+      ${input.userId ?? null},
+      ${input.startDate ?? null}::date
     )
   `);
 }
@@ -73,6 +76,7 @@ export async function getTripBySlug(slug: string): Promise<SavedTrip | null> {
     SELECT
       t.id, t.slug, t.days, t.interests, t.dietary, t.budget, t.plan,
       t.user_id AS "userId",
+      t.start_date AS "startDate",
       c.name AS "countryName", c.slug AS "countrySlug"
     FROM trips t
     JOIN countries c ON c.id = t.country_id

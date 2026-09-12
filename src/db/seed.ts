@@ -10,10 +10,24 @@ type SeedCollectible = {
   cost?: number;
 };
 
+type SeedEvent = {
+  name: string;
+  slug: string;
+  description: string;
+  startMonth: number;
+  startDay?: number;
+  endMonth?: number;
+  endDay?: number;
+};
+
 type SeedPlace = {
   name: string;
   slug: string;
   wikidataId?: string;
+  /** Months (1-12) genuinely worth visiting; omit when the place is year-round. */
+  bestMonths?: number[];
+  seasonNote?: string;
+  events?: SeedEvent[];
   collectibles?: SeedCollectible[];
   kind: "attraction" | "nature" | "culture" | "food" | "hidden_gem";
   summary: string;
@@ -52,6 +66,19 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Great Wall at Mutianyu",
           slug: "great-wall-mutianyu",
+          events: [
+            {
+              name: "Autumn foliage on the ramparts",
+              slug: "autumn-foliage",
+              description:
+                "The forested slopes below Mutianyu turn red and gold — the most photogenic weeks on this section.",
+              startMonth: 10,
+              endMonth: 11,
+            },
+          ],
+          bestMonths: [4, 5, 9, 10],
+          seasonNote:
+            "Spring and autumn are clear and mild; midsummer is hazy and crowded, winter sections can ice over.",
           collectibles: [
             {
               name: "Great Wall climbing certificate",
@@ -73,6 +100,8 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Forbidden City",
           slug: "forbidden-city",
+          bestMonths: [4, 5, 9, 10],
+          seasonNote: "Shoulder seasons avoid both summer crowds and Beijing's winter cold.",
           collectibles: [
             {
               name: "Palace Museum seal stamp",
@@ -93,6 +122,18 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Temple of Heaven",
           slug: "temple-of-heaven",
+          events: [
+            {
+              name: "Spring Festival temple fair",
+              slug: "spring-festival-fair",
+              description:
+                "Lunar New Year fair with a re-enactment of the imperial heaven-worship ceremony, plus food and folk performance stalls.",
+              startMonth: 1,
+              endMonth: 2,
+            },
+          ],
+          bestMonths: [4, 5, 9, 10],
+          seasonNote: "Come early: the surrounding park fills with morning tai chi and music.",
           collectibles: [
             {
               name: "Temple of Heaven commemorative ticket",
@@ -114,6 +155,18 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Jingshan Park",
           slug: "jingshan-park",
+          events: [
+            {
+              name: "Peony season",
+              slug: "peony-season",
+              description:
+                "Hundreds of peony varieties flower across the hillside — the park's busiest and most photographed weeks.",
+              startMonth: 4,
+              endMonth: 5,
+            },
+          ],
+          bestMonths: [3, 4, 10, 11],
+          seasonNote: "Peonies in spring, golden foliage in late autumn over the Forbidden City rooftops.",
       wikidataId: "Q734499",
           kind: "hidden_gem",
           summary: "Hilltop pavilion with the best rooftop view over the Forbidden City.",
@@ -134,6 +187,8 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Terracotta Army",
           slug: "terracotta-army",
+          bestMonths: [3, 4, 5, 9, 10],
+          seasonNote: "The pits are covered, so weather matters less than crowds — avoid national holidays.",
           collectibles: [
             {
               name: "Warrior replica figurine",
@@ -155,6 +210,18 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Xi'an City Wall",
           slug: "xian-city-wall",
+          events: [
+            {
+              name: "City Wall lantern festival",
+              slug: "lantern-festival",
+              description:
+                "The ramparts are lit with thousands of lanterns through the Lunar New Year period.",
+              startMonth: 1,
+              endMonth: 2,
+            },
+          ],
+          bestMonths: [4, 5, 9, 10],
+          seasonNote: "Cycling the 14km circuit is punishing in July heat.",
       wikidataId: "Q1334336",
           kind: "culture",
           summary: "Intact Ming fortification you can cycle the full 14km circuit of.",
@@ -165,6 +232,7 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Muslim Quarter",
           slug: "muslim-quarter",
+          seasonNote: "Busiest and best after dark, year-round.",
           kind: "food",
           summary: "Night food streets: hand-pulled noodles, roujiamo and persimmon cakes.",
           lat: 34.2667,
@@ -184,6 +252,19 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Zhangjiajie National Forest Park",
           slug: "zhangjiajie-national-forest-park",
+          events: [
+            {
+              name: "Autumn colour season",
+              slug: "autumn-colour",
+              description:
+                "Clearest skies of the year and turning foliage between the sandstone pillars.",
+              startMonth: 10,
+              endMonth: 11,
+            },
+          ],
+          bestMonths: [4, 5, 9, 10],
+          seasonNote:
+            "Avoid June-August monsoon rain; autumn brings the clearest views of the pillars.",
           collectibles: [
             {
               name: "Park passport booklet",
@@ -205,6 +286,8 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Tianmen Mountain",
           slug: "tianmen-mountain",
+          bestMonths: [4, 5, 9, 10],
+          seasonNote: "The glass walkway closes in ice and heavy cloud; clear autumn days are best.",
           collectibles: [
             {
               name: "Heaven's Gate 999 steps badge",
@@ -255,7 +338,7 @@ async function main() {
 
       for (const place of city.places) {
         const [insertedPlace] = await tx.execute<{ id: string }>(sql`
-          INSERT INTO places (city_id, name, slug, kind, summary, location, visit_minutes, wikidata_id)
+          INSERT INTO places (city_id, name, slug, kind, summary, location, visit_minutes, wikidata_id, best_months, season_note)
           VALUES (
             ${inserted.id},
             ${place.name},
@@ -264,10 +347,28 @@ async function main() {
             ${place.summary},
             ST_SetSRID(ST_MakePoint(${place.lng}, ${place.lat}), 4326),
             ${place.visitMinutes},
-            ${place.wikidataId ?? null}
+            ${place.wikidataId ?? null},
+            ${place.bestMonths ? sql`ARRAY[${sql.join(place.bestMonths.map((m) => sql`${m}`), sql`, `)}]::smallint[]` : null},
+            ${place.seasonNote ?? null}
           )
           RETURNING id
         `);
+
+        for (const ev of place.events ?? []) {
+          await tx.execute(sql`
+            INSERT INTO events (place_id, name, slug, description, start_month, start_day, end_month, end_day)
+            VALUES (
+              ${insertedPlace.id},
+              ${ev.name},
+              ${ev.slug},
+              ${ev.description},
+              ${ev.startMonth},
+              ${ev.startDay ?? null},
+              ${ev.endMonth ?? null},
+              ${ev.endDay ?? null}
+            )
+          `);
+        }
 
         for (const item of place.collectibles ?? []) {
           await tx.execute(sql`

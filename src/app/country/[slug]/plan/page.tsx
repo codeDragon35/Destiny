@@ -33,6 +33,7 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
     const picked = INTERESTS.map((i) => i.value).filter((v) => formData.get(v) === "on");
     const interests = picked.length > 0 ? picked : (["culture"] as Interest[]);
     const dietary = (formData.get("dietary") as string)?.trim() || null;
+    const startDate = (formData.get("startDate") as string)?.trim() || null;
     const budgetRaw = Number(formData.get("budget"));
     const budget = Number.isFinite(budgetRaw) && budgetRaw > 0 ? Math.round(budgetRaw) : null;
 
@@ -57,6 +58,7 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
       budget,
       plan,
       userId: session?.user?.id ?? null,
+      startDate,
     });
 
     redirect(`/trip/${tripSlug}`);
@@ -93,6 +95,21 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
               max={30}
               defaultValue={5}
               className="mt-3 w-32 rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory outline-none transition focus:border-jade"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="startDate" className="block text-sm font-medium text-ivory">
+              When are you going? <span className="text-soft-gray">(optional)</span>
+            </label>
+            <p className="mt-1 text-xs text-soft-gray/70">
+              We&apos;ll flag places that are badly timed and festivals you could catch.
+            </p>
+            <input
+              id="startDate"
+              name="startDate"
+              type="date"
+              className="mt-3 rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory outline-none transition focus:border-jade [color-scheme:dark]"
             />
           </div>
 

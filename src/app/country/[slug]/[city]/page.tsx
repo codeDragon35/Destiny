@@ -9,7 +9,9 @@ import {
 } from "@/modules/destination/queries";
 import { getPhoto } from "@/modules/media/wikimedia";
 import { listCollectiblesForCity } from "@/modules/souvenir/queries";
+import { eventsForCity, formatRange } from "@/modules/destination/seasons";
 import CollectibleBadge from "@/components/CollectibleBadge";
+import Sparkles from "@/components/Sparkles";
 
 export const dynamic = "force-dynamic";
 
@@ -45,6 +47,7 @@ export default async function CityPage({
 
   const places = await listPlacesForCity(city.id);
   const collectibles = await listCollectiblesForCity(city.id);
+  const events = await eventsForCity(city.id);
   const [cityPhoto, ...placePhotos] = await Promise.all([
     getPhoto("cities", city.id, `${city.name}, ${country.name}`, city.wikidataId),
     ...places.map((p) => getPhoto("places", p.id, `${p.name}, ${city.name}`, p.wikidataId)),
@@ -136,6 +139,38 @@ export default async function CityPage({
           })}
         </div>
       </section>
+
+      {events.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 pb-4 sm:px-10">
+          <h2 className="text-xs uppercase tracking-[0.35em] text-coral">While you&apos;re there</h2>
+          <p className="mt-3 max-w-xl text-sm text-soft-gray">
+            Festivals and seasons worth timing a visit around.
+          </p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2">
+            {events.map((ev, i) => (
+              <Reveal key={ev.id} delay={i * 70} className="h-full">
+                <article className="relative h-full overflow-hidden rounded-xl border border-coral/25 bg-coral/[0.04] p-5">
+                  <Sparkles />
+                  <div className="relative">
+                    <div className="flex flex-wrap items-baseline gap-x-3">
+                      <span className="text-xs uppercase tracking-[0.2em] text-coral">
+                        {formatRange(ev.startMonth, ev.endMonth)}
+                      </span>
+                      <span className="text-xs text-soft-gray/70">{ev.placeName}</span>
+                    </div>
+                    <h3 className="mt-2 text-ivory">{ev.name}</h3>
+                    {ev.description && (
+                      <p className="mt-2 text-sm leading-relaxed text-soft-gray">
+                        {ev.description}
+                      </p>
+                    )}
+                  </div>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
 
       {collectibles.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
