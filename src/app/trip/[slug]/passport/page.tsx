@@ -99,7 +99,7 @@ export default async function PassportPage({
           <Link href={`/trip/${slug}`} className="text-sm text-soft-gray transition hover:text-jade">
             ← Itinerary
           </Link>
-          <SoundToggle />
+          <SoundToggle motif={country?.motif} />
         </div>
 
         <header className="relative mt-10 overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/[0.10] via-midnight to-space p-8 shadow-2xl shadow-gold/5 sm:p-12">

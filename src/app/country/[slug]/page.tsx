@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/Reveal";
 import Motif from "@/components/Motif";
+import SoundToggle from "@/components/SoundToggle";
 import { getCountryBySlug, listCitiesForCountry } from "@/modules/destination/queries";
 import { getPhoto } from "@/modules/media/wikimedia";
 
@@ -22,7 +23,11 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
   const totalPlaces = cities.reduce((n, c) => n + c.placeCount, 0);
 
   return (
-    <main className="min-h-dvh bg-space">
+    <main className="relative min-h-dvh bg-space">
+      <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
+        <SoundToggle motif={country.motif} />
+      </div>
+
       <Hero
         title={country.name}
         summary={country.summary}

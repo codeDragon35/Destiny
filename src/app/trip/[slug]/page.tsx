@@ -11,6 +11,11 @@ import {
   monthName,
 } from "@/modules/destination/seasons";
 import { kindOf } from "@/components/CollectibleBadge";
+import { getPhoto } from "@/modules/media/wikimedia";
+import { getCountryBySlug } from "@/modules/destination/queries";
+import Hero from "@/components/Hero";
+import Motif from "@/components/Motif";
+import SoundToggle from "@/components/SoundToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -54,25 +59,53 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
 
   // Month of travel drives both the "bad timing" warnings and which events are catchable.
   const travelMonth = trip.startDate ? new Date(trip.startDate).getUTCMonth() + 1 : null;
+
+  const allPlaces = days.flatMap((d) => d.places);
+  const photoList = await Promise.all(
+    allPlaces.map((pl) => getPhoto("places", pl.id, pl.name, pl.wikidataId).catch(() => null)),
+  );
+  const photos = new Map(allPlaces.map((pl, i) => [pl.id, photoList[i]]));
+  const country = await getCountryBySlug(trip.countrySlug);
+  // Lead with the most striking place on the trip, as the city pages do.
+  const heroPhoto =
+    photoList.find((photo, i) => photo && allPlaces[i].kind === "nature") ??
+    photoList.find(Boolean) ??
+    null;
   const totalPlaces = days.reduce((n, d) => n + d.places.length, 0);
   const cities = [...new Set(days.map((d) => d.cityName))];
 
   return (
-    <main className="min-h-dvh bg-space">
-      <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-24">
-        <Link
-          href={`/country/${trip.countrySlug}`}
-          className="text-sm text-soft-gray transition hover:text-jade"
-        >
-          ← {trip.countryName}
-        </Link>
+    <main className="relative min-h-dvh bg-space">
+      <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
+        <SoundToggle motif={country?.motif} />
+      </div>
 
-        <p className="mt-10 text-xs uppercase tracking-[0.35em] text-jade">Your itinerary</p>
-        <h1 className="mt-4 text-4xl font-semibold leading-tight text-ivory sm:text-5xl">
-          {days.length} days in {trip.countryName}
-        </h1>
+      <Hero
+        title={`${days.length} days in ${trip.countryName}`}
+        photo={heroPhoto}
+        seed={trip.slug}
+        height="h-[42vh]"
+        kicker={
+          <div className="animate-float-in">
+            <Link
+              href={`/country/${trip.countrySlug}`}
+              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-jade"
+            >
+              <span aria-hidden>←</span> {trip.countryName}
+            </Link>
+            <p className="mt-5 text-xs uppercase tracking-[0.35em] text-jade">Your itinerary</p>
+          </div>
+        }
+      />
 
-        <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-soft-gray">
+      {country?.motif && (
+        <div className="mx-auto max-w-3xl px-6 pt-8 sm:px-10">
+          <Motif motif={country.motif} className="motif-float mx-auto h-16 w-full opacity-70" />
+        </div>
+      )}
+
+      <div className="mx-auto max-w-3xl px-6 py-12 sm:px-10">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-soft-gray">
           <span>{cities.join(" → ")}</span>
           <span className="text-soft-gray/40">·</span>
           <span>{totalPlaces} places</span>
@@ -134,7 +167,19 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
 
                   <ul className="divide-y divide-white/5">
                     {day.places.map((place) => (
-                      <li key={place.id} className="px-6 py-4">
+                      <li key={place.id} className="flex gap-4 px-6 py-4">
+                        <div className="hidden h-20 w-28 shrink-0 overflow-hidden rounded-lg sm:block">
+                          {photos.get(place.id) ? (
+                            <img
+                              src={photos.get(place.id)!.url}
+                              alt=""
+                              className="h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-gradient-to-br from-space to-midnight" />
+                          )}
+                        </div>
+                        <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                           <span className="text-ivory">{place.name}</span>
                           <span className={`text-xs ${KIND_COLOR[place.kind] ?? "text-soft-gray"}`}>
@@ -196,6 +241,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                             )}
                           </p>
                         ))}
+                        </div>
                       </li>
                     ))}
                   </ul>

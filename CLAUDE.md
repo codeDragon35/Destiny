@@ -174,9 +174,27 @@ these queries.
 
 ## Ambient sound
 
-`SoundToggle` synthesises a slow pentatonic drone through WebAudio, so the repo ships no audio files. It is
-**off by default and opt-in**, persisted in `localStorage`: browsers block autoplay, and unrequested sound is
-hostile. Keep it that way.
+`SoundToggle` synthesises sparse plucked notes through WebAudio — no audio files ship. The scale is chosen by
+the country's `motif`, so each destination sounds different: China uses a gong pentatonic, and the map in the
+component holds the others. Pass `motif` wherever the toggle is rendered; without it you get the generic
+fallback, which was the original flat drone and is not good enough on its own.
+
+It is **off by default and opt-in**, persisted in `localStorage`: browsers block autoplay, and unrequested
+sound is hostile. Keep it that way.
+
+## No page should feel flat
+
+Every page carries the same devices, and a page missing them reads as unfinished — the itinerary shipped as
+plain text blocks once and had to be rebuilt. A page needs:
+
+- **Photography** — a `Hero` and per-item images, never text alone on a dark ground.
+- **Animation** — `Reveal` on lists, `motif-float`, stamp and draw animations. All respect
+  `prefers-reduced-motion`.
+- **Sparkles** — `StarField` sits in the root layout as a fixed, `-z-10` backdrop on every page; `Sparkles`
+  marks individual earned or seasonal items.
+- **The country motif** — `Motif` renders the country's animated emblem. It needs the country row, so a page
+  showing a trip must load it via `getCountryBySlug(trip.countrySlug)`.
+- **The sound toggle**, wired to that same motif.
 
 ## Seasonality and events
 

@@ -12,6 +12,8 @@ import { listCollectiblesForCity } from "@/modules/souvenir/queries";
 import { eventsForCity, formatRange } from "@/modules/destination/seasons";
 import CollectibleBadge from "@/components/CollectibleBadge";
 import Sparkles from "@/components/Sparkles";
+import SoundToggle from "@/components/SoundToggle";
+import Motif from "@/components/Motif";
 
 export const dynamic = "force-dynamic";
 
@@ -66,7 +68,11 @@ export default async function CityPage({
   const totalHours = places.reduce((n, p) => n + (p.visitMinutes ?? 0), 0) / 60;
 
   return (
-    <main className="min-h-dvh bg-space">
+    <main className="relative min-h-dvh bg-space">
+      <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
+        <SoundToggle motif={country.motif} />
+      </div>
+
       <Hero
         title={city.name}
         summary={city.summary}
@@ -88,6 +94,12 @@ export default async function CityPage({
           </div>
         }
       />
+
+      {country.motif && (
+        <div className="mx-auto max-w-6xl px-6 pt-10 sm:px-10">
+          <Motif motif={country.motif} className="motif-float mx-auto h-20 w-full max-w-2xl opacity-85" />
+        </div>
+      )}
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
         <h2 className="text-xs uppercase tracking-[0.35em] text-jade">What to see</h2>
