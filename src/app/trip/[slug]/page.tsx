@@ -145,10 +145,10 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
 
         <div className="mt-12 flex flex-wrap items-center gap-4">
           <Link
-            href={`/trip/${trip.slug}/passport`}
+            href={`/trip/${trip.slug}/collect`}
             className="rounded-full bg-gold px-6 py-2.5 text-sm font-medium text-space transition hover:bg-gold/90"
           >
-            Open travel passport
+            Create my passport
           </Link>
           <Link
             href={`/country/${trip.countrySlug}/plan`}

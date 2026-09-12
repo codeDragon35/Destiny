@@ -110,9 +110,23 @@ souvenir / book / badge.
 
 ## Journey Book / passport
 
-`/trip/[slug]/passport` composes a finished trip into the Journey Book from step 6: one chapter per city,
-places and collectibles as a checklist you stamp as you go. Progress lives in `trip_progress`, one row per
-ticked item, keyed by trip — so a passport is shareable by URL and needs no login.
+Two steps, deliberately separate:
+
+1. `/trip/[slug]/collect` — the user ticks what they actually saw and collected.
+2. `/trip/[slug]/passport` — the finished keepsake, **read-only**.
+
+Keep that split. The passport is a reveal, so it must not contain checkboxes; editing happens on the collect
+step and `setProgress` replaces the whole selection in one transaction. Progress lives in `trip_progress`,
+keyed by trip — so a passport is shareable by URL and needs no login.
+
+The passport carries place photos, a route map, animated stamps and sparkles. `RouteMap` draws the country
+outline from the same `public/geo/countries.geojson` the globe uses and plots city coordinates from PostGIS —
+no map library or API key. Its projection corrects for latitude (`cos(midLat)`), without which countries far
+from the equator look horizontally stretched.
+
+**Screenshotting the passport needs patience**: `.route-stop` markers start at `opacity: 0` with delays up to
+~1.7s, and Wikimedia photos are ~1MB each. Wait for `networkidle2`, then for images to decode, then ~4s more —
+otherwise the map looks empty and the cards look broken when they are both fine.
 
 There is no auth yet, so **anyone with the URL can tick items**. That is fine for an unguessable slug and a
 personal trip, but revisit it before trips belong to accounts.

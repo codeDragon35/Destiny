@@ -17,6 +17,28 @@ export async function getProgress(tripId: string): Promise<Progress> {
   return { places, collectibles };
 }
 
+/** Replaces a trip's whole selection in one transaction. */
+export async function setProgress(
+  tripId: string,
+  placeIds: string[],
+  collectibleIds: string[],
+) {
+  await db.transaction(async (tx) => {
+    await tx.execute(sql`DELETE FROM trip_progress WHERE trip_id = ${tripId}`);
+
+    for (const id of placeIds) {
+      await tx.execute(sql`
+        INSERT INTO trip_progress (trip_id, place_id) VALUES (${tripId}, ${id}::uuid)
+      `);
+    }
+    for (const id of collectibleIds) {
+      await tx.execute(sql`
+        INSERT INTO trip_progress (trip_id, collectible_id) VALUES (${tripId}, ${id}::uuid)
+      `);
+    }
+  });
+}
+
 /** Ticks an item on or off. `kind` decides which column the id lands in. */
 export async function toggleProgress(
   tripId: string,

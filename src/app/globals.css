@@ -33,3 +33,95 @@
     animation: float-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 }
+
+/* Route line draws itself across the map. */
+@keyframes draw-route {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes stop-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
+  }
+  70% {
+    transform: scale(1.25);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.4) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1) rotate(180deg);
+  }
+}
+
+@keyframes stamp-in {
+  0% {
+    opacity: 0;
+    transform: scale(1.7) rotate(-14deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.94) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(-6deg);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    background-position: -180% 0;
+  }
+  to {
+    background-position: 180% 0;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .route-line {
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: draw-route 2.6s ease-out 0.4s forwards;
+  }
+
+  .route-stop {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: stop-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .sparkle {
+    animation: sparkle 2.4s ease-in-out infinite;
+  }
+
+  .stamp-in {
+    animation: stamp-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .passport-title {
+    background: linear-gradient(
+      100deg,
+      #F7F4EA 30%,
+      #F4C95D 45%,
+      #F7F4EA 60%
+    );
+    background-size: 180% auto;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: shimmer 5s linear infinite;
+  }
+}

@@ -1,11 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import Reveal from "@/components/Reveal";
 import { kindOf } from "@/components/CollectibleBadge";
 import { getTripBySlug } from "@/modules/trip/queries";
 import { collectiblesByPlaceIds, type Collectible } from "@/modules/souvenir/queries";
-import { getProgress, toggleProgress } from "@/modules/passport/queries";
+import { getProgress } from "@/modules/passport/queries";
+import { getPhoto } from "@/modules/media/wikimedia";
+import { listCitiesForCountry, getCountryBySlug } from "@/modules/destination/queries";
+import RouteMap from "@/components/RouteMap";
+import Sparkles from "@/components/Sparkles";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +17,8 @@ type CityChapter = {
   places: { id: string; name: string; kind: string; summary: string | null }[];
   collectibles: Collectible[];
 };
+
+type PlacePhoto = { url: string } | null;
 
 export default async function PassportPage({
   params,
@@ -52,20 +57,36 @@ export default async function PassportPage({
     chapters.set(day.cityName, chapter);
   }
 
+  // Photos for every place in the book, plus city coordinates for the route map.
+  const country = await getCountryBySlug(trip.countrySlug);
+  const cityRows = country ? await listCitiesForCountry(country.id) : [];
+  const cityByName = new Map(cityRows.map((c) => [c.name, c]));
+
+  const allPlaces = [...chapters.values()].flatMap((c) => c.places);
+  const photoList = await Promise.all(
+    allPlaces.map((p) =>
+      getPhoto("places", p.id, p.name, null).catch(() => null),
+    ),
+  );
+  const photos = new Map<string, PlacePhoto>(
+    allPlaces.map((p, i) => [p.id, photoList[i]]),
+  );
+
+  const stops = [...chapters.values()].flatMap((chapter) => {
+    const city = cityByName.get(chapter.cityName);
+    if (!city) return [];
+    return [{
+      name: chapter.cityName,
+      lat: city.lat,
+      lng: city.lng,
+      visited: chapter.places.some((p) => progress.places.has(p.id)),
+    }];
+  });
+
   const allCollectibles = [...chapters.values()].flatMap((c) => c.collectibles);
   const visited = progress.places.size;
   const collected = progress.collectibles.size;
   const year = new Date().getFullYear();
-
-  async function toggle(formData: FormData) {
-    "use server";
-    const target = await getTripBySlug(slug);
-    if (!target) notFound();
-    const kind = formData.get("kind") === "place" ? "place" : "collectible";
-    const id = String(formData.get("id"));
-    await toggleProgress(target.id, kind, id);
-    revalidatePath(`/trip/${slug}/passport`);
-  }
 
   return (
     <main className="min-h-dvh bg-space">
@@ -74,21 +95,39 @@ export default async function PassportPage({
           ← Itinerary
         </Link>
 
-        <header className="mt-10 rounded-2xl border border-gold/25 bg-gradient-to-br from-gold/[0.07] to-transparent p-8 sm:p-10">
-          <p className="text-xs uppercase tracking-[0.35em] text-gold">Travel passport</p>
-          <h1 className="mt-4 text-4xl font-semibold leading-tight text-ivory sm:text-5xl">
-            My {trip.countryName} Journey — {year}
-          </h1>
-          <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-soft-gray">
-            <span>
-              <span className="text-ivory">{visited}</span>/{placeIds.length} places visited
-            </span>
-            <span>
-              <span className="text-gold">{collected}</span>/{allCollectibles.length} collected
-            </span>
-            <span>{chapters.size} cities</span>
+        <header className="relative mt-10 overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/[0.10] via-midnight to-space p-8 shadow-2xl shadow-gold/5 sm:p-12">
+          <Sparkles />
+          <div className="relative">
+            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-gold">
+              <span aria-hidden>✦</span>
+              Travel passport
+            </div>
+            <h1 className="passport-title mt-5 text-4xl font-semibold leading-tight sm:text-6xl">
+              My {trip.countryName} Journey
+            </h1>
+            <p className="mt-2 text-2xl font-light text-gold/70">{year}</p>
+
+            <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+              <span className="text-soft-gray">
+                <span className="text-2xl font-medium text-jade">{visited}</span>
+                <span className="text-soft-gray/60">/{placeIds.length}</span> visited
+              </span>
+              <span className="text-soft-gray">
+                <span className="text-2xl font-medium text-gold">{collected}</span>
+                <span className="text-soft-gray/60">/{allCollectibles.length}</span> collected
+              </span>
+              <span className="text-soft-gray">
+                <span className="text-2xl font-medium text-ivory">{chapters.size}</span> cities
+              </span>
+            </div>
           </div>
         </header>
+
+        {stops.length > 0 && country && (
+          <section className="mt-8 overflow-hidden rounded-2xl border border-white/5 bg-midnight/60 p-4 sm:p-6">
+            <RouteMap countryCode={country.code} stops={stops} />
+          </section>
+        )}
 
         <div className="mt-14 space-y-12">
           {[...chapters.values()].map((chapter, ci) => (
@@ -99,73 +138,71 @@ export default async function PassportPage({
                   <span className="h-px flex-1 bg-white/10" />
                 </div>
 
-                <ul className="mt-5 space-y-2">
+                <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   {chapter.places.map((place) => {
                     const done = progress.places.has(place.id);
+                    const photo = photos.get(place.id);
                     return (
-                      <li key={place.id}>
-                        <form action={toggle}>
-                          <input type="hidden" name="kind" value="place" />
-                          <input type="hidden" name="id" value={place.id} />
-                          <button
-                            type="submit"
-                            className={`flex w-full items-center gap-3 rounded-xl border px-5 py-3 text-left transition ${
-                              done
-                                ? "border-jade/40 bg-jade/[0.06]"
-                                : "border-white/5 bg-midnight hover:border-white/15"
-                            }`}
-                          >
-                            <span
-                              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-xs ${
-                                done ? "border-jade bg-jade text-space" : "border-soft-gray/40"
-                              }`}
-                              aria-hidden
-                            >
-                              {done ? "✓" : ""}
+                      <div
+                        key={place.id}
+                        className={`relative overflow-hidden rounded-xl border ${
+                          done ? "border-jade/40" : "border-white/5"
+                        }`}
+                      >
+                        <div className="relative h-36">
+                          {photo ? (
+                            <img
+                              src={photo.url}
+                              alt=""
+                              className={`h-full w-full object-cover ${done ? "" : "grayscale opacity-40"}`}
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-gradient-to-br from-midnight to-space" />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/30 to-transparent" />
+
+                          {done && (
+                            <span className="stamp-in absolute right-3 top-3 rounded-md border-2 border-jade bg-space/85 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-jade shadow-lg backdrop-blur-sm">
+                              Visited
                             </span>
-                            <span className={done ? "text-ivory" : "text-soft-gray"}>
-                              {place.name}
-                            </span>
-                          </button>
-                        </form>
-                      </li>
+                          )}
+                        </div>
+                        <p className={`px-4 py-3 text-sm ${done ? "text-ivory" : "text-soft-gray"}`}>
+                          {place.name}
+                        </p>
+                      </div>
                     );
                   })}
-                </ul>
+                </div>
 
                 {chapter.collectibles.length > 0 && (
-                  <ul className="mt-4 grid gap-2 sm:grid-cols-2">
+                  <ul className="mt-4 grid gap-3 sm:grid-cols-2">
                     {chapter.collectibles.map((item) => {
                       const done = progress.collectibles.has(item.id);
                       return (
-                        <li key={item.id}>
-                          <form action={toggle}>
-                            <input type="hidden" name="kind" value="collectible" />
-                            <input type="hidden" name="id" value={item.id} />
-                            <button
-                              type="submit"
-                              className={`flex h-full w-full items-start gap-3 rounded-xl border px-5 py-3 text-left transition ${
-                                done
-                                  ? "border-gold/50 bg-gold/[0.08]"
-                                  : "border-dashed border-gold/20 bg-transparent hover:border-gold/40"
-                              }`}
-                            >
-                              <span
-                                className={`text-lg leading-none ${done ? "text-gold" : "text-gold/30"}`}
-                                aria-hidden
-                              >
-                                {kindOf(item.kind).icon}
-                              </span>
-                              <span>
-                                <span className={done ? "text-ivory" : "text-soft-gray"}>
-                                  {item.name}
-                                </span>
-                                <span className="mt-0.5 block text-xs text-soft-gray/70">
-                                  {done ? "Collected" : item.whereToGet}
-                                </span>
-                              </span>
-                            </button>
-                          </form>
+                        <li
+                          key={item.id}
+                          className={`relative flex items-start gap-3 overflow-hidden rounded-xl border px-5 py-4 ${
+                            done
+                              ? "border-gold/50 bg-gold/[0.08]"
+                              : "border-dashed border-white/10 opacity-50"
+                          }`}
+                        >
+                          {done && <Sparkles />}
+                          <span
+                            className={`relative text-lg leading-none ${done ? "text-gold" : "text-soft-gray/40"}`}
+                            aria-hidden
+                          >
+                            {kindOf(item.kind).icon}
+                          </span>
+                          <span className="relative">
+                            <span className={done ? "text-ivory" : "text-soft-gray"}>
+                              {item.name}
+                            </span>
+                            <span className="mt-0.5 block text-xs text-soft-gray/70">
+                              {done ? "Collected" : "Not collected"}
+                            </span>
+                          </span>
                         </li>
                       );
                     })}
@@ -176,9 +213,14 @@ export default async function PassportPage({
           ))}
         </div>
 
-        <p className="mt-16 text-center text-sm text-soft-gray/60">
-          Tap anything above to stamp it as done.
-        </p>
+        <div className="mt-16 text-center">
+          <Link
+            href={`/trip/${slug}/collect`}
+            className="text-sm text-jade transition hover:text-jade/80"
+          >
+            ← Update what you collected
+          </Link>
+        </div>
       </div>
     </main>
   );
