@@ -5,6 +5,7 @@ import { kindOf } from "@/components/CollectibleBadge";
 import { getTripBySlug } from "@/modules/trip/queries";
 import { collectiblesByPlaceIds, type Collectible } from "@/modules/souvenir/queries";
 import { getProgress } from "@/modules/passport/queries";
+import { listMemories } from "@/modules/passport/memories";
 import { getPhoto } from "@/modules/media/wikimedia";
 import { listCitiesForCountry, getCountryBySlug } from "@/modules/destination/queries";
 import RouteMap from "@/components/RouteMap";
@@ -31,9 +32,10 @@ export default async function PassportPage({
 
   const days = trip.plan.days ?? [];
   const placeIds = days.flatMap((d) => d.places.map((p) => p.id));
-  const [collectibles, progress] = await Promise.all([
+  const [collectibles, progress, memories] = await Promise.all([
     collectiblesByPlaceIds(placeIds),
     getProgress(trip.id),
+    listMemories(trip.id),
   ]);
 
   // Collapse the day-by-day plan into one chapter per city.
@@ -212,6 +214,35 @@ export default async function PassportPage({
             </Reveal>
           ))}
         </div>
+
+        {memories.length > 0 && (
+          <section className="mt-16">
+            <div className="flex items-baseline gap-3">
+              <h2 className="text-2xl font-medium text-ivory">Your memories</h2>
+              <span className="h-px flex-1 bg-white/10" />
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-3">
+              {memories.map((m, i) => (
+                <Reveal key={m.id} delay={i * 70} className="h-full">
+                  <figure className="h-full overflow-hidden rounded-xl border border-gold/20 bg-midnight">
+                    {m.imagePath && (
+                      <img
+                        src={`/api/uploads/${m.imagePath}`}
+                        alt=""
+                        className="h-40 w-full object-cover"
+                      />
+                    )}
+                    {m.note && (
+                      <figcaption className="px-4 py-3 text-sm leading-relaxed text-soft-gray">
+                        {m.note}
+                      </figcaption>
+                    )}
+                  </figure>
+                </Reveal>
+              ))}
+            </div>
+          </section>
+        )}
 
         <div className="mt-16 text-center">
           <Link

@@ -57,6 +57,13 @@
       "when": 1789217907669,
       "tag": "0007_auth",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1789218686881,
+      "tag": "0008_memories",
+      "breakpoints": true
     }
   ]
 }

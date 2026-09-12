@@ -151,7 +151,29 @@ otherwise the map looks empty and the cards look broken when they are both fine.
 There is no auth yet, so **anyone with the URL can tick items**. That is fine for an unguessable slug and a
 personal trip, but revisit it before trips belong to accounts.
 
-Photos, notes and tickets (step 5) are not built: they need upload storage and a user to own them.
+**Memories (step 5)** are built: signed-in users add photos and notes on `/trip/[slug]/collect`, and they
+appear in a "Your memories" section of the passport. Files are written to a gitignored `uploads/` directory
+via `src/modules/media/storage.ts` and served through `/api/uploads/[name]`. Filenames are generated UUIDs,
+never derived from user input, and both write and read validate the `<uuid>.<ext>` shape — swapping in S3/R2
+later means changing only that module and the read route.
+
+**Ownership** is decided in one place, `src/modules/trip/access.ts`. A trip with a null `user_id` (planned
+while signed out) stays editable by anyone with the link, so older shareable trips keep working; an owned
+trip is editable only by its owner. Check `canEdit` on render *and* again inside every server action — the
+render is not a security boundary.
+
+## Planned: seasonality and events
+
+Requested, not yet built. Two related ideas:
+
+- **Best time to visit** — each place should carry which months are worth going (the Great Wall in autumn,
+  Zhangjiajie outside monsoon). The trip planner already takes trip dates implicitly via `days`; it should
+  take an actual travel date and warn or reorder when a place is badly timed.
+- **Events** — places should carry dated events (festivals, seasonal openings, light shows), surfaced on the
+  place and city pages and folded into the itinerary for the user's dates.
+
+Present both the way the rest of the app presents things: real photography, sparkle/reveal animation, and the
+gold accent used for collectibles — not a bare table of dates.
 
 ## Trip planner
 

@@ -10,3 +10,6 @@ next-env.d.ts
 
 # local screenshots / scratch
 Screenshot*.png
+
+# user uploads
+uploads/

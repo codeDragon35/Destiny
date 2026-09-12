@@ -12,6 +12,7 @@ export type SavedTrip = {
   plan: { days: PlannedDay[]; unfilledDays: number };
   countryName: string;
   countrySlug: string;
+  userId: string | null;
 };
 
 export async function saveTrip(input: {
@@ -71,6 +72,7 @@ export async function getTripBySlug(slug: string): Promise<SavedTrip | null> {
   const rows = await db.execute<SavedTrip>(sql`
     SELECT
       t.id, t.slug, t.days, t.interests, t.dietary, t.budget, t.plan,
+      t.user_id AS "userId",
       c.name AS "countryName", c.slug AS "countrySlug"
     FROM trips t
     JOIN countries c ON c.id = t.country_id
