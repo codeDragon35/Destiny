@@ -1,6 +1,7 @@
 import "server-only";
 import { sql } from "drizzle-orm";
 import { db } from "@/db/client";
+import { cacheGet, cacheSet } from "./cache";
 
 const UA = "DestinyTravelApp/0.1 (https://github.com/codeDragon35/Destiny)";
 const REFRESH_AFTER_DAYS = 30;
@@ -31,12 +32,19 @@ async function wd<T>(url: string): Promise<T | null> {
 }
 
 async function imageFileFor(qid: string) {
+  // Wikidata P18 rarely changes; a week of caching keeps cold renders off the network.
+  const cacheKey = `wd:p18:${qid}`;
+  const cached = await cacheGet(cacheKey);
+  if (cached !== null) return cached === "" ? null : cached;
+
   const data = await wd<{
     claims?: { P18?: { mainsnak: { datavalue?: { value: string } } }[] };
   }>(
     `https://www.wikidata.org/w/api.php?action=wbgetclaims&entity=${qid}&property=P18&format=json&origin=*`,
   );
-  return data?.claims?.P18?.[0]?.mainsnak?.datavalue?.value ?? null;
+  const file = data?.claims?.P18?.[0]?.mainsnak?.datavalue?.value ?? null;
+  await cacheSet(cacheKey, file ?? "", 604800);
+  return file;
 }
 
 /**

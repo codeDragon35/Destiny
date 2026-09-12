@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgis/postgis:17-3.5
+        env:
+          POSTGRES_USER: destiny
+          POSTGRES_PASSWORD: destiny
+          POSTGRES_DB: destiny
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd "pg_isready -U destiny -d destiny"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgresql://destiny:destiny@localhost:5433/destiny
+      AUTH_SECRET: ci-only-secret-not-used-in-production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Apply migrations
+        run: npm run db:migrate
+
+      - name: Seed
+        run: npm run db:seed
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

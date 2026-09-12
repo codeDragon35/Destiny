@@ -8,6 +8,19 @@ The Destination slice is implemented and running: a 3D globe home page → count
 backed by PostgreSQL + PostGIS and seeded with China (Beijing, Xi'an, Zhangjiajie). Everything else described
 below — AI planning, passport, media, souvenirs — is still target architecture, not built yet.
 
+## What is not built
+
+The product concept below describes the target, not the current state. Notably absent:
+
+- **No AI.** There is no LLM, orchestrator or tool layer. `planTrip` is deterministic and only groups seeded
+  places into days — it does not suggest lodging, restaurants or inter-city transport, and the dietary and
+  budget preferences are captured but unused.
+- **Preferences are checkboxes**, not the free-form text the concept describes.
+- **Memories accept photos and notes only** — no video, no tickets.
+- **The passport is digital only** — no PDF, no print ordering.
+- **No tests.** The day-packing rules, `monthInRange` wraparound and trip access control are all untested.
+- No background jobs, PWA/offline, Sentry/OpenTelemetry, or rate limiting.
+
 ## Commands
 
 ```bash
@@ -19,6 +32,14 @@ npm run dev          # Next.js dev server on :3000
 npm run typecheck    # tsc --noEmit
 npm run lint
 ```
+
+`docker compose --profile app up` additionally builds and runs the app itself; plain `docker compose up`
+starts only the databases, which is what day-to-day development wants alongside `npm run dev`.
+
+**Redis is an optional cache, never a dependency.** `src/modules/media/cache.ts` degrades every call to a
+miss when `REDIS_URL` is unset or Redis is down, so the app works either way — which also means a silently
+missing `REDIS_URL` looks identical to a working cache with zero hits. Check `redis-cli DBSIZE` before
+concluding caching is broken.
 
 Host ports are **5433** (Postgres) and **6380** (Redis), not the defaults — this machine already runs a
 local Postgres on 5432. `DATABASE_URL` overrides the default connection string; see `.env.example`.

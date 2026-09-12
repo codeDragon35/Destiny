@@ -18,11 +18,38 @@ services:
 
   redis:
     image: redis:7-alpine
+    # 6380 on the host, for the same reason as Postgres above.
     ports:
       - "6380:6379"
     volumes:
       - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # Opt in with: docker compose --profile app up
+  # Day-to-day development runs `npm run dev` on the host instead, which is faster.
+  app:
+    profiles: ["app"]
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: postgresql://destiny:destiny@postgres:5432/destiny
+      REDIS_URL: redis://redis:6379
+      AUTH_SECRET: ${AUTH_SECRET:-dev-only-insecure-secret-change-me}
+      AUTH_TRUST_HOST: "true"
+    volumes:
+      - uploads:/app/uploads
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
 
 volumes:
   postgres_data:
   redis_data:
+  uploads:
