@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Reveal from "@/components/Reveal";
 import { getTripBySlug } from "@/modules/trip/queries";
+import { collectiblesByPlaceIds } from "@/modules/souvenir/queries";
+import { kindOf } from "@/components/CollectibleBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +34,10 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
   if (!trip) notFound();
 
   const days = trip.plan.days ?? [];
+  const collectibles = await collectiblesByPlaceIds(
+    days.flatMap((d) => d.places.map((p) => p.id)),
+  );
+  const collectibleCount = [...collectibles.values()].reduce((n, list) => n + list.length, 0);
   const totalPlaces = days.reduce((n, d) => n + d.places.length, 0);
   const cities = [...new Set(days.map((d) => d.cityName))];
 
@@ -54,6 +60,12 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
           <span>{cities.join(" → ")}</span>
           <span className="text-soft-gray/40">·</span>
           <span>{totalPlaces} places</span>
+          {collectibleCount > 0 && (
+            <>
+              <span className="text-soft-gray/40">·</span>
+              <span className="text-gold">{collectibleCount} to collect</span>
+            </>
+          )}
           {trip.dietary && (
             <>
               <span className="text-soft-gray/40">·</span>
@@ -110,6 +122,18 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                             {place.summary}
                           </p>
                         )}
+                        {(collectibles.get(place.id) ?? []).map((item) => (
+                          <p
+                            key={item.id}
+                            className="mt-2 flex flex-wrap items-baseline gap-x-2 text-sm text-gold"
+                          >
+                            <span aria-hidden>{kindOf(item.kind).icon}</span>
+                            <span>{item.name}</span>
+                            {item.whereToGet && (
+                              <span className="text-xs text-soft-gray">{item.whereToGet}</span>
+                            )}
+                          </p>
+                        ))}
                       </li>
                     ))}
                   </ul>

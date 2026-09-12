@@ -24,6 +24,14 @@ export const tripInterest = pgEnum("trip_interest", [
   "hidden_gem",
 ]);
 
+export const collectibleKind = pgEnum("collectible_kind", [
+  "stamp",
+  "passport",
+  "souvenir",
+  "book",
+  "badge",
+]);
+
 export const placeKind = pgEnum("place_kind", [
   "attraction",
   "nature",
@@ -124,4 +132,27 @@ export const trips = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("trips_slug_idx").on(t.slug)],
+);
+
+export const collectibles = pgTable(
+  "collectibles",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    placeId: uuid("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    kind: collectibleKind("kind").notNull(),
+    description: text("description"),
+    /** Where to physically obtain it, e.g. "Visitor centre, east gate". */
+    whereToGet: text("where_to_get"),
+    /** Local currency minor units; null when free. */
+    cost: integer("cost"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("collectibles_place_slug_idx").on(t.placeId, t.slug),
+    index("collectibles_kind_idx").on(t.kind),
+  ],
 );

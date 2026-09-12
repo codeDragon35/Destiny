@@ -1,10 +1,20 @@
 import { sql } from "drizzle-orm";
 import { client, db } from "./client";
 
+type SeedCollectible = {
+  name: string;
+  slug: string;
+  kind: "stamp" | "passport" | "souvenir" | "book" | "badge";
+  description: string;
+  whereToGet: string;
+  cost?: number;
+};
+
 type SeedPlace = {
   name: string;
   slug: string;
   wikidataId?: string;
+  collectibles?: SeedCollectible[];
   kind: "attraction" | "nature" | "culture" | "food" | "hidden_gem";
   summary: string;
   lat: number;
@@ -42,6 +52,17 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Great Wall at Mutianyu",
           slug: "great-wall-mutianyu",
+          collectibles: [
+            {
+              name: "Great Wall climbing certificate",
+              slug: "climbing-certificate",
+              kind: "book",
+              description:
+                "A personalised certificate recording that you climbed the Wall, printed with your name and the date.",
+              whereToGet: "Souvenir shops near the Mutianyu cable car station",
+              cost: 30,
+            },
+          ],
       wikidataId: "Q12501",
           kind: "attraction",
           summary: "Restored, forested stretch of wall that stays far quieter than Badaling.",
@@ -52,6 +73,16 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Forbidden City",
           slug: "forbidden-city",
+          collectibles: [
+            {
+              name: "Palace Museum seal stamp",
+              slug: "palace-seal-stamp",
+              kind: "stamp",
+              description:
+                "Free self-service ink stamps of imperial seals, placed at gates and halls along the route.",
+              whereToGet: "Stamp tables inside the main halls",
+            },
+          ],
       wikidataId: "Q80290",
           kind: "culture",
           summary: "Ming and Qing imperial palace complex at the city's heart.",
@@ -62,6 +93,17 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Temple of Heaven",
           slug: "temple-of-heaven",
+          collectibles: [
+            {
+              name: "Temple of Heaven commemorative ticket",
+              slug: "commemorative-ticket",
+              kind: "souvenir",
+              description:
+                "An illustrated keepsake ticket sold alongside the standard entry ticket.",
+              whereToGet: "Main ticket office, east gate",
+              cost: 20,
+            },
+          ],
       wikidataId: "Q125445",
           kind: "culture",
           summary: "Ming-era ritual complex ringed by a park full of morning tai chi.",
@@ -92,6 +134,17 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Terracotta Army",
           slug: "terracotta-army",
+          collectibles: [
+            {
+              name: "Warrior replica figurine",
+              slug: "warrior-figurine",
+              kind: "souvenir",
+              description:
+                "Officially licensed replica of a terracotta warrior, boxed with a certificate.",
+              whereToGet: "Museum gift shop by the exit of Pit 1",
+              cost: 120,
+            },
+          ],
       wikidataId: "Q47672",
           kind: "attraction",
           summary: "Thousands of life-size funerary figures guarding Qin Shi Huang's tomb.",
@@ -131,6 +184,17 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Zhangjiajie National Forest Park",
           slug: "zhangjiajie-national-forest-park",
+          collectibles: [
+            {
+              name: "Park passport booklet",
+              slug: "park-passport",
+              kind: "passport",
+              description:
+                "Booklet stamped at each scenic viewpoint — a record of how much of the park you covered.",
+              whereToGet: "Visitor centre at the main park entrance",
+              cost: 25,
+            },
+          ],
       wikidataId: "Q3895620",
           kind: "nature",
           summary: "The sandstone pillar landscape that inspired Avatar's floating mountains.",
@@ -141,6 +205,17 @@ const CHINA: { code: string; name: string; slug: string; wikidataId: string; emo
         {
           name: "Tianmen Mountain",
           slug: "tianmen-mountain",
+          collectibles: [
+            {
+              name: "Heaven's Gate 999 steps badge",
+              slug: "heavens-gate-badge",
+              kind: "badge",
+              description:
+                "Enamel pin awarded for climbing all 999 steps to the Heaven's Gate arch.",
+              whereToGet: "Kiosk at the top of the stairway",
+              cost: 35,
+            },
+          ],
       wikidataId: "Q3861073",
           kind: "nature",
           summary: "Cable car, cliff-edge glass walkways and the Heaven's Gate arch.",
@@ -179,7 +254,7 @@ async function main() {
       `);
 
       for (const place of city.places) {
-        await tx.execute(sql`
+        const [insertedPlace] = await tx.execute<{ id: string }>(sql`
           INSERT INTO places (city_id, name, slug, kind, summary, location, visit_minutes, wikidata_id)
           VALUES (
             ${inserted.id},
@@ -191,13 +266,35 @@ async function main() {
             ${place.visitMinutes},
             ${place.wikidataId ?? null}
           )
+          RETURNING id
         `);
+
+        for (const item of place.collectibles ?? []) {
+          await tx.execute(sql`
+            INSERT INTO collectibles (place_id, name, slug, kind, description, where_to_get, cost)
+            VALUES (
+              ${insertedPlace.id},
+              ${item.name},
+              ${item.slug},
+              ${item.kind}::collectible_kind,
+              ${item.description},
+              ${item.whereToGet},
+              ${item.cost ?? null}
+            )
+          `);
+        }
       }
     }
   });
 
   const placeCount = CHINA.cities.reduce((n, c) => n + c.places.length, 0);
-  console.log(`seeded ${CHINA.name}: ${CHINA.cities.length} cities, ${placeCount} places`);
+  const collectibleCount = CHINA.cities.reduce(
+    (n, c) => n + c.places.reduce((m, p) => m + (p.collectibles?.length ?? 0), 0),
+    0,
+  );
+  console.log(
+    `seeded ${CHINA.name}: ${CHINA.cities.length} cities, ${placeCount} places, ${collectibleCount} collectibles`,
+  );
   await client.end();
 }
 

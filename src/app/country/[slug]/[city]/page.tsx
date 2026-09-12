@@ -8,6 +8,8 @@ import {
   listPlacesForCity,
 } from "@/modules/destination/queries";
 import { getPhoto } from "@/modules/media/wikimedia";
+import { listCollectiblesForCity } from "@/modules/souvenir/queries";
+import CollectibleBadge from "@/components/CollectibleBadge";
 
 export const dynamic = "force-dynamic";
 
@@ -42,6 +44,7 @@ export default async function CityPage({
   if (!city) notFound();
 
   const places = await listPlacesForCity(city.id);
+  const collectibles = await listCollectiblesForCity(city.id);
   const [cityPhoto, ...placePhotos] = await Promise.all([
     getPhoto("cities", city.id, `${city.name}, ${country.name}`, city.wikidataId),
     ...places.map((p) => getPhoto("places", p.id, `${p.name}, ${city.name}`, p.wikidataId)),
@@ -133,6 +136,22 @@ export default async function CityPage({
           })}
         </div>
       </section>
+
+      {collectibles.length > 0 && (
+        <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
+          <h2 className="text-xs uppercase tracking-[0.35em] text-gold">Don&apos;t miss</h2>
+          <p className="mt-3 max-w-xl text-sm text-soft-gray">
+            Stamps, passports and collectibles you can only pick up here.
+          </p>
+          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {collectibles.map((item, i) => (
+              <Reveal key={item.id} delay={i * 70} className="h-full">
+                <CollectibleBadge item={item} />
+              </Reveal>
+            ))}
+          </div>
+        </section>
+      )}
     </main>
   );
 }

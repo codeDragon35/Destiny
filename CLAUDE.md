@@ -98,6 +98,16 @@ uniform card grid reads as a database table and was explicitly rejected.
 - Tailwind cannot see interpolated class names: `group-hover:${x}` silently produces no CSS. Store complete
   class strings (see the `KIND` map in the city page) instead of building them from fragments.
 
+## Collectibles
+
+Step 4 of the product journey — the "special things" a traveller would otherwise miss. `collectibles` hang
+off a place (`src/modules/souvenir/queries.ts`) and surface in two places: a "Don't miss" section on the city
+page, and inline under each place in a generated itinerary, so the plan says what to collect and where.
+
+Seeded collectibles must be **real and verifiable** — a stamp table that does not exist sends someone
+hunting for it on the day. Each carries `where_to_get` for that reason. Kinds are stamp / passport /
+souvenir / book / badge.
+
 ## Trip planner
 
 `src/modules/trip/planner.ts` is deliberately **rules-based, not an LLM** — it packs places into days
