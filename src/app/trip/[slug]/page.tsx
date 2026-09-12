@@ -143,12 +143,20 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
           })}
         </ol>
 
-        <Link
-          href={`/country/${trip.countrySlug}/plan`}
-          className="mt-12 inline-block text-sm text-jade transition hover:text-jade/80"
-        >
-          Plan a different trip →
-        </Link>
+        <div className="mt-12 flex flex-wrap items-center gap-4">
+          <Link
+            href={`/trip/${trip.slug}/passport`}
+            className="rounded-full bg-gold px-6 py-2.5 text-sm font-medium text-space transition hover:bg-gold/90"
+          >
+            Open travel passport
+          </Link>
+          <Link
+            href={`/country/${trip.countrySlug}/plan`}
+            className="text-sm text-jade transition hover:text-jade/80"
+          >
+            Plan a different trip →
+          </Link>
+        </div>
       </div>
     </main>
   );

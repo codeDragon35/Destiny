@@ -156,3 +156,23 @@ export const collectibles = pgTable(
     index("collectibles_kind_idx").on(t.kind),
   ],
 );
+
+/** One row per thing ticked off on a trip: either a place visited or a collectible obtained. */
+export const tripProgress = pgTable(
+  "trip_progress",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    tripId: uuid("trip_id")
+      .notNull()
+      .references(() => trips.id, { onDelete: "cascade" }),
+    placeId: uuid("place_id").references(() => places.id, { onDelete: "cascade" }),
+    collectibleId: uuid("collectible_id").references(() => collectibles.id, {
+      onDelete: "cascade",
+    }),
+    collectedAt: timestamp("collected_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("trip_progress_place_idx").on(t.tripId, t.placeId),
+    uniqueIndex("trip_progress_collectible_idx").on(t.tripId, t.collectibleId),
+  ],
+);

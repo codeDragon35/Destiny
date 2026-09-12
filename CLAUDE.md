@@ -108,6 +108,17 @@ Seeded collectibles must be **real and verifiable** — a stamp table that does 
 hunting for it on the day. Each carries `where_to_get` for that reason. Kinds are stamp / passport /
 souvenir / book / badge.
 
+## Journey Book / passport
+
+`/trip/[slug]/passport` composes a finished trip into the Journey Book from step 6: one chapter per city,
+places and collectibles as a checklist you stamp as you go. Progress lives in `trip_progress`, one row per
+ticked item, keyed by trip — so a passport is shareable by URL and needs no login.
+
+There is no auth yet, so **anyone with the URL can tick items**. That is fine for an unguessable slug and a
+personal trip, but revisit it before trips belong to accounts.
+
+Photos, notes and tickets (step 5) are not built: they need upload storage and a user to own them.
+
 ## Trip planner
 
 `src/modules/trip/planner.ts` is deliberately **rules-based, not an LLM** — it packs places into days
