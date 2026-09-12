@@ -34,6 +34,8 @@ export const countries = pgTable(
     slug: text("slug").notNull(),
     summary: text("summary"),
     emoji: text("emoji"),
+    imageUrl: text("image_url"),
+    imageCredit: text("image_credit"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -53,6 +55,8 @@ export const cities = pgTable(
     slug: text("slug").notNull(),
     summary: text("summary"),
     location: point("location").notNull(),
+    imageUrl: text("image_url"),
+    imageCredit: text("image_credit"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -73,6 +77,8 @@ export const places = pgTable(
     kind: placeKind("kind").notNull(),
     summary: text("summary"),
     location: point("location").notNull(),
+    imageUrl: text("image_url"),
+    imageCredit: text("image_credit"),
     // Typical visit length, used later by the Trip Planner Agent for day packing.
     visitMinutes: integer("visit_minutes"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

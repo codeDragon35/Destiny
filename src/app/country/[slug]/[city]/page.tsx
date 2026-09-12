@@ -1,33 +1,32 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import Hero from "@/components/Hero";
+import Reveal from "@/components/Reveal";
 import {
   getCityBySlug,
   getCountryBySlug,
   listPlacesForCity,
 } from "@/modules/destination/queries";
+import { searchPhoto } from "@/modules/media/unsplash";
 
 export const dynamic = "force-dynamic";
 
-const KIND_LABELS: Record<string, string> = {
-  attraction: "Attraction",
-  nature: "Nature",
-  culture: "Culture",
-  food: "Food",
-  hidden_gem: "Hidden gem",
-};
+const KIND = {
+  attraction: { label: "Attraction", hoverText: "group-hover:text-jade", chip: "bg-jade/15 text-jade", ring: "hover:border-jade/40" },
+  nature: { label: "Nature", hoverText: "group-hover:text-mist", chip: "bg-mist/15 text-mist", ring: "hover:border-mist/40" },
+  culture: { label: "Culture", hoverText: "group-hover:text-gold", chip: "bg-gold/15 text-gold", ring: "hover:border-gold/40" },
+  food: { label: "Food", hoverText: "group-hover:text-coral", chip: "bg-coral/15 text-coral", ring: "hover:border-coral/40" },
+  hidden_gem: { label: "Hidden gem", hoverText: "group-hover:text-gold", chip: "bg-gold/20 text-gold", ring: "hover:border-gold/50" },
+} as const;
 
-const KIND_STYLES: Record<string, string> = {
-  attraction: "bg-jade/15 text-jade",
-  nature: "bg-mist/15 text-mist",
-  culture: "bg-gold/15 text-gold",
-  food: "bg-coral/15 text-coral",
-  hidden_gem: "bg-gold/15 text-gold",
-};
+function kindOf(k: string) {
+  return KIND[k as keyof typeof KIND] ?? KIND.attraction;
+}
 
 function formatVisit(minutes: number | null) {
   if (!minutes) return null;
-  const hours = minutes / 60;
-  return Number.isInteger(hours) ? `${hours}h visit` : `${hours.toFixed(1)}h visit`;
+  const h = minutes / 60;
+  return Number.isInteger(h) ? `${h}h` : `${h.toFixed(1)}h`;
 }
 
 export default async function CityPage({
@@ -43,44 +42,87 @@ export default async function CityPage({
   if (!city) notFound();
 
   const places = await listPlacesForCity(city.id);
+  const [hero, ...placePhotos] = await Promise.all([
+    searchPhoto(`${city.name} ${country.name}`),
+    ...places.map((p) => searchPhoto(`${p.name} ${city.name}`)),
+  ]);
+
+  const totalHours = places.reduce((n, p) => n + (p.visitMinutes ?? 0), 0) / 60;
 
   return (
-    <main className="mx-auto max-w-5xl px-6 py-16">
-      <Link
-        href={`/country/${country.slug}`}
-        className="text-sm text-soft-gray transition hover:text-jade"
-      >
-        ← {country.name}
-      </Link>
-
-      <h1 className="mt-6 text-4xl font-semibold text-ivory">{city.name}</h1>
-      {city.summary && <p className="mt-4 max-w-2xl text-soft-gray">{city.summary}</p>}
-
-      <h2 className="mt-14 text-sm uppercase tracking-[0.2em] text-jade">Places</h2>
-      <ul className="mt-6 space-y-4">
-        {places.map((place) => {
-          const visit = formatVisit(place.visitMinutes);
-          return (
-            <li
-              key={place.id}
-              className="rounded-xl border border-white/5 bg-midnight p-6"
+    <main className="min-h-dvh bg-space">
+      <Hero
+        title={city.name}
+        summary={city.summary}
+        photo={hero}
+        seed={city.slug}
+        kicker={
+          <div className="animate-float-in">
+            <Link
+              href={`/country/${country.slug}`}
+              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-jade"
             >
-              <div className="flex flex-wrap items-center gap-3">
-                <h3 className="text-lg font-medium text-ivory">{place.name}</h3>
-                <span
-                  className={`rounded-full px-3 py-1 text-xs ${KIND_STYLES[place.kind] ?? "bg-white/10 text-soft-gray"}`}
+              <span aria-hidden>←</span> {country.name}
+            </Link>
+            <div className="mt-6 flex items-center gap-3 text-sm text-mist/70">
+              <span>{places.length} places</span>
+              <span className="h-px w-8 bg-jade/50" />
+              <span>≈{Math.round(totalHours)}h to see it all</span>
+            </div>
+          </div>
+        }
+      />
+
+      <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
+        <h2 className="text-xs uppercase tracking-[0.35em] text-jade">What to see</h2>
+
+        <div className="mt-10 grid gap-6 sm:grid-cols-2">
+          {places.map((place, i) => {
+            const k = kindOf(place.kind);
+            const photo = placePhotos[i];
+            const visit = formatVisit(place.visitMinutes);
+            return (
+              <Reveal key={place.id} delay={i * 80}>
+                <article
+                  className={`group h-full overflow-hidden rounded-2xl border border-white/5 bg-midnight transition duration-500 hover:-translate-y-1 ${k.ring}`}
                 >
-                  {KIND_LABELS[place.kind] ?? place.kind}
-                </span>
-                {visit && <span className="text-xs text-soft-gray">{visit}</span>}
-              </div>
-              {place.summary && (
-                <p className="mt-3 text-sm leading-relaxed text-soft-gray">{place.summary}</p>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+                  <div className="relative h-52 overflow-hidden">
+                    {photo ? (
+                      <img
+                        src={photo.url}
+                        alt=""
+                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="h-full w-full bg-gradient-to-br from-midnight via-space to-midnight" />
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-midnight to-transparent" />
+                    <span
+                      className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-medium backdrop-blur ${k.chip}`}
+                    >
+                      {k.label}
+                    </span>
+                    {visit && (
+                      <span className="absolute right-4 top-4 rounded-full bg-space/70 px-3 py-1 text-xs text-mist/90 backdrop-blur">
+                        {visit}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-6">
+                    <h3 className={`text-xl font-medium text-ivory transition ${k.hoverText}`}>
+                      {place.name}
+                    </h3>
+                    {place.summary && (
+                      <p className="mt-2 text-sm leading-relaxed text-soft-gray">{place.summary}</p>
+                    )}
+                  </div>
+                </article>
+              </Reveal>
+            );
+          })}
+        </div>
+      </section>
     </main>
   );
 }

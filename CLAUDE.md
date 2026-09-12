@@ -79,6 +79,21 @@ props; the cast is what hides the error until runtime.
 `page.mouse.click()` in Puppeteer silently does nothing. Use `mouse.down()` → ~80ms pause → `mouse.up()`, and
 allow ~4-5s for the transition before concluding it failed.
 
+## Visual design
+
+Pages are editorial, not utilitarian: a photo hero with oversized type, an asymmetric card grid (the first
+card spans full width), per-category colour, and hover lift. Keep that register when adding pages — a plain
+uniform card grid reads as a database table and was explicitly rejected.
+
+- **Photos** come from Unsplash via `src/modules/media/unsplash.ts`, server-side and cached 24h (the Demo
+  tier allows only 50 req/hour). Set `UNSPLASH_ACCESS_KEY` to enable them; without it every image falls back
+  to a deterministic gradient seeded from the slug, so layouts stay intact but look flat.
+- **Motion** is progressive enhancement only. `Reveal` starts *visible* and hides itself solely for elements
+  below the fold — so content still renders if JS never runs, and nothing flickers on load. It also respects
+  `prefers-reduced-motion`.
+- Tailwind cannot see interpolated class names: `group-hover:${x}` silently produces no CSS. Store complete
+  class strings (see the `KIND` map in the city page) instead of building them from fragments.
+
 ## Product concept
 
 An AI-powered travel app that takes a user through discover → plan → experience → remember for a trip,
