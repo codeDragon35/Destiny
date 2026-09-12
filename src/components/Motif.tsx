@@ -7,7 +7,7 @@ function Dragon({ className = "" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 480 140"
-      className={className}
+      className={`motif-dragon ${className}`}
       fill="none"
       aria-hidden
       preserveAspectRatio="xMidYMid meet"
@@ -61,28 +61,62 @@ function Dragon({ className = "" }: { className?: string }) {
 
 function Crane({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 480 140" className={className} fill="none" aria-hidden preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 480 140" className={`motif-crane ${className}`} fill="none" aria-hidden preserveAspectRatio="xMidYMid meet">
       <defs>
-        <linearGradient id="crane-wing" x1="0" x2="1" y1="0" y2="1">
-          <stop offset="0%" stopColor="#F7F4EA" stopOpacity="0.85" />
-          <stop offset="100%" stopColor="#F47C6C" stopOpacity="0.55" />
+        <linearGradient id="crane-wing" x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor="#F7F4EA" stopOpacity="0.95" />
+          <stop offset="70%" stopColor="#F2A2C0" stopOpacity="0.8" />
+          <stop offset="100%" stopColor="#F2A2C0" stopOpacity="0.5" />
         </linearGradient>
       </defs>
-      {/* Flight path */}
-      <path className="dragon-body" d="M20 104c60-10 96-52 150-56 48-4 74 30 122 24 36-4 60-26 92-40"
-        stroke="#F4C95D" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="3 10" opacity="0.5" />
+
+      {/* Flight trail */}
+      <path
+        className="dragon-body"
+        d="M24 108c70-16 118-56 186-62"
+        stroke="#F2A2C0"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeDasharray="3 11"
+        opacity="0.45"
+      />
+
       <g className="dragon-head">
-        {/* Body and neck */}
-        <path d="M300 74c18-6 34-4 46 6-14 8-30 10-46 4z" fill="url(#crane-wing)" />
-        <path d="M346 80c14-2 24-10 30-20" stroke="#F7F4EA" strokeWidth="3" strokeLinecap="round" opacity="0.8" />
-        <circle cx="378" cy="58" r="5" fill="#F7F4EA" />
-        <circle cx="380" cy="56" r="1.5" fill="#101827" />
-        <path d="M383 58l12-3-11 7z" fill="#F4C95D" />
-        {/* Wings */}
-        <path d="M306 72c-12-20-6-38 12-46 6 18 4 34-12 46z" fill="url(#crane-wing)" opacity="0.9" />
-        <path d="M314 84c-16 10-34 8-44-6 16-8 32-8 44 6z" fill="url(#crane-wing)" opacity="0.7" />
+        {/* Far wing, swept back */}
+        <path className="crane-wing-far" d="M262 60 L210 18 Q248 34 272 56 Z" fill="url(#crane-wing)" opacity="0.55" />
+
+        {/* Tail */}
+        <path d="M246 66 L206 78 Q228 62 248 58 Z" fill="url(#crane-wing)" opacity="0.75" />
+
+        {/* Body */}
+        <path d="M248 62 Q290 48 322 58 Q292 78 252 72 Z" fill="url(#crane-wing)" />
+
+        {/* Near wing, raised */}
+        <path className="crane-wing-near" d="M270 58 L256 10 Q292 30 300 56 Z" fill="url(#crane-wing)" />
+
+        {/* Neck and head */}
+        <path
+          d="M322 58 Q346 52 360 40"
+          stroke="#F7F4EA"
+          strokeWidth="4.5"
+          strokeLinecap="round"
+          opacity="0.95"
+        />
+        <circle cx="364" cy="37" r="5.5" fill="#F7F4EA" />
+        <circle cx="366" cy="35" r="1.6" fill="#101827" />
+        {/* Red crown */}
+        <circle cx="362" cy="31" r="2.6" fill="#F47C6C" />
+        {/* Beak */}
+        <path d="M369 37 L385 34 L369 40 Z" fill="#F4C95D" />
+
         {/* Trailing legs */}
-        <path d="M300 82l-30 16M304 84l-26 20" stroke="#F7F4EA" strokeWidth="2" strokeLinecap="round" opacity="0.6" />
+        <path
+          d="M256 70 L214 92 M262 72 L224 98"
+          stroke="#F7F4EA"
+          strokeWidth="2"
+          strokeLinecap="round"
+          opacity="0.6"
+        />
       </g>
     </svg>
   );
@@ -90,7 +124,7 @@ function Crane({ className = "" }: { className?: string }) {
 
 function Peacock({ className = "" }: { className?: string }) {
   return (
-    <svg viewBox="0 0 480 140" className={className} fill="none" aria-hidden preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 480 140" className={`motif-peacock ${className}`} fill="none" aria-hidden preserveAspectRatio="xMidYMid meet">
       <defs>
         <linearGradient id="peacock-fan" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0%" stopColor="#2FBF9F" stopOpacity="0.8" />
@@ -132,7 +166,7 @@ function Laurel({ className = "" }: { className?: string }) {
   const leaf = (x: number, flip: number) =>
     `M${x} 92 q ${8 * flip} -14 ${22 * flip} -10 q ${-8 * flip} 14 ${-22 * flip} 10 z`;
   return (
-    <svg viewBox="0 0 480 140" className={className} fill="none" aria-hidden preserveAspectRatio="xMidYMid meet">
+    <svg viewBox="0 0 480 140" className={`motif-laurel ${className}`} fill="none" aria-hidden preserveAspectRatio="xMidYMid meet">
       <defs>
         <linearGradient id="laurel-leaf" x1="0" x2="1" y1="0" y2="0">
           <stop offset="0%" stopColor="#2FBF9F" stopOpacity="0.75" />

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/Reveal";
 import Motif from "@/components/Motif";
+import { accentFor } from "@/lib/accent";
 import SoundToggle from "@/components/SoundToggle";
 import { getCountryBySlug, listCitiesForCountry } from "@/modules/destination/queries";
 import { getPhoto } from "@/modules/media/wikimedia";
@@ -21,6 +22,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
   ]);
 
   const totalPlaces = cities.reduce((n, c) => n + c.placeCount, 0);
+  const accent = accentFor(country.motif);
 
   return (
     <main className="relative min-h-dvh bg-space">
@@ -37,13 +39,13 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           <div className="animate-float-in">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-jade"
+              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-ivory"
             >
               <span aria-hidden>←</span> All countries
             </Link>
             <div className="mt-6 flex items-center gap-3 text-sm text-mist/70">
               <span className="text-4xl leading-none">{country.emoji}</span>
-              <span className="h-px w-8 bg-jade/50" />
+              <span className={`h-px w-8 ${accent.rule}`} />
               <span>
                 {cities.length} {cities.length === 1 ? "city" : "cities"} · {totalPlaces} places
               </span>
@@ -60,13 +62,14 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
 
       <section className="mx-auto max-w-6xl px-6 pb-20 pt-4 sm:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="flex items-center gap-4 text-xs uppercase tracking-[0.35em] text-jade">
+          <h2 className={`flex items-center gap-4 text-xs uppercase tracking-[0.35em] ${accent.text}`}>
             Where to go
-            <span className="h-px w-16 bg-gradient-to-r from-jade/60 to-transparent" />
+            <span className={`h-px w-16 ${accent.rule}`} />
           </h2>
           <Link
             href={`/country/${country.slug}/plan`}
-            className="rounded-full bg-jade px-6 py-2.5 text-sm font-medium text-space transition hover:bg-jade/90"
+            className="rounded-full px-6 py-2.5 text-sm font-medium text-space transition hover:opacity-90"
+            style={{ backgroundColor: accent.hex }}
           >
             Plan a trip
           </Link>
@@ -85,7 +88,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
               >
                 <Link
                   href={`/country/${country.slug}/${city.slug}`}
-                  className="group relative block h-full overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 transition duration-500 hover:-translate-y-1 hover:border-jade/40 hover:shadow-2xl hover:shadow-jade/5"
+                  className="group relative block h-full overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 hover:border-current"
                 >
                   <div className={`relative overflow-hidden ${wide ? "h-72" : "h-56"}`}>
                     {photo ? (
@@ -104,7 +107,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
                   </div>
 
                   <div className="p-6">
-                    <h3 className="font-display text-2xl font-medium text-ivory transition group-hover:text-jade">
+                    <h3 className="font-display text-2xl font-medium text-ivory transition group-hover:opacity-90">
                       {city.name}
                     </h3>
                     {city.summary && (
@@ -112,7 +115,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
                         {city.summary}
                       </p>
                     )}
-                    <span className="mt-4 inline-flex items-center gap-2 text-sm text-jade opacity-0 transition duration-300 group-hover:opacity-100">
+                    <span className={`mt-4 inline-flex items-center gap-2 text-sm opacity-0 ${accent.text} transition duration-300 group-hover:opacity-100`}>
                       Explore {city.name}
                       <span className="transition group-hover:translate-x-1" aria-hidden>
                         →

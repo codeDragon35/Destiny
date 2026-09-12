@@ -14,6 +14,8 @@ import CollectibleBadge from "@/components/CollectibleBadge";
 import Sparkles from "@/components/Sparkles";
 import SoundToggle from "@/components/SoundToggle";
 import Motif from "@/components/Motif";
+import { accentFor } from "@/lib/accent";
+import { eventTone } from "@/lib/event-tone";
 
 export const dynamic = "force-dynamic";
 
@@ -50,6 +52,7 @@ export default async function CityPage({
   const places = await listPlacesForCity(city.id);
   const collectibles = await listCollectiblesForCity(city.id);
   const events = await eventsForCity(city.id);
+  const accent = accentFor(country.motif);
   const [cityPhoto, ...placePhotos] = await Promise.all([
     getPhoto("cities", city.id, `${city.name}, ${country.name}`, city.wikidataId),
     ...places.map((p) => getPhoto("places", p.id, `${p.name}, ${city.name}`, p.wikidataId)),
@@ -164,11 +167,13 @@ export default async function CityPage({
           <div className="mt-8 grid gap-5 sm:grid-cols-2">
             {events.map((ev, i) => (
               <Reveal key={ev.id} delay={i * 70} className="h-full">
-                <article className="relative h-full overflow-hidden rounded-xl border border-coral/25 bg-coral/[0.04] p-5">
+                <article
+                  className={`relative h-full overflow-hidden rounded-xl border p-5 ${eventTone(ev.name).border} ${eventTone(ev.name).bg}`}
+                >
                   <Sparkles />
                   <div className="relative">
                     <div className="flex flex-wrap items-baseline gap-x-3">
-                      <span className="text-xs uppercase tracking-[0.2em] text-coral">
+                      <span className={`text-xs uppercase tracking-[0.2em] ${eventTone(ev.name).text}`}>
                         {formatRange(ev.startMonth, ev.endMonth)}
                       </span>
                       <span className="text-xs text-soft-gray/70">{ev.placeName}</span>

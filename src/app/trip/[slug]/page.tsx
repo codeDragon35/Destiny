@@ -15,6 +15,8 @@ import { getPhoto } from "@/modules/media/wikimedia";
 import { getCountryBySlug } from "@/modules/destination/queries";
 import Hero from "@/components/Hero";
 import Motif from "@/components/Motif";
+import { eventTone } from "@/lib/event-tone";
+import { accentFor } from "@/lib/accent";
 import SoundToggle from "@/components/SoundToggle";
 
 export const dynamic = "force-dynamic";
@@ -67,6 +69,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
   const photos = new Map(allPlaces.map((pl, i) => [pl.id, photoList[i]]));
   const country = await getCountryBySlug(trip.countrySlug);
   // Lead with the most striking place on the trip, as the city pages do.
+  const accent = accentFor(country?.motif);
   const heroPhoto =
     photoList.find((photo, i) => photo && allPlaces[i].kind === "nature") ??
     photoList.find(Boolean) ??
@@ -93,7 +96,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
             >
               <span aria-hidden>←</span> {trip.countryName}
             </Link>
-            <p className="mt-5 text-xs uppercase tracking-[0.35em] text-jade">Your itinerary</p>
+            <p className={`mt-5 text-xs uppercase tracking-[0.35em] ${accent.text}`}>Your itinerary</p>
           </div>
         }
       />
@@ -157,7 +160,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                 <li className="overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40">
                   <div className="flex items-baseline justify-between gap-4 border-b border-white/5 px-6 py-4">
                     <div className="flex items-baseline gap-4">
-                      <span className="text-xs uppercase tracking-[0.25em] text-jade">
+                      <span className={`text-xs uppercase tracking-[0.25em] ${accent.text}`}>
                         Day {day.day}
                       </span>
                       <span className="text-lg text-ivory">{day.cityName}</span>
@@ -221,7 +224,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                               monthInRange(travelMonth, ev.startMonth, ev.endMonth),
                           )
                           .map((ev) => (
-                            <p key={ev.id} className="mt-2 text-sm text-jade">
+                            <p key={ev.id} className={`mt-2 text-sm ${eventTone(ev.name).text}`}>
                               <span aria-hidden>✦</span> {ev.name}{" "}
                               <span className="text-xs text-soft-gray">
                                 {formatRange(ev.startMonth, ev.endMonth)}

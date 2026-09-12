@@ -201,3 +201,89 @@
     animation: dragon-drift 7s ease-in-out infinite;
   }
 }
+
+/* Continuous motif motion: these loop forever rather than settling. */
+@keyframes fly-across {
+  0% {
+    transform: translateX(-18%) translateY(6px);
+  }
+  50% {
+    transform: translateX(10%) translateY(-10px);
+  }
+  100% {
+    transform: translateX(-18%) translateY(6px);
+  }
+}
+
+@keyframes wing-flap {
+  0%, 100% {
+    transform: scaleY(1) translateY(0);
+  }
+  50% {
+    transform: scaleY(0.45) translateY(6px);
+  }
+}
+
+@keyframes undulate {
+  0%, 100% {
+    d: path("M14 96c46-4 62-44 104-48 44-4 52 38 96 36 40-2 48-40 90-42 36-2 54 26 86 24 22-1 38-12 52-24");
+  }
+  50% {
+    d: path("M14 84c46 6 62-30 104-38 44-8 52 46 96 40 40-6 48-32 90-30 36 2 54 34 86 28 22-4 38-16 52-28");
+  }
+}
+
+@keyframes fan-sway {
+  0%, 100% {
+    transform: rotate(-2.5deg);
+  }
+  50% {
+    transform: rotate(2.5deg);
+  }
+}
+
+@keyframes leaf-rustle {
+  0%, 100% {
+    transform: rotate(-1.5deg) translateY(0);
+  }
+  50% {
+    transform: rotate(1.5deg) translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Whole-motif drift, layered under the per-part motion below. */
+  .motif-crane {
+    animation: fly-across 14s ease-in-out infinite;
+  }
+
+  .motif-crane .crane-wing-near {
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    animation: wing-flap 1.6s ease-in-out infinite;
+  }
+
+  .motif-crane .crane-wing-far {
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    animation: wing-flap 1.6s ease-in-out 0.12s infinite;
+  }
+
+  .motif-dragon .dragon-body {
+    animation:
+      dragon-draw 2.8s ease-out 0.3s forwards,
+      undulate 6s ease-in-out 3.1s infinite;
+  }
+
+  .motif-peacock {
+    transform-box: fill-box;
+    transform-origin: 50% 90%;
+    animation: fan-sway 7s ease-in-out infinite;
+  }
+
+  .motif-laurel {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: leaf-rustle 6s ease-in-out infinite;
+  }
+}

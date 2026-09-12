@@ -20,6 +20,10 @@ export default {
         // Warmer surface tints so sections are not all one navy.
         ink: "#0B1220",
         dusk: "#1E3055",
+        // Per-country accents, selected by motif.
+        sakura: "#F2A2C0",
+        saffron: "#F0913A",
+        terracotta: "#E0654B",
       },
     },
   },

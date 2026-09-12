@@ -61,6 +61,15 @@ what stops the app reading like a dashboard — keep it on headings. Note that `
 alongside explicit `weight` values, and `@apply font-display` fails inside `@layer base`; set
 `font-family: var(--font-display)` directly there instead.
 
+**Accent colour is per country**, keyed by motif via `src/lib/accent.ts`: jade for China, sakura pink for
+Japan, saffron for India, terracotta for Italy. Section labels, rules and the primary button all take it, so
+a destination is recognisable before you read its name. Event cards take their tone from what the event *is*
+(`src/lib/event-tone.ts`) — blossom renders pink, autumn foliage coral, festivals gold.
+
+**Motifs keep moving.** Each draws itself in once, then loops forever: the crane flies with flapping wings,
+the dragon undulates, the peacock's fan sways, laurel rustles. A motif that animates once and freezes reads
+as broken — verify with `getComputedStyle(el).transform` sampled twice, not by eye on a screenshot.
+
 **Surfaces are never flat**: `body` carries fixed radial washes in jade/gold/coral plus an SVG film grain via
 `body::after`, and cards use `bg-gradient-to-b from-midnight to-dusk/40` rather than one solid navy. Section
 labels pair with a fading gradient rule. A uniform dark panel reads as unfinished.
