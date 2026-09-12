@@ -53,14 +53,17 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
       />
 
       {country.motif && (
-        <div className="mx-auto max-w-6xl px-6 pt-10 sm:px-10">
-          <Motif motif={country.motif} className="motif-float mx-auto h-28 w-full max-w-3xl opacity-95" />
+        <div className="relative mx-auto -mt-6 max-w-6xl px-6 sm:px-10">
+          <Motif motif={country.motif} className="motif-float mx-auto h-24 w-full max-w-2xl opacity-95" />
         </div>
       )}
 
-      <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
+      <section className="mx-auto max-w-6xl px-6 pb-20 pt-4 sm:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
-          <h2 className="text-xs uppercase tracking-[0.35em] text-jade">Where to go</h2>
+          <h2 className="flex items-center gap-4 text-xs uppercase tracking-[0.35em] text-jade">
+            Where to go
+            <span className="h-px w-16 bg-gradient-to-r from-jade/60 to-transparent" />
+          </h2>
           <Link
             href={`/country/${country.slug}/plan`}
             className="rounded-full bg-jade px-6 py-2.5 text-sm font-medium text-space transition hover:bg-jade/90"
@@ -82,7 +85,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
               >
                 <Link
                   href={`/country/${country.slug}/${city.slug}`}
-                  className="group relative block h-full overflow-hidden rounded-2xl border border-white/5 bg-midnight transition duration-500 hover:-translate-y-1 hover:border-jade/40 hover:shadow-2xl hover:shadow-jade/5"
+                  className="group relative block h-full overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 transition duration-500 hover:-translate-y-1 hover:border-jade/40 hover:shadow-2xl hover:shadow-jade/5"
                 >
                   <div className={`relative overflow-hidden ${wide ? "h-72" : "h-56"}`}>
                     {photo ? (
@@ -101,7 +104,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
                   </div>
 
                   <div className="p-6">
-                    <h3 className="text-2xl font-medium text-ivory transition group-hover:text-jade">
+                    <h3 className="font-display text-2xl font-medium text-ivory transition group-hover:text-jade">
                       {city.name}
                     </h3>
                     {city.summary && (

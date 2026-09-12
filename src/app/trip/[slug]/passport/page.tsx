@@ -115,29 +115,29 @@ export default async function PassportPage({
               <span aria-hidden>✦</span>
               Travel passport
             </div>
-            <h1 className="passport-title mt-5 text-4xl font-semibold leading-tight sm:text-6xl">
+            <h1 className="passport-title mt-5 font-display text-4xl font-semibold leading-tight sm:text-6xl">
               My {trip.countryName} Journey
             </h1>
             <p className="mt-2 text-2xl font-light text-gold/70">{year}</p>
 
             <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm">
               <span className="text-soft-gray">
-                <span className="text-2xl font-medium text-jade">{visited}</span>
+                <span className="font-display text-2xl font-medium text-jade">{visited}</span>
                 <span className="text-soft-gray/60">/{placeIds.length}</span> visited
               </span>
               <span className="text-soft-gray">
-                <span className="text-2xl font-medium text-gold">{collected}</span>
+                <span className="font-display text-2xl font-medium text-gold">{collected}</span>
                 <span className="text-soft-gray/60">/{allCollectibles.length}</span> collected
               </span>
               <span className="text-soft-gray">
-                <span className="text-2xl font-medium text-ivory">{chapters.size}</span> cities
+                <span className="font-display text-2xl font-medium text-ivory">{chapters.size}</span> cities
               </span>
             </div>
           </div>
         </header>
 
         {stops.length > 0 && country && (
-          <section className="mt-8 overflow-hidden rounded-2xl border border-white/5 bg-midnight/60 p-4 sm:p-6">
+          <section className="mt-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40/60 p-4 sm:p-6">
             <RouteMap countryCode={country.code} stops={stops} />
           </section>
         )}
@@ -147,7 +147,7 @@ export default async function PassportPage({
             <Reveal key={chapter.cityName} delay={ci * 80}>
               <section>
                 <div className="flex items-baseline gap-3">
-                  <h2 className="text-2xl font-medium text-ivory">{chapter.cityName}</h2>
+                  <h2 className="font-display text-2xl font-medium text-ivory">{chapter.cityName}</h2>
                   <span className="h-px flex-1 bg-white/10" />
                 </div>
 
@@ -229,7 +229,7 @@ export default async function PassportPage({
         {memories.length > 0 && (
           <section className="mt-16">
             <div className="flex items-baseline gap-3">
-              <h2 className="text-2xl font-medium text-ivory">Your memories</h2>
+              <h2 className="font-display text-2xl font-medium text-ivory">Your memories</h2>
               <span className="h-px flex-1 bg-white/10" />
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">

@@ -5,6 +5,30 @@
 @layer base {
   body {
     @apply bg-space text-ivory antialiased;
+    font-family: var(--font-sans), system-ui, sans-serif;
+    /* Warm wash from the top so the page is not one flat navy. */
+    background-image:
+      radial-gradient(120% 70% at 12% -10%, rgba(47, 191, 159, 0.10), transparent 60%),
+      radial-gradient(100% 60% at 88% 4%, rgba(244, 201, 93, 0.07), transparent 55%),
+      radial-gradient(90% 70% at 50% 104%, rgba(244, 124, 108, 0.06), transparent 60%);
+    background-attachment: fixed;
+  }
+
+  /* Film grain: breaks up large flat areas without adding an image asset. */
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -5;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display), Georgia, serif;
   }
 }
 

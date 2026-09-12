@@ -154,7 +154,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
             const minutes = day.places.reduce((n, p) => n + (p.visitMinutes ?? 120), 0);
             return (
               <Reveal key={day.day} delay={i * 60}>
-                <li className="overflow-hidden rounded-2xl border border-white/5 bg-midnight">
+                <li className="overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40">
                   <div className="flex items-baseline justify-between gap-4 border-b border-white/5 px-6 py-4">
                     <div className="flex items-baseline gap-4">
                       <span className="text-xs uppercase tracking-[0.25em] text-jade">

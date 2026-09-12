@@ -87,7 +87,7 @@ export default async function CollectPage({
         </Link>
 
         <p className="mt-10 text-xs uppercase tracking-[0.35em] text-jade">Your journey</p>
-        <h1 className="mt-4 text-4xl font-semibold text-ivory sm:text-5xl">
+        <h1 className="mt-4 font-display text-4xl font-semibold text-ivory sm:text-5xl">
           What did you see and collect?
         </h1>
         <p className="mt-4 text-soft-gray">
@@ -101,7 +101,7 @@ export default async function CollectPage({
               return (
                 <section key={cityName}>
                   <div className="flex items-baseline gap-3">
-                    <h2 className="text-xl font-medium text-ivory">{cityName}</h2>
+                    <h2 className="font-display text-xl font-medium text-ivory">{cityName}</h2>
                     <span className="h-px flex-1 bg-white/10" />
                   </div>
 
@@ -109,7 +109,7 @@ export default async function CollectPage({
                     {places.map((place) => (
                       <label
                         key={place.id}
-                        className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/5 bg-midnight px-5 py-3 transition hover:border-jade/40 has-[:checked]:border-jade/50 has-[:checked]:bg-jade/[0.06]"
+                        className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 px-5 py-3 transition hover:border-jade/40 has-[:checked]:border-jade/50 has-[:checked]:bg-jade/[0.06]"
                       >
                         <input
                           type="checkbox"
@@ -168,7 +168,7 @@ export default async function CollectPage({
         </form>
 
         <section className="mt-20 border-t border-white/5 pt-12">
-          <h2 className="text-xl font-medium text-ivory">Your photos &amp; notes</h2>
+          <h2 className="font-display text-xl font-medium text-ivory">Your photos &amp; notes</h2>
           <p className="mt-2 text-sm text-soft-gray">
             Add your own pictures and memories — they go into your passport.
           </p>
@@ -178,7 +178,7 @@ export default async function CollectPage({
               {memories.map((m) => (
                 <li
                   key={m.id}
-                  className="overflow-hidden rounded-xl border border-white/5 bg-midnight"
+                  className="overflow-hidden rounded-xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40"
                 >
                   {m.imagePath && (
                     <img
@@ -226,7 +226,7 @@ export default async function CollectPage({
               </button>
             </form>
           ) : (
-            <p className="mt-6 rounded-xl border border-white/5 bg-midnight px-5 py-4 text-sm text-soft-gray">
+            <p className="mt-6 rounded-xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 px-5 py-4 text-sm text-soft-gray">
               <Link href={`/signin?from=/trip/${slug}/collect`} className="text-jade">
                 Sign in
               </Link>{" "}

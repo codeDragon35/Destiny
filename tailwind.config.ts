@@ -4,6 +4,10 @@ export default {
   content: ["./src/**/*.{ts,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        display: ["var(--font-display)", "Georgia", "serif"],
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+      },
       colors: {
         space: "#101827",
         midnight: "#172A46",
@@ -13,6 +17,9 @@ export default {
         ivory: "#F7F4EA",
         "soft-gray": "#AAB4C3",
         mist: "#DCE7E5",
+        // Warmer surface tints so sections are not all one navy.
+        ink: "#0B1220",
+        dusk: "#1E3055",
       },
     },
   },

@@ -51,8 +51,19 @@ The palette is defined once as Tailwind tokens in `tailwind.config.ts`; use the 
 | `ivory` | `#F7F4EA` | Main text |
 | `soft-gray` | `#AAB4C3` | Secondary text |
 | `mist` | `#DCE7E5` | Light backgrounds |
+| `ink` | `#0B1220` | Deeper ground for layering |
+| `dusk` | `#1E3055` | Warm card gradient end |
 
 The app is dark-first: `bg-space` + `text-ivory` are set on `body` in `globals.css`.
+
+**Typography**: headings use the Fraunces display serif (`font-display`), body copy uses Inter. The serif is
+what stops the app reading like a dashboard — keep it on headings. Note that `next/font` rejects `axes`
+alongside explicit `weight` values, and `@apply font-display` fails inside `@layer base`; set
+`font-family: var(--font-display)` directly there instead.
+
+**Surfaces are never flat**: `body` carries fixed radial washes in jade/gold/coral plus an SVG film grain via
+`body::after`, and cards use `bg-gradient-to-b from-midnight to-dusk/40` rather than one solid navy. Section
+labels pair with a fading gradient rule. A uniform dark panel reads as unfinished.
 
 ## Globe
 

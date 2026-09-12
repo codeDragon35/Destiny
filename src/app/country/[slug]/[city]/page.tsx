@@ -102,7 +102,10 @@ export default async function CityPage({
       )}
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
-        <h2 className="text-xs uppercase tracking-[0.35em] text-jade">What to see</h2>
+        <h2 className="flex items-center gap-4 text-xs uppercase tracking-[0.35em] text-jade">
+          What to see
+          <span className="h-px w-16 bg-gradient-to-r from-jade/60 to-transparent" />
+        </h2>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           {places.map((place, i) => {
@@ -112,7 +115,7 @@ export default async function CityPage({
             return (
               <Reveal key={place.id} delay={i * 80}>
                 <article
-                  className={`group h-full overflow-hidden rounded-2xl border border-white/5 bg-midnight transition duration-500 hover:-translate-y-1 ${k.ring}`}
+                  className={`group h-full overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 transition duration-500 hover:-translate-y-1 ${k.ring}`}
                 >
                   <div className="relative h-52 overflow-hidden">
                     {photo ? (
@@ -138,7 +141,7 @@ export default async function CityPage({
                   </div>
 
                   <div className="p-6">
-                    <h3 className={`text-xl font-medium text-ivory transition ${k.hoverText}`}>
+                    <h3 className={`font-display text-xl font-medium text-ivory transition ${k.hoverText}`}>
                       {place.name}
                     </h3>
                     {place.summary && (

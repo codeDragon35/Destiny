@@ -20,7 +20,7 @@ export default async function HomePage() {
 
       <div className="pointer-events-none absolute inset-x-0 top-0 p-6 sm:p-10">
         <p className="text-xs uppercase tracking-[0.3em] text-jade">Destiny</p>
-        <h1 className="mt-3 max-w-md text-3xl font-semibold leading-tight text-ivory sm:text-4xl">
+        <h1 className="mt-3 max-w-md font-display text-3xl font-semibold leading-tight text-ivory sm:text-4xl">
           Choose a country
         </h1>
         <p className="mt-2 max-w-sm text-sm text-soft-gray">

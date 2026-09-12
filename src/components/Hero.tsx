@@ -48,7 +48,7 @@ export default function Hero({
 
       <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-12 sm:px-10 sm:pb-16">
         {kicker}
-        <h1 className="mt-4 text-5xl font-semibold leading-[1.05] tracking-tight text-ivory sm:text-7xl">
+        <h1 className="mt-4 font-display text-5xl font-semibold leading-[1.05] tracking-tight text-ivory sm:text-7xl">
           {title}
         </h1>
         {summary && (
