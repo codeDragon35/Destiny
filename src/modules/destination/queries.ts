@@ -12,6 +12,7 @@ export type Country = {
   lat: number | null;
   lng: number | null;
   wikidataId: string | null;
+  motif: string | null;
 };
 
 export type City = {
@@ -47,6 +48,7 @@ export async function listCountries(): Promise<Country[]> {
       c.summary,
       c.emoji,
       c.wikidata_id AS "wikidataId",
+      c.motif,
       ST_Y(ST_Centroid(ST_Collect(ct.location))) AS lat,
       ST_X(ST_Centroid(ST_Collect(ct.location))) AS lng
     FROM countries c
@@ -59,7 +61,7 @@ export async function listCountries(): Promise<Country[]> {
 
 export async function getCountryBySlug(slug: string): Promise<Country | null> {
   const rows = await db.execute<Country>(sql`
-    SELECT id, code, name, slug, summary, emoji, wikidata_id AS "wikidataId"
+    SELECT id, code, name, slug, summary, emoji, wikidata_id AS "wikidataId", motif
     FROM countries
     WHERE slug = ${slug}
     LIMIT 1

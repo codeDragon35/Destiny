@@ -10,6 +10,8 @@ import { getPhoto } from "@/modules/media/wikimedia";
 import { listCitiesForCountry, getCountryBySlug } from "@/modules/destination/queries";
 import RouteMap from "@/components/RouteMap";
 import Sparkles from "@/components/Sparkles";
+import Motif from "@/components/Motif";
+import SoundToggle from "@/components/SoundToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -93,12 +95,21 @@ export default async function PassportPage({
   return (
     <main className="min-h-dvh bg-space">
       <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-24">
-        <Link href={`/trip/${slug}`} className="text-sm text-soft-gray transition hover:text-jade">
-          ← Itinerary
-        </Link>
+        <div className="flex items-center justify-between gap-4">
+          <Link href={`/trip/${slug}`} className="text-sm text-soft-gray transition hover:text-jade">
+            ← Itinerary
+          </Link>
+          <SoundToggle />
+        </div>
 
         <header className="relative mt-10 overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/[0.10] via-midnight to-space p-8 shadow-2xl shadow-gold/5 sm:p-12">
           <Sparkles />
+          {country?.motif && (
+            <Motif
+              motif={country.motif}
+              className="pointer-events-none absolute inset-x-0 -top-2 h-32 w-full opacity-45"
+            />
+          )}
           <div className="relative">
             <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-gold">
               <span aria-hidden>✦</span>

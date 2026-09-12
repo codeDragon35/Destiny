@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/Reveal";
+import Motif from "@/components/Motif";
 import { getCountryBySlug, listCitiesForCountry } from "@/modules/destination/queries";
 import { getPhoto } from "@/modules/media/wikimedia";
 
@@ -45,6 +46,12 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           </div>
         }
       />
+
+      {country.motif && (
+        <div className="mx-auto max-w-6xl px-6 pt-10 sm:px-10">
+          <Motif motif={country.motif} className="motif-float mx-auto h-28 w-full max-w-3xl opacity-95" />
+        </div>
+      )}
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">

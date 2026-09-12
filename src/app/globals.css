@@ -125,3 +125,55 @@
     animation: shimmer 5s linear infinite;
   }
 }
+
+@keyframes dragon-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes dragon-drift {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@keyframes dragon-breathe {
+  0%, 100% {
+    opacity: 0.85;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .dragon-body {
+    stroke-dasharray: 620;
+    stroke-dashoffset: 620;
+    animation: dragon-draw 2.8s ease-out 0.3s forwards;
+  }
+
+  .dragon-spine {
+    animation-delay: 0.6s;
+  }
+
+  .dragon-head {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: dragon-breathe 3.4s ease-in-out 3s infinite;
+  }
+
+  .dragon-whisker {
+    animation: dragon-drift 4s ease-in-out 3s infinite;
+  }
+
+  .motif-float {
+    animation: dragon-drift 7s ease-in-out infinite;
+  }
+}

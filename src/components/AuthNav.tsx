@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { auth, signOut } from "@/auth";
+import SoundToggle from "@/components/SoundToggle";
 
 export default async function AuthNav() {
   const session = await auth();
 
   return (
     <nav className="pointer-events-auto absolute right-4 top-4 z-20 flex items-center gap-3 text-sm sm:right-8 sm:top-6">
+      <SoundToggle />
       {session?.user ? (
         <>
           <Link href="/trips" className="text-soft-gray transition hover:text-jade">

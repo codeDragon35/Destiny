@@ -52,6 +52,8 @@ export const countries = pgTable(
     emoji: text("emoji"),
     imageUrl: text("image_url"),
     imageCredit: text("image_credit"),
+    /** Cultural motif key driving country-specific decoration, e.g. "dragon". */
+    motif: text("motif"),
     // Exact Wikidata entity; avoids ambiguous name search when resolving photos.
     wikidataId: text("wikidata_id"),
     photoFetchedAt: timestamp("photo_fetched_at", { withTimezone: true }),

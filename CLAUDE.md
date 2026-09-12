@@ -162,6 +162,22 @@ while signed out) stays editable by anyone with the link, so older shareable tri
 trip is editable only by its owner. Check `canEdit` on render *and* again inside every server action — the
 render is not a security boundary.
 
+## Country motifs
+
+`countries.motif` names a cultural decoration rendered by `src/components/Motif.tsx` — China is `dragon`, an
+animated SVG that draws itself in, then breathes. Adding a country's motif means adding a case in that one
+component; the pages that render it do not change.
+
+`motif` belongs to **countries only**. A careless edit once added `c.motif` to `listCitiesForCountry`, where
+`c` aliases `cities`, and every country and passport page 500'd — beware shared table aliases when editing
+these queries.
+
+## Ambient sound
+
+`SoundToggle` synthesises a slow pentatonic drone through WebAudio, so the repo ships no audio files. It is
+**off by default and opt-in**, persisted in `localStorage`: browsers block autoplay, and unrequested sound is
+hostile. Keep it that way.
+
 ## Planned: seasonality and events
 
 Requested, not yet built. Two related ideas:
