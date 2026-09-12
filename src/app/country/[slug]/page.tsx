@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/Reveal";
 import { getCountryBySlug, listCitiesForCountry } from "@/modules/destination/queries";
-import { searchPhoto } from "@/modules/media/unsplash";
+import { getPhoto } from "@/modules/media/wikimedia";
 
 export const dynamic = "force-dynamic";
 
@@ -14,8 +14,8 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
 
   const cities = await listCitiesForCountry(country.id);
   const [hero, ...cityPhotos] = await Promise.all([
-    searchPhoto(`${country.name} landscape travel`),
-    ...cities.map((c) => searchPhoto(`${c.name} ${country.name} city`)),
+    getPhoto("countries", country.id, country.name, country.wikidataId),
+    ...cities.map((c) => getPhoto("cities", c.id, `${c.name}, ${country.name}`, c.wikidataId)),
   ]);
 
   const totalPlaces = cities.reduce((n, c) => n + c.placeCount, 0);
@@ -74,7 +74,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
                     ) : (
                       <div className="h-full w-full bg-gradient-to-br from-midnight via-space to-midnight" />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/40 to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-midnight to-transparent" />
                     <span className="absolute right-4 top-4 rounded-full bg-space/70 px-3 py-1 text-xs font-medium text-gold backdrop-blur">
                       {city.placeCount} places
                     </span>

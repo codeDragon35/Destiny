@@ -1,4 +1,4 @@
-import type { Photo } from "@/modules/media/unsplash";
+import type { Photo } from "@/modules/media/wikimedia";
 
 /** Stable hue per name so gradient fallbacks differ between places but never shift between renders. */
 function hueFrom(seed: string) {
@@ -44,7 +44,7 @@ export default function Hero({
       )}
 
       {/* Keeps text legible over any photo. */}
-      <div className="absolute inset-0 bg-gradient-to-t from-space via-space/75 to-space/25" />
+      <div className="absolute inset-0 bg-gradient-to-t from-space via-space/55 to-space/10" />
 
       <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-12 sm:px-10 sm:pb-16">
         {kicker}
@@ -56,15 +56,10 @@ export default function Hero({
         )}
       </div>
 
-      {photo && (
-        <a
-          href={photo.creditUrl}
-          target="_blank"
-          rel="noreferrer"
-          className="absolute bottom-3 right-4 text-[11px] text-soft-gray/60 transition hover:text-soft-gray"
-        >
-          Photo: {photo.credit} / Unsplash
-        </a>
+      {photo?.credit && (
+        <p className="absolute bottom-3 right-4 text-[11px] text-soft-gray/60">
+          Photo: {photo.credit}
+        </p>
       )}
     </header>
   );

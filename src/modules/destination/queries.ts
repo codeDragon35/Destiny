@@ -11,6 +11,7 @@ export type Country = {
   /** Centroid of the country's cities; null until cities are seeded. */
   lat: number | null;
   lng: number | null;
+  wikidataId: string | null;
 };
 
 export type City = {
@@ -21,6 +22,7 @@ export type City = {
   lat: number;
   lng: number;
   placeCount: number;
+  wikidataId: string | null;
 };
 
 export type Place = {
@@ -32,6 +34,7 @@ export type Place = {
   lat: number;
   lng: number;
   visitMinutes: number | null;
+  wikidataId: string | null;
 };
 
 export async function listCountries(): Promise<Country[]> {
@@ -43,6 +46,7 @@ export async function listCountries(): Promise<Country[]> {
       c.slug,
       c.summary,
       c.emoji,
+      c.wikidata_id AS "wikidataId",
       ST_Y(ST_Centroid(ST_Collect(ct.location))) AS lat,
       ST_X(ST_Centroid(ST_Collect(ct.location))) AS lng
     FROM countries c
@@ -55,7 +59,7 @@ export async function listCountries(): Promise<Country[]> {
 
 export async function getCountryBySlug(slug: string): Promise<Country | null> {
   const rows = await db.execute<Country>(sql`
-    SELECT id, code, name, slug, summary, emoji
+    SELECT id, code, name, slug, summary, emoji, wikidata_id AS "wikidataId"
     FROM countries
     WHERE slug = ${slug}
     LIMIT 1
@@ -72,6 +76,7 @@ export async function listCitiesForCountry(countryId: string): Promise<City[]> {
       c.summary,
       ST_Y(c.location) AS lat,
       ST_X(c.location) AS lng,
+      c.wikidata_id AS "wikidataId",
       COUNT(p.id)::int AS "placeCount"
     FROM cities c
     LEFT JOIN places p ON p.city_id = c.id
@@ -90,7 +95,8 @@ export async function getCityBySlug(countryId: string, slug: string) {
       slug,
       summary,
       ST_Y(location) AS lat,
-      ST_X(location) AS lng
+      ST_X(location) AS lng,
+      wikidata_id AS "wikidataId"
     FROM cities
     WHERE country_id = ${countryId} AND slug = ${slug}
     LIMIT 1
@@ -108,7 +114,8 @@ export async function listPlacesForCity(cityId: string): Promise<Place[]> {
       summary,
       ST_Y(location) AS lat,
       ST_X(location) AS lng,
-      visit_minutes AS "visitMinutes"
+      visit_minutes AS "visitMinutes",
+      wikidata_id AS "wikidataId"
     FROM places
     WHERE city_id = ${cityId}
     ORDER BY name

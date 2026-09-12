@@ -7,16 +7,16 @@ import {
   getCountryBySlug,
   listPlacesForCity,
 } from "@/modules/destination/queries";
-import { searchPhoto } from "@/modules/media/unsplash";
+import { getPhoto } from "@/modules/media/wikimedia";
 
 export const dynamic = "force-dynamic";
 
 const KIND = {
-  attraction: { label: "Attraction", hoverText: "group-hover:text-jade", chip: "bg-jade/15 text-jade", ring: "hover:border-jade/40" },
-  nature: { label: "Nature", hoverText: "group-hover:text-mist", chip: "bg-mist/15 text-mist", ring: "hover:border-mist/40" },
-  culture: { label: "Culture", hoverText: "group-hover:text-gold", chip: "bg-gold/15 text-gold", ring: "hover:border-gold/40" },
-  food: { label: "Food", hoverText: "group-hover:text-coral", chip: "bg-coral/15 text-coral", ring: "hover:border-coral/40" },
-  hidden_gem: { label: "Hidden gem", hoverText: "group-hover:text-gold", chip: "bg-gold/20 text-gold", ring: "hover:border-gold/50" },
+  attraction: { label: "Attraction", hoverText: "group-hover:text-jade", chip: "bg-space/85 text-jade ring-1 ring-jade/30", ring: "hover:border-jade/40" },
+  nature: { label: "Nature", hoverText: "group-hover:text-mist", chip: "bg-space/85 text-mist ring-1 ring-mist/30", ring: "hover:border-mist/40" },
+  culture: { label: "Culture", hoverText: "group-hover:text-gold", chip: "bg-space/85 text-gold ring-1 ring-gold/30", ring: "hover:border-gold/40" },
+  food: { label: "Food", hoverText: "group-hover:text-coral", chip: "bg-space/85 text-coral ring-1 ring-coral/30", ring: "hover:border-coral/40" },
+  hidden_gem: { label: "Hidden gem", hoverText: "group-hover:text-gold", chip: "bg-space/85 text-gold ring-1 ring-gold/40", ring: "hover:border-gold/50" },
 } as const;
 
 function kindOf(k: string) {
@@ -43,8 +43,8 @@ export default async function CityPage({
 
   const places = await listPlacesForCity(city.id);
   const [hero, ...placePhotos] = await Promise.all([
-    searchPhoto(`${city.name} ${country.name}`),
-    ...places.map((p) => searchPhoto(`${p.name} ${city.name}`)),
+    getPhoto("cities", city.id, `${city.name}, ${country.name}`, city.wikidataId),
+    ...places.map((p) => getPhoto("places", p.id, `${p.name}, ${city.name}`, p.wikidataId)),
   ]);
 
   const totalHours = places.reduce((n, p) => n + (p.visitMinutes ?? 0), 0) / 60;
@@ -96,7 +96,7 @@ export default async function CityPage({
                     ) : (
                       <div className="h-full w-full bg-gradient-to-br from-midnight via-space to-midnight" />
                     )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-midnight to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-midnight to-transparent" />
                     <span
                       className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-medium backdrop-blur ${k.chip}`}
                     >

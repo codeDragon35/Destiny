@@ -15,6 +15,20 @@
       "when": 1789211514590,
       "tag": "0001_third_elektra",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789212177161,
+      "tag": "0002_noisy_the_stranger",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789212752266,
+      "tag": "0003_wikidata_id",
+      "breakpoints": true
     }
   ]
 }

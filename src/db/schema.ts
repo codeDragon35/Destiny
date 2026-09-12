@@ -36,6 +36,9 @@ export const countries = pgTable(
     emoji: text("emoji"),
     imageUrl: text("image_url"),
     imageCredit: text("image_credit"),
+    // Exact Wikidata entity; avoids ambiguous name search when resolving photos.
+    wikidataId: text("wikidata_id"),
+    photoFetchedAt: timestamp("photo_fetched_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -57,6 +60,9 @@ export const cities = pgTable(
     location: point("location").notNull(),
     imageUrl: text("image_url"),
     imageCredit: text("image_credit"),
+    // Exact Wikidata entity; avoids ambiguous name search when resolving photos.
+    wikidataId: text("wikidata_id"),
+    photoFetchedAt: timestamp("photo_fetched_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
@@ -79,6 +85,9 @@ export const places = pgTable(
     location: point("location").notNull(),
     imageUrl: text("image_url"),
     imageCredit: text("image_credit"),
+    // Exact Wikidata entity; avoids ambiguous name search when resolving photos.
+    wikidataId: text("wikidata_id"),
+    photoFetchedAt: timestamp("photo_fetched_at", { withTimezone: true }),
     // Typical visit length, used later by the Trip Planner Agent for day packing.
     visitMinutes: integer("visit_minutes"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

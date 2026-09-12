@@ -85,9 +85,13 @@ Pages are editorial, not utilitarian: a photo hero with oversized type, an asymm
 card spans full width), per-category colour, and hover lift. Keep that register when adding pages — a plain
 uniform card grid reads as a database table and was explicitly rejected.
 
-- **Photos** come from Unsplash via `src/modules/media/unsplash.ts`, server-side and cached 24h (the Demo
-  tier allows only 50 req/hour). Set `UNSPLASH_ACCESS_KEY` to enable them; without it every image falls back
-  to a deterministic gradient seeded from the slug, so layouts stay intact but look flat.
+- **Photos** come from Wikimedia Commons via Wikidata (`src/modules/media/wikimedia.ts`) — no API key, no
+  usage cost. Each row caches its resolved `image_url` and `photo_fetched_at`, so a warm row makes no network
+  call; refresh is every 30 days. A subject with no image records the attempt so it is not retried per render.
+- **Always seed `wikidata_id` for new places.** Name search is ambiguous and silently returns the wrong
+  subject — a bare "Muslim Quarter" resolves to *Jerusalem*, and "Jingshan Park" once resolved to an entity
+  meaning "inauguration". Look the QID up and verify its label/description before adding it. Rows without a
+  QID fall back to a deterministic gradient, which is correct behaviour — a wrong photo is worse than none.
 - **Motion** is progressive enhancement only. `Reveal` starts *visible* and hides itself solely for elements
   below the fold — so content still renders if JS never runs, and nothing flickers on load. It also respects
   `prefers-reduced-motion`.
