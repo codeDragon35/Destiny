@@ -4,31 +4,35 @@
 
 @layer base {
   body {
-    @apply bg-space text-ivory antialiased;
+    @apply bg-paper text-ink antialiased;
     font-family: var(--font-sans), system-ui, sans-serif;
-    /* Warm wash from the top so the page is not one flat navy. */
-    background-image:
-      radial-gradient(120% 70% at 12% -10%, rgba(47, 191, 159, 0.10), transparent 60%),
-      radial-gradient(100% 60% at 88% 4%, rgba(244, 201, 93, 0.07), transparent 55%),
-      radial-gradient(90% 70% at 50% 104%, rgba(244, 124, 108, 0.06), transparent 60%);
-    background-attachment: fixed;
-  }
-
-  /* Film grain: breaks up large flat areas without adding an image asset. */
-  body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: -5;
-    pointer-events: none;
-    opacity: 0.5;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.045'/%3E%3C/svg%3E");
+    font-size: 15px;
+    line-height: 1.55;
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  h4 {
     font-family: var(--font-display), Georgia, serif;
+    font-weight: 400;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+  }
+}
+
+@layer components {
+  /* Photography sits on warm paper, so it is desaturated to match the ground. */
+  .washed {
+    filter: saturate(0.6) contrast(0.85) brightness(1.1) opacity(0.94);
+  }
+
+  .card {
+    @apply rounded-md border border-ink/[0.08] bg-cream shadow-sm;
+  }
+
+  .chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-ink/10 bg-cream px-3 py-1 text-xs;
   }
 }
 
@@ -52,35 +56,9 @@
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .animate-float-in {
-    animation: float-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
-  }
-}
-
-/* Route line draws itself across the map. */
-@keyframes draw-route {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes stop-pop {
-  0% {
-    opacity: 0;
-    transform: scale(0.2);
-  }
-  70% {
-    transform: scale(1.25);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 @keyframes sparkle {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0;
     transform: scale(0.4) rotate(0deg);
   }
@@ -105,48 +83,23 @@
   }
 }
 
-@keyframes shimmer {
-  from {
-    background-position: -180% 0;
-  }
+@keyframes draw-route {
   to {
-    background-position: 180% 0;
+    stroke-dashoffset: 0;
   }
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .route-line {
-    stroke-dasharray: 1400;
-    stroke-dashoffset: 1400;
-    animation: draw-route 2.6s ease-out 0.4s forwards;
+@keyframes stop-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2);
   }
-
-  .route-stop {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: stop-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  70% {
+    transform: scale(1.25);
   }
-
-  .sparkle {
-    animation: sparkle 2.4s ease-in-out infinite;
-  }
-
-  .stamp-in {
-    animation: stamp-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  }
-
-  .passport-title {
-    background: linear-gradient(
-      100deg,
-      #F7F4EA 30%,
-      #F4C95D 45%,
-      #F7F4EA 60%
-    );
-    background-size: 180% auto;
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-    animation: shimmer 5s linear infinite;
+  100% {
+    opacity: 1;
+    transform: scale(1);
   }
 }
 
@@ -157,7 +110,8 @@
 }
 
 @keyframes dragon-drift {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -165,44 +119,6 @@
   }
 }
 
-@keyframes dragon-breathe {
-  0%, 100% {
-    opacity: 0.85;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.06);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .dragon-body {
-    stroke-dasharray: 620;
-    stroke-dashoffset: 620;
-    animation: dragon-draw 2.8s ease-out 0.3s forwards;
-  }
-
-  .dragon-spine {
-    animation-delay: 0.6s;
-  }
-
-  .dragon-head {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: dragon-breathe 3.4s ease-in-out 3s infinite;
-  }
-
-  .dragon-whisker {
-    animation: dragon-drift 4s ease-in-out 3s infinite;
-  }
-
-  .motif-float {
-    animation: dragon-drift 7s ease-in-out infinite;
-  }
-}
-
-/* Continuous motif motion: these loop forever rather than settling. */
 @keyframes fly-across {
   0% {
     transform: translateX(-18%) translateY(6px);
@@ -216,7 +132,8 @@
 }
 
 @keyframes wing-flap {
-  0%, 100% {
+  0%,
+  100% {
     transform: scaleY(1) translateY(0);
   }
   50% {
@@ -224,17 +141,9 @@
   }
 }
 
-@keyframes undulate {
-  0%, 100% {
-    d: path("M14 96c46-4 62-44 104-48 44-4 52 38 96 36 40-2 48-40 90-42 36-2 54 26 86 24 22-1 38-12 52-24");
-  }
-  50% {
-    d: path("M14 84c46 6 62-30 104-38 44-8 52 46 96 40 40-6 48-32 90-30 36 2 54 34 86 28 22-4 38-16 52-28");
-  }
-}
-
 @keyframes fan-sway {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(-2.5deg);
   }
   50% {
@@ -243,7 +152,8 @@
 }
 
 @keyframes leaf-rustle {
-  0%, 100% {
+  0%,
+  100% {
     transform: rotate(-1.5deg) translateY(0);
   }
   50% {
@@ -252,7 +162,34 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  /* Whole-motif drift, layered under the per-part motion below. */
+  .animate-float-in {
+    animation: float-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .sparkle {
+    animation: sparkle 2.4s ease-in-out infinite;
+  }
+
+  .stamp-in {
+    animation: stamp-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .route-line {
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: draw-route 2.6s ease-out 0.4s forwards;
+  }
+
+  .route-stop {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: stop-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  }
+
+  .motif-float {
+    animation: dragon-drift 7s ease-in-out infinite;
+  }
+
   .motif-crane {
     animation: fly-across 14s ease-in-out infinite;
   }
@@ -270,9 +207,15 @@
   }
 
   .motif-dragon .dragon-body {
-    animation:
-      dragon-draw 2.8s ease-out 0.3s forwards,
-      undulate 6s ease-in-out 3.1s infinite;
+    stroke-dasharray: 620;
+    stroke-dashoffset: 620;
+    animation: dragon-draw 2.8s ease-out 0.3s forwards;
+  }
+
+  .motif-dragon .dragon-head,
+  .motif-crane .dragon-head {
+    transform-box: fill-box;
+    transform-origin: center;
   }
 
   .motif-peacock {

@@ -1,6 +1,6 @@
 /**
  * Seasonal events read better when their colour matches what they are:
- * blossom is pink, autumn foliage is amber, lantern festivals are gold.
+ * blossom is pink-clay, autumn foliage is amber, festivals are gold.
  * Complete class strings only — Tailwind cannot see interpolated names.
  */
 export type Tone = { text: string; border: string; bg: string };
@@ -9,33 +9,33 @@ const TONES: { match: RegExp; tone: Tone }[] = [
   {
     match: /blossom|sakura|hanami|peony|flower|bloom|spring/i,
     tone: {
-      text: "text-sakura",
-      border: "border-sakura/30",
-      bg: "bg-sakura/[0.06]",
+      text: "text-accent-600",
+      border: "border-accent-300",
+      bg: "bg-accent-100",
     },
   },
   {
     match: /autumn|foliage|colour|color|maple/i,
     tone: {
-      text: "text-coral",
-      border: "border-coral/30",
-      bg: "bg-coral/[0.05]",
+      text: "text-clay",
+      border: "border-clay/30",
+      bg: "bg-clay/[0.07]",
     },
   },
   {
     match: /lantern|light|fire|carnival|festival|matsuri|teej/i,
     tone: {
-      text: "text-gold",
-      border: "border-gold/30",
-      bg: "bg-gold/[0.05]",
+      text: "text-leaf-700",
+      border: "border-leaf-300",
+      bg: "bg-leaf-100",
     },
   },
 ];
 
 const DEFAULT: Tone = {
-  text: "text-mist",
-  border: "border-mist/25",
-  bg: "bg-mist/[0.04]",
+  text: "text-forest",
+  border: "border-ink/10",
+  bg: "bg-surface",
 };
 
 export function eventTone(name: string): Tone {

@@ -58,42 +58,39 @@ Coordinates live in PostGIS `geometry(Point,4326)` columns via Drizzle's native 
 Do not hand-edit files in `drizzle/` — they are generated. If a generated type comes out wrong, fix the
 column definition in `src/db/schema.ts` and regenerate.
 
-## Theme
+## Theme — Organic design system
 
-The palette is defined once as Tailwind tokens in `tailwind.config.ts`; use the token names, not raw hex:
+The app follows the mockups in `design-mockups/` (`Destiny Web Mockups.dc.html`, ten screens). It is a
+**warm paper theme, not dark**: cream ground, forest ink, clay accent. The earlier dark-navy theme was
+replaced wholesale — do not reintroduce `space`/`midnight`/`jade` tokens.
 
 | Token | Hex | Use |
 | --- | --- | --- |
-| `space` | `#101827` | Main background / 3D map |
-| `midnight` | `#172A46` | Cards, panels |
-| `jade` | `#2FBF9F` | Primary accent / selected destinations |
-| `gold` | `#F4C95D` | Highlights, achievements, collectibles |
-| `coral` | `#F47C6C` | Important actions / experiences |
-| `ivory` | `#F7F4EA` | Main text |
-| `soft-gray` | `#AAB4C3` | Secondary text |
-| `mist` | `#DCE7E5` | Light backgrounds |
-| `ink` | `#0B1220` | Deeper ground for layering |
-| `dusk` | `#1E3055` | Warm card gradient end |
+| `paper` | `#F5EAD8` | Page ground |
+| `surface` | `#EBDDC5` | Inset panels, inputs |
+| `cream` | `#FFF9ED` | Cards |
+| `ink` | `#201E1D` | Body text |
+| `forest` | `#173F35` | Headings, sidebar rail |
+| `clay` | `#C67139` | Primary accent, buttons |
+| `sage` | `#7A8A5E` | Secondary accent |
 
-The app is dark-first: `bg-space` + `text-ivory` are set on `body` in `globals.css`.
+Ramps `neutral-*`, `accent-*` and `leaf-*` follow the design system's OKLCH scale; `shadow-sm/md/lg` are its
+ink-tinted elevations. Source of truth is `design-mockups/_ds/.../styles.css`.
 
-**Typography**: headings use the Fraunces display serif (`font-display`), body copy uses Inter. The serif is
-what stops the app reading like a dashboard — keep it on headings. Note that `next/font` rejects `axes`
+**Typography**: Caprasimo display for headings, Figtree for body. Note that `next/font` rejects `axes`
 alongside explicit `weight` values, and `@apply font-display` fails inside `@layer base`; set
 `font-family: var(--font-display)` directly there instead.
 
-**Accent colour is per country**, keyed by motif via `src/lib/accent.ts`: jade for China, sakura pink for
-Japan, saffron for India, terracotta for Italy. Section labels, rules and the primary button all take it, so
-a destination is recognisable before you read its name. Event cards take their tone from what the event *is*
-(`src/lib/event-tone.ts`) — blossom renders pink, autumn foliage coral, festivals gold.
+**Photography is `.washed`** — desaturated and lifted so it sits on paper rather than fighting it. A
+full-saturation photo on this ground looks pasted on.
+
+**Accent colour is per country**, keyed by motif via `src/lib/accent.ts`: clay for China, accent-600 for
+Japan, leaf for India, forest for Italy. Event cards take their tone from what the event *is*
+(`src/lib/event-tone.ts`) — blossom renders accent, autumn foliage clay, festivals leaf.
 
 **Motifs keep moving.** Each draws itself in once, then loops forever: the crane flies with flapping wings,
 the dragon undulates, the peacock's fan sways, laurel rustles. A motif that animates once and freezes reads
 as broken — verify with `getComputedStyle(el).transform` sampled twice, not by eye on a screenshot.
-
-**Surfaces are never flat**: `body` carries fixed radial washes in jade/gold/coral plus an SVG film grain via
-`body::after`, and cards use `bg-gradient-to-b from-midnight to-dusk/40` rather than one solid navy. Section
-labels pair with a fading gradient rule. A uniform dark panel reads as unfinished.
 
 ## Globe
 

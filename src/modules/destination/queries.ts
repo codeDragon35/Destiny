@@ -13,6 +13,7 @@ export type Country = {
   lng: number | null;
   wikidataId: string | null;
   motif: string | null;
+  placeCount: number;
 };
 
 export type City = {
@@ -50,7 +51,9 @@ export async function listCountries(): Promise<Country[]> {
       c.wikidata_id AS "wikidataId",
       c.motif,
       ST_Y(ST_Centroid(ST_Collect(ct.location))) AS lat,
-      ST_X(ST_Centroid(ST_Collect(ct.location))) AS lng
+      ST_X(ST_Centroid(ST_Collect(ct.location))) AS lng,
+      (SELECT COUNT(*)::int FROM places p
+       JOIN cities c2 ON c2.id = p.city_id WHERE c2.country_id = c.id) AS "placeCount"
     FROM countries c
     LEFT JOIN cities ct ON ct.country_id = c.id
     GROUP BY c.id
@@ -61,9 +64,13 @@ export async function listCountries(): Promise<Country[]> {
 
 export async function getCountryBySlug(slug: string): Promise<Country | null> {
   const rows = await db.execute<Country>(sql`
-    SELECT id, code, name, slug, summary, emoji, wikidata_id AS "wikidataId", motif
-    FROM countries
-    WHERE slug = ${slug}
+    SELECT
+      c.id, c.code, c.name, c.slug, c.summary, c.emoji,
+      c.wikidata_id AS "wikidataId", c.motif,
+      (SELECT COUNT(*)::int FROM places p
+       JOIN cities c2 ON c2.id = p.city_id WHERE c2.country_id = c.id) AS "placeCount"
+    FROM countries c
+    WHERE c.slug = ${slug}
     LIMIT 1
   `);
   return rows[0] ?? null;

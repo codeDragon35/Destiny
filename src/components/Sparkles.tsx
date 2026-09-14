@@ -22,7 +22,7 @@ export default function Sparkles({ className = "" }: { className?: string }) {
             animationDelay: `${p.delay}ms`,
           }}
           viewBox="0 0 24 24"
-          fill="#F4C95D"
+          fill="#C67139"
         >
           <path d="M12 0l2.6 8.4L23 12l-8.4 2.6L12 23l-2.6-8.4L1 12l8.4-2.6z" />
         </svg>

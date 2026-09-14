@@ -11,10 +11,10 @@ type CountryFeature = {
 
 export type GlobeCountry = { code: string; slug: string; lat: number; lng: number };
 
-const SPACE = "#101827";
-const JADE = "#2FBF9F";
-const MIDNIGHT = "#172A46";
-const SOFT_GRAY = "#AAB4C3";
+const SPACE = "#E1EECC";
+const JADE = "#173F35";
+const MIDNIGHT = "#CCDBB2";
+const SOFT_GRAY = "#645C50";
 
 export default function Globe({ available }: { available: GlobeCountry[] }) {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function Globe({ available }: { available: GlobeCountry[] }) {
 
   // Must be a real Material: react-globe.gl calls .dispose() on unmount.
   const globeMaterial = useMemo(
-    () => new MeshPhongMaterial({ color: MIDNIGHT, opacity: 0.95, transparent: true }),
+    () => new MeshPhongMaterial({ color: MIDNIGHT, opacity: 0.98, transparent: true }),
     [],
   );
 
@@ -80,12 +80,12 @@ export default function Globe({ available }: { available: GlobeCountry[] }) {
           polygonsData={features}
           polygonCapColor={(f) => {
             const feat = f as CountryFeature;
-            if (feat === hovered) return isAvailable(feat) ? JADE : "rgba(170,180,195,0.35)";
-            return isAvailable(feat) ? "rgba(47,191,159,0.55)" : "rgba(170,180,195,0.12)";
+            if (feat === hovered) return isAvailable(feat) ? "#C67139" : "rgba(100,92,80,0.35)";
+            return isAvailable(feat) ? "rgba(23,63,53,0.78)" : "rgba(100,92,80,0.16)";
           }}
-          polygonSideColor={() => "rgba(16,24,39,0.6)"}
+          polygonSideColor={() => "rgba(23,63,53,0.35)"}
           polygonStrokeColor={(f) =>
-            isAvailable(f as CountryFeature) ? JADE : "rgba(170,180,195,0.25)"
+            isAvailable(f as CountryFeature) ? "#173F35" : "rgba(100,92,80,0.25)"
           }
           polygonAltitude={(f) => (f === hovered ? 0.06 : 0.01)}
           onPolygonHover={(f) => setHovered((f as CountryFeature) ?? null)}
@@ -98,8 +98,8 @@ export default function Globe({ available }: { available: GlobeCountry[] }) {
       )}
 
       {hovered && (
-        <div className="pointer-events-none absolute left-1/2 top-6 -translate-x-1/2 rounded-full border border-white/10 bg-midnight/90 px-5 py-2 backdrop-blur">
-          <span className="text-ivory">{hovered.properties.name}</span>
+        <div className="pointer-events-none absolute left-1/2 top-6 -translate-x-1/2 rounded-full border border-ink/10 bg-cream/95 px-5 py-2 shadow-sm">
+          <span className="text-forest">{hovered.properties.name}</span>
           <span
             className="ml-3 text-xs"
             style={{ color: isAvailable(hovered) ? JADE : SOFT_GRAY }}

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Japan — hidden places map</title>
+<script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
+<style>
+  html,body{margin:0;height:100%;background:#8EC8D8;overflow:hidden}
+  svg{display:block;width:100%;height:100%}
+  .lbl{font:600 12px Figtree,system-ui,sans-serif;fill:#173F35}
+  .lbl-on{font:600 12px Figtree,system-ui,sans-serif;fill:#FFF9ED}
+</style>
+</head>
+<body>
+<svg id="map"></svg>
+<script>
+const PLACES = [
+  { name: 'Kyoto',        lon: 135.768, lat: 35.011, kind: 'city', side: 'left', off: 22 },
+  { name: 'Kanazawa',     lon: 136.656, lat: 36.561, kind: 'city', side: 'left' },
+  { name: 'Nara',         lon: 135.805, lat: 34.685, kind: 'city', side: 'below' },
+  { name: 'Kurama-dera',  lon: 135.766, lat: 35.121, kind: 'hero', side: 'above' },
+  { name: 'Kinosaki',     lon: 134.812, lat: 35.625, kind: 'gem',  side: 'left' },
+  { name: 'Magome',       lon: 137.572, lat: 35.524, kind: 'gem',  side: 'right' },
+  { name: 'Shirakawa-gō', lon: 136.906, lat: 36.256, kind: 'gem',  side: 'right' }
+];
+const ROUTE = ['Kyoto', 'Kurama-dera', 'Magome', 'Kanazawa'];
+
+function draw(land) {
+  const w = window.innerWidth, h = window.innerHeight;
+  const svg = d3.select('#map').attr('viewBox', [0, 0, w, h]);
+  svg.selectAll('*').remove();
+
+  // Frame the Kansai–Chūbu corridor rather than all of Japan.
+  const focus = { type: 'MultiPoint', coordinates: [[132.8, 33.0], [139.6, 37.9]] };
+  const proj = d3.geoMercator().fitExtent([[-30, -20], [w + 30, h + 20]], focus);
+  const path = d3.geoPath(proj);
+  const p = d => proj([d.lon, d.lat]);
+
+  const defs = svg.append('defs');
+  const glow = defs.append('filter').attr('id', 'soft').attr('x', '-30%').attr('y', '-30%').attr('width', '160%').attr('height', '160%');
+  glow.append('feDropShadow').attr('dx', 0).attr('dy', 6).attr('stdDeviation', 10).attr('flood-color', '#173F35').attr('flood-opacity', 0.28);
+
+  svg.append('rect').attr('width', w).attr('height', h).attr('fill', '#8EC8D8');
+
+  // Sea texture: soft concentric graticule, kept faint.
+  const grat = d3.geoGraticule().step([2, 2]);
+  svg.append('path').datum(grat()).attr('d', path)
+     .attr('fill', 'none').attr('stroke', '#FFF9ED').attr('stroke-width', 1).attr('opacity', 0.28);
+
+  // Land — one washed mint mass with a sage shoreline.
+  const g = svg.append('g').attr('filter', 'url(#soft)');
+  g.append('path').datum(land).attr('d', path).attr('fill', '#DCEFE2')
+   .attr('stroke', '#7FAF8A').attr('stroke-width', 1.6).attr('stroke-linejoin', 'round');
+
+  // Route between the stops the traveller has picked.
+  const pts = ROUTE.map(n => PLACES.find(q => q.name === n));
+  svg.append('path')
+     .attr('d', d3.line().curve(d3.curveCatmullRom.alpha(0.6))(pts.map(p)))
+     .attr('fill', 'none').attr('stroke', '#FFF9ED').attr('stroke-width', 3.5)
+     .attr('stroke-linecap', 'round').attr('stroke-dasharray', '9 11');
+
+  const pin = svg.selectAll('g.pin').data(PLACES).join('g')
+    .attr('transform', d => `translate(${p(d)})`);
+
+  pin.filter(d => d.kind === 'hero').each(function () {
+    const s = d3.select(this);
+    s.append('circle').attr('r', 26).attr('fill', '#C96F4A').attr('opacity', 0.22);
+    s.append('circle').attr('r', 17).attr('fill', '#C96F4A').attr('stroke', '#FFF9ED').attr('stroke-width', 4);
+    s.append('path').attr('d', 'M-6 5h12M-4 5V-2l4-3 4 3v7')
+     .attr('fill', 'none').attr('stroke', '#FFF9ED').attr('stroke-width', 2).attr('stroke-linecap', 'round');
+  });
+  pin.filter(d => d.kind === 'city').append('circle')
+     .attr('r', 8).attr('fill', '#173F35').attr('stroke', '#FFF9ED').attr('stroke-width', 3);
+  pin.filter(d => d.kind === 'gem').append('circle')
+     .attr('r', 6.5).attr('fill', '#F3E8D0').attr('stroke', '#FFF9ED').attr('stroke-width', 3);
+
+  const gap = d => (d.off || 0) + (d.kind === 'hero' ? 26 : 16);
+  const place = d => {
+    if (d.side === 'left')  return [-gap(d) - (d.name.length * 6.6 + 18) / 2, 0];
+    if (d.side === 'right') return [ gap(d) + (d.name.length * 6.6 + 18) / 2, 0];
+    if (d.side === 'above') return [0, -gap(d) - 12];
+    return [0, gap(d) + 12];
+  };
+  const label = pin.append('g').attr('transform', d => `translate(${place(d)})`);
+  label.append('rect')
+     .attr('x', d => -(d.name.length * 6.6 + 18) / 2).attr('y', -11.5)
+     .attr('width', d => d.name.length * 6.6 + 18).attr('height', 23).attr('rx', 11.5)
+     .attr('fill', d => d.kind === 'hero' ? '#173F35' : 'rgba(255,249,237,0.94)');
+  label.append('text').attr('class', d => d.kind === 'hero' ? 'lbl-on' : 'lbl')
+     .attr('text-anchor', 'middle').attr('y', 4).text(d => d.name);
+}
+
+d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-110m.json').then(topo => {
+  const countries = topojson.feature(topo, topo.objects.countries).features;
+  const land = { type: 'FeatureCollection', features: countries };
+  draw(land);
+  window.addEventListener('resize', () => draw(land));
+});
+</script>
+</body>
+</html>
