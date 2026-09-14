@@ -82,13 +82,13 @@ export default async function RouteMap({
       role="img"
       aria-label={`Route map: ${stops.map((s) => s.name).join(" to ")}`}
     >
-      <path d={outline} fill="#172A46" stroke="#2FBF9F" strokeWidth={1} opacity={0.5} />
+      <path d={outline} fill="#CCDBB2" stroke="#173F35" strokeWidth={1} opacity={0.85} />
 
       {points.length > 1 && (
         <polyline
           points={route}
           fill="none"
-          stroke="#F4C95D"
+          stroke="#C67139"
           strokeWidth={2}
           strokeLinecap="round"
           opacity={0.85}
@@ -104,9 +104,9 @@ export default async function RouteMap({
               cy={p.xy[1]}
               r={14}
               fill="none"
-              stroke="#2FBF9F"
+              stroke="#C67139"
               strokeWidth={1}
-              opacity={0.35}
+              opacity={0.4}
               className="sparkle"
               style={{ animationDelay: `${i * 500}ms` }}
             />
@@ -115,15 +115,15 @@ export default async function RouteMap({
             cx={p.xy[0]}
             cy={p.xy[1]}
             r={p.visited ? 7 : 5}
-            fill={p.visited ? "#2FBF9F" : "#101827"}
-            stroke={p.visited ? "#2FBF9F" : "#AAB4C3"}
+            fill={p.visited ? "#C67139" : "#FFF9ED"}
+            stroke={p.visited ? "#C67139" : "#173F35"}
             strokeWidth={2}
           />
           <text
             x={p.xy[0]}
             y={p.xy[1] - 14}
             textAnchor="middle"
-            className="fill-ivory"
+            className="fill-forest"
             style={{ fontSize: 15, fontWeight: 500 }}
           >
             {p.name}
@@ -132,7 +132,7 @@ export default async function RouteMap({
             x={p.xy[0]}
             y={p.xy[1] + 24}
             textAnchor="middle"
-            style={{ fontSize: 11, fill: "#AAB4C3" }}
+            style={{ fontSize: 11, fill: "#645C50" }}
           >
             {i + 1}
           </text>

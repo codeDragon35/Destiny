@@ -16,6 +16,8 @@ const config = [
       "uploads/**",
       "public/**",
       "next-env.d.ts",
+      // Vendored design mockups — third-party output, not our source.
+      "design-mockups/**",
     ],
   },
   ...compat.extends("next/core-web-vitals", "next/typescript"),

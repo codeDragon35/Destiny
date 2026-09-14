@@ -10,7 +10,7 @@ export default async function AuthNav() {
       <SoundToggle />
       {session?.user ? (
         <>
-          <Link href="/trips" className="text-soft-gray transition hover:text-jade">
+          <Link href="/trips" className="text-neutral-600 transition hover:text-clay">
             My trips
           </Link>
           <form
@@ -19,7 +19,7 @@ export default async function AuthNav() {
               await signOut({ redirectTo: "/" });
             }}
           >
-            <button type="submit" className="text-soft-gray/70 transition hover:text-coral">
+            <button type="submit" className="text-neutral-600/70 transition hover:text-accent-600">
               Sign out
             </button>
           </form>
@@ -27,7 +27,7 @@ export default async function AuthNav() {
       ) : (
         <Link
           href="/signin"
-          className="rounded-full border border-jade/30 px-4 py-1.5 text-jade transition hover:border-jade"
+          className="rounded-full border border-clay/30 px-4 py-1.5 text-clay transition hover:border-clay"
         >
           Sign in
         </Link>

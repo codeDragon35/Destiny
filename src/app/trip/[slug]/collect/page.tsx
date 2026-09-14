@@ -80,17 +80,17 @@ export default async function CollectPage({
   }
 
   return (
-    <main className="min-h-dvh bg-space">
+    <main className="min-h-dvh bg-paper">
       <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-24">
-        <Link href={`/trip/${slug}`} className="text-sm text-soft-gray transition hover:text-jade">
+        <Link href={`/trip/${slug}`} className="text-sm text-neutral-600 transition hover:text-clay">
           ← Itinerary
         </Link>
 
-        <p className="mt-10 text-xs uppercase tracking-[0.35em] text-jade">Your journey</p>
-        <h1 className="mt-4 font-display text-4xl font-semibold text-ivory sm:text-5xl">
+        <p className="mt-10 text-xs uppercase tracking-[0.35em] text-clay">Your journey</p>
+        <h1 className="mt-4 font-display text-4xl font-semibold text-forest sm:text-5xl">
           What did you see and collect?
         </h1>
-        <p className="mt-4 text-soft-gray">
+        <p className="mt-4 text-neutral-600">
           Tick everything you managed — we&apos;ll turn it into your passport.
         </p>
 
@@ -101,15 +101,15 @@ export default async function CollectPage({
               return (
                 <section key={cityName}>
                   <div className="flex items-baseline gap-3">
-                    <h2 className="font-display text-xl font-medium text-ivory">{cityName}</h2>
-                    <span className="h-px flex-1 bg-white/10" />
+                    <h2 className="font-display text-xl font-medium text-forest">{cityName}</h2>
+                    <span className="h-px flex-1 bg-ink/5" />
                   </div>
 
                   <div className="mt-4 space-y-2">
                     {places.map((place) => (
                       <label
                         key={place.id}
-                        className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 px-5 py-3 transition hover:border-jade/40 has-[:checked]:border-jade/50 has-[:checked]:bg-jade/[0.06]"
+                        className="flex cursor-pointer items-center gap-3 rounded-xl border border-ink/[0.08] bg-cream px-5 py-3 transition hover:border-clay/40 has-[:checked]:border-clay/50 has-[:checked]:bg-clay/[0.06]"
                       >
                         <input
                           type="checkbox"
@@ -118,7 +118,7 @@ export default async function CollectPage({
                           defaultChecked={progress.places.has(place.id)}
                           className="h-4 w-4 accent-jade"
                         />
-                        <span className="text-soft-gray">{place.name}</span>
+                        <span className="text-neutral-600">{place.name}</span>
                       </label>
                     ))}
                   </div>
@@ -128,7 +128,7 @@ export default async function CollectPage({
                       {cityCollectibles.map((item) => (
                         <label
                           key={item.id}
-                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-dashed border-gold/25 px-5 py-3 transition hover:border-gold/50 has-[:checked]:border-solid has-[:checked]:border-gold/60 has-[:checked]:bg-gold/[0.07]"
+                          className="flex cursor-pointer items-start gap-3 rounded-xl border border-dashed border-clay/25 px-5 py-3 transition hover:border-clay/50 has-[:checked]:border-solid has-[:checked]:border-clay/60 has-[:checked]:bg-clay/[0.07]"
                         >
                           <input
                             type="checkbox"
@@ -138,14 +138,14 @@ export default async function CollectPage({
                             className="mt-1 h-4 w-4 accent-[#F4C95D]"
                           />
                           <span>
-                            <span className="text-sm text-soft-gray">
-                              <span aria-hidden className="mr-1 text-gold">
+                            <span className="text-sm text-neutral-600">
+                              <span aria-hidden className="mr-1 text-clay">
                                 {kindOf(item.kind).icon}
                               </span>
                               {item.name}
                             </span>
                             {item.whereToGet && (
-                              <span className="mt-0.5 block text-xs text-soft-gray/60">
+                              <span className="mt-0.5 block text-xs text-neutral-600/60">
                                 {item.whereToGet}
                               </span>
                             )}
@@ -161,15 +161,15 @@ export default async function CollectPage({
 
           <button
             type="submit"
-            className="mt-12 rounded-full bg-gold px-8 py-3 font-medium text-space transition hover:bg-gold/90"
+            className="mt-12 rounded-full bg-clay px-8 py-3 font-medium text-cream transition hover:bg-clay/90"
           >
             Next — create my passport →
           </button>
         </form>
 
-        <section className="mt-20 border-t border-white/5 pt-12">
-          <h2 className="font-display text-xl font-medium text-ivory">Your photos &amp; notes</h2>
-          <p className="mt-2 text-sm text-soft-gray">
+        <section className="mt-20 border-t border-ink/[0.08] pt-12">
+          <h2 className="font-display text-xl font-medium text-forest">Your photos &amp; notes</h2>
+          <p className="mt-2 text-sm text-neutral-600">
             Add your own pictures and memories — they go into your passport.
           </p>
 
@@ -178,16 +178,16 @@ export default async function CollectPage({
               {memories.map((m) => (
                 <li
                   key={m.id}
-                  className="overflow-hidden rounded-xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40"
+                  className="overflow-hidden rounded-xl border border-ink/[0.08] bg-cream"
                 >
                   {m.imagePath && (
                     <img
                       src={`/api/uploads/${m.imagePath}`}
                       alt=""
-                      className="h-32 w-full object-cover"
+                      className="washed h-32 w-full object-cover"
                     />
                   )}
-                  {m.note && <p className="px-4 py-3 text-sm text-soft-gray">{m.note}</p>}
+                  {m.note && <p className="px-4 py-3 text-sm text-neutral-600">{m.note}</p>}
                 </li>
               ))}
             </ul>
@@ -197,7 +197,7 @@ export default async function CollectPage({
             <form action={addNote} className="mt-6 space-y-4">
               <select
                 name="placeId"
-                className="w-full rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory outline-none focus:border-jade"
+                className="w-full rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest outline-none focus:border-clay"
               >
                 <option value="">Anywhere on this trip</option>
                 {allPlaces.map((pl) => (
@@ -210,24 +210,24 @@ export default async function CollectPage({
                 name="note"
                 rows={3}
                 placeholder="What do you want to remember?"
-                className="w-full rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory placeholder:text-soft-gray/50 outline-none focus:border-jade"
+                className="w-full rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest placeholder:text-neutral-600/50 outline-none focus:border-clay"
               />
               <input
                 type="file"
                 name="photo"
                 accept="image/jpeg,image/png,image/webp"
-                className="block w-full text-sm text-soft-gray file:mr-4 file:rounded-full file:border-0 file:bg-jade/15 file:px-5 file:py-2 file:text-jade"
+                className="block w-full text-sm text-neutral-600 file:mr-4 file:rounded-full file:border-0 file:bg-clay/15 file:px-5 file:py-2 file:text-clay"
               />
               <button
                 type="submit"
-                className="rounded-full border border-jade/40 px-6 py-2.5 text-sm text-jade transition hover:border-jade"
+                className="rounded-full border border-clay/40 px-6 py-2.5 text-sm text-clay transition hover:border-clay"
               >
                 Add to my journey
               </button>
             </form>
           ) : (
-            <p className="mt-6 rounded-xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 px-5 py-4 text-sm text-soft-gray">
-              <Link href={`/signin?from=/trip/${slug}/collect`} className="text-jade">
+            <p className="mt-6 rounded-xl border border-ink/[0.08] bg-cream px-5 py-4 text-sm text-neutral-600">
+              <Link href={`/signin?from=/trip/${slug}/collect`} className="text-clay">
                 Sign in
               </Link>{" "}
               to add your own photos and notes.

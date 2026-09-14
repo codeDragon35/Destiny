@@ -22,19 +22,19 @@ export default async function SignInPage({
   }
 
   return (
-    <main className="grid min-h-dvh place-items-center bg-space px-6">
+    <main className="grid min-h-dvh place-items-center bg-paper px-6">
       <div className="w-full max-w-sm">
-        <Link href="/" className="text-sm text-soft-gray transition hover:text-jade">
+        <Link href="/" className="text-sm text-neutral-600 transition hover:text-clay">
           ← Destiny
         </Link>
 
-        <h1 className="mt-8 text-3xl font-semibold text-ivory">Sign in</h1>
-        <p className="mt-3 text-sm leading-relaxed text-soft-gray">
+        <h1 className="mt-8 text-3xl font-semibold text-forest">Sign in</h1>
+        <p className="mt-3 text-sm leading-relaxed text-neutral-600">
           We&apos;ll email you a link — no password to remember.
         </p>
 
         {error && (
-          <p className="mt-6 rounded-lg border border-coral/30 bg-coral/5 px-4 py-3 text-sm text-coral">
+          <p className="mt-6 rounded-lg border border-accent-300/30 bg-accent-200/5 px-4 py-3 text-sm text-accent-600">
             That link didn&apos;t work. Try again.
           </p>
         )}
@@ -46,11 +46,11 @@ export default async function SignInPage({
             required
             autoComplete="email"
             placeholder="you@example.com"
-            className="w-full rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory placeholder:text-soft-gray/50 outline-none transition focus:border-jade"
+            className="w-full rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest placeholder:text-neutral-600/50 outline-none transition focus:border-clay"
           />
           <button
             type="submit"
-            className="w-full rounded-full bg-jade py-3 font-medium text-space transition hover:bg-jade/90"
+            className="w-full rounded-full bg-clay py-3 font-medium text-cream transition hover:bg-clay/90"
           >
             Email me a link
           </button>

@@ -157,3 +157,31 @@ export async function listPlacesNear(
   `);
   return [...rows];
 }
+
+/** Hidden gems across all countries, for the home dashboard's taste row. */
+export async function listHiddenPlaces(limit = 4) {
+  const rows = await db.execute<{
+    id: string;
+    name: string;
+    summary: string | null;
+    kind: string;
+    cityName: string;
+    citySlug: string;
+    countryName: string;
+    countrySlug: string;
+    wikidataId: string | null;
+  }>(sql`
+    SELECT
+      p.id, p.name, p.summary, p.kind,
+      p.wikidata_id AS "wikidataId",
+      ct.name AS "cityName", ct.slug AS "citySlug",
+      co.name AS "countryName", co.slug AS "countrySlug"
+    FROM places p
+    JOIN cities ct ON ct.id = p.city_id
+    JOIN countries co ON co.id = ct.country_id
+    WHERE p.kind = 'hidden_gem'
+    ORDER BY random()
+    LIMIT ${limit}
+  `);
+  return [...rows];
+}

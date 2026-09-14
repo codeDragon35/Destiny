@@ -65,26 +65,26 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
   }
 
   return (
-    <main className="min-h-dvh bg-space">
+    <main className="min-h-dvh bg-paper">
       <div className="mx-auto max-w-2xl px-6 py-16 sm:px-10 sm:py-24">
         <Link
           href={`/country/${country.slug}`}
-          className="text-sm text-soft-gray transition hover:text-jade"
+          className="text-sm text-neutral-600 transition hover:text-clay"
         >
           ← {country.name}
         </Link>
 
-        <p className="mt-10 text-xs uppercase tracking-[0.35em] text-jade">Plan your trip</p>
-        <h1 className="mt-4 text-4xl font-semibold text-ivory sm:text-5xl">
+        <p className="mt-10 text-xs uppercase tracking-[0.35em] text-clay">Plan your trip</p>
+        <h1 className="mt-4 text-4xl font-semibold text-forest sm:text-5xl">
           Tell us about your trip
         </h1>
-        <p className="mt-4 text-soft-gray">
+        <p className="mt-4 text-neutral-600">
           We&apos;ll build a day-by-day route through {country.name} around what you care about.
         </p>
 
         <form action={createTrip} className="mt-12 space-y-10">
           <div>
-            <label htmlFor="days" className="block text-sm font-medium text-ivory">
+            <label htmlFor="days" className="block text-sm font-medium text-forest">
               How many days?
             </label>
             <input
@@ -94,32 +94,32 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
               min={1}
               max={30}
               defaultValue={5}
-              className="mt-3 w-32 rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory outline-none transition focus:border-jade"
+              className="mt-3 w-32 rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest outline-none transition focus:border-clay"
             />
           </div>
 
           <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-ivory">
-              When are you going? <span className="text-soft-gray">(optional)</span>
+            <label htmlFor="startDate" className="block text-sm font-medium text-forest">
+              When are you going? <span className="text-neutral-600">(optional)</span>
             </label>
-            <p className="mt-1 text-xs text-soft-gray/70">
+            <p className="mt-1 text-xs text-neutral-600/70">
               We&apos;ll flag places that are badly timed and festivals you could catch.
             </p>
             <input
               id="startDate"
               name="startDate"
               type="date"
-              className="mt-3 rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory outline-none transition focus:border-jade [color-scheme:dark]"
+              className="mt-3 rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest outline-none transition focus:border-clay [color-scheme:dark]"
             />
           </div>
 
           <fieldset>
-            <legend className="text-sm font-medium text-ivory">What do you enjoy?</legend>
+            <legend className="text-sm font-medium text-forest">What do you enjoy?</legend>
             <div className="mt-3 flex flex-wrap gap-3">
               {INTERESTS.map((i) => (
                 <label
                   key={i.value}
-                  className="cursor-pointer rounded-full border border-white/10 bg-midnight px-4 py-2 text-sm text-soft-gray transition hover:border-jade/50 has-[:checked]:border-jade has-[:checked]:text-jade"
+                  className="cursor-pointer rounded-full border border-ink/12 bg-cream px-4 py-2 text-sm text-neutral-600 transition hover:border-clay/50 has-[:checked]:border-clay has-[:checked]:text-clay"
                 >
                   <input type="checkbox" name={i.value} className="sr-only" />
                   {i.label}
@@ -129,20 +129,20 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
           </fieldset>
 
           <div>
-            <label htmlFor="dietary" className="block text-sm font-medium text-ivory">
-              Dietary needs <span className="text-soft-gray">(optional)</span>
+            <label htmlFor="dietary" className="block text-sm font-medium text-forest">
+              Dietary needs <span className="text-neutral-600">(optional)</span>
             </label>
             <input
               id="dietary"
               name="dietary"
               placeholder="Vegetarian, halal, gluten-free…"
-              className="mt-3 w-full rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory placeholder:text-soft-gray/50 outline-none transition focus:border-jade"
+              className="mt-3 w-full rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest placeholder:text-neutral-600/50 outline-none transition focus:border-clay"
             />
           </div>
 
           <div>
-            <label htmlFor="budget" className="block text-sm font-medium text-ivory">
-              Budget <span className="text-soft-gray">(optional)</span>
+            <label htmlFor="budget" className="block text-sm font-medium text-forest">
+              Budget <span className="text-neutral-600">(optional)</span>
             </label>
             <input
               id="budget"
@@ -150,13 +150,13 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
               type="number"
               min={0}
               placeholder="100000"
-              className="mt-3 w-48 rounded-lg border border-white/10 bg-midnight px-4 py-3 text-ivory placeholder:text-soft-gray/50 outline-none transition focus:border-jade"
+              className="mt-3 w-48 rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest placeholder:text-neutral-600/50 outline-none transition focus:border-clay"
             />
           </div>
 
           <button
             type="submit"
-            className="rounded-full bg-jade px-8 py-3 font-medium text-space transition hover:bg-jade/90"
+            className="rounded-full bg-clay px-8 py-3 font-medium text-cream transition hover:bg-clay/90"
           >
             Build my itinerary
           </button>

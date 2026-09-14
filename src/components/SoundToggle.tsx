@@ -120,7 +120,7 @@ export default function SoundToggle({ motif }: { motif?: string | null }) {
       onClick={toggle}
       aria-pressed={on}
       title={on ? "Mute ambience" : "Play ambience"}
-      className="rounded-full border border-white/10 px-3 py-1.5 text-soft-gray transition hover:border-jade/50 hover:text-jade"
+      className="rounded-full border border-ink/12 px-3 py-1.5 text-neutral-600 transition hover:border-clay/50 hover:text-clay"
     >
       <span aria-hidden>{on ? "♪" : "♪̸"}</span>
       <span className="sr-only">{on ? "Mute ambience" : "Play ambience"}</span>

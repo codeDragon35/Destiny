@@ -38,26 +38,26 @@ export default function Hero({
           style={{
             background: `radial-gradient(120% 90% at 20% 10%, hsl(${hue} 55% 28%), transparent 60%),
                          radial-gradient(100% 80% at 85% 30%, hsl(${(hue + 45) % 360} 50% 24%), transparent 55%),
-                         #101827`,
+                         #173F35`,
           }}
         />
       )}
 
       {/* Keeps text legible over any photo. */}
-      <div className="absolute inset-0 bg-gradient-to-t from-space via-space/55 to-space/10" />
+      <div className="absolute inset-0 bg-gradient-to-t from-forest/85 via-forest/45 to-forest/15" />
 
       <div className="relative mx-auto flex h-full max-w-6xl flex-col justify-end px-6 pb-12 sm:px-10 sm:pb-16">
         {kicker}
-        <h1 className="mt-4 font-display text-5xl font-semibold leading-[1.05] tracking-tight text-ivory sm:text-7xl">
+        <h1 className="mt-4 font-display text-5xl font-semibold leading-[1.05] tracking-tight text-cream sm:text-7xl">
           {title}
         </h1>
         {summary && (
-          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-mist/80">{summary}</p>
+          <p className="mt-5 max-w-2xl text-lg leading-relaxed text-cream/85">{summary}</p>
         )}
       </div>
 
       {photo?.credit && (
-        <p className="absolute bottom-3 right-4 text-[11px] text-soft-gray/60">
+        <p className="absolute bottom-3 right-4 text-[11px] text-cream/60">
           Photo: {photo.credit}
         </p>
       )}

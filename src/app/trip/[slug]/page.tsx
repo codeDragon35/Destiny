@@ -30,11 +30,11 @@ const KIND_LABEL: Record<string, string> = {
 };
 
 const KIND_COLOR: Record<string, string> = {
-  attraction: "text-jade",
-  nature: "text-mist",
-  culture: "text-gold",
-  food: "text-coral",
-  hidden_gem: "text-gold",
+  attraction: "text-clay",
+  nature: "text-neutral-700",
+  culture: "text-clay",
+  food: "text-accent-600",
+  hidden_gem: "text-clay",
 };
 
 function hours(minutes: number) {
@@ -78,7 +78,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
   const cities = [...new Set(days.map((d) => d.cityName))];
 
   return (
-    <main className="relative min-h-dvh bg-space">
+    <main className="relative min-h-dvh bg-paper">
       <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
         <SoundToggle motif={country?.motif} />
       </div>
@@ -92,7 +92,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
           <div className="animate-float-in">
             <Link
               href={`/country/${trip.countrySlug}`}
-              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-jade"
+              className="inline-flex items-center gap-2 text-sm text-neutral-600 transition hover:text-clay"
             >
               <span aria-hidden>←</span> {trip.countryName}
             </Link>
@@ -108,20 +108,20 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
       )}
 
       <div className="mx-auto max-w-3xl px-6 py-12 sm:px-10">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-soft-gray">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-600">
           <span>{cities.join(" → ")}</span>
-          <span className="text-soft-gray/40">·</span>
+          <span className="text-neutral-600/40">·</span>
           <span>{totalPlaces} places</span>
           {collectibleCount > 0 && (
             <>
-              <span className="text-soft-gray/40">·</span>
-              <span className="text-gold">{collectibleCount} to collect</span>
+              <span className="text-neutral-600/40">·</span>
+              <span className="text-clay">{collectibleCount} to collect</span>
             </>
           )}
           {trip.startDate && (
             <>
-              <span className="text-soft-gray/40">·</span>
-              <span className="text-mist">
+              <span className="text-neutral-600/40">·</span>
+              <span className="text-neutral-700">
                 {new Date(trip.startDate).toLocaleDateString("en-GB", {
                   day: "numeric",
                   month: "long",
@@ -133,20 +133,20 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
           )}
           {trip.dietary && (
             <>
-              <span className="text-soft-gray/40">·</span>
-              <span className="text-coral">{trip.dietary}</span>
+              <span className="text-neutral-600/40">·</span>
+              <span className="text-accent-600">{trip.dietary}</span>
             </>
           )}
           {trip.budget && (
             <>
-              <span className="text-soft-gray/40">·</span>
-              <span className="text-gold">Budget {trip.budget.toLocaleString()}</span>
+              <span className="text-neutral-600/40">·</span>
+              <span className="text-clay">Budget {trip.budget.toLocaleString()}</span>
             </>
           )}
         </div>
 
         {trip.plan.unfilledDays > 0 && (
-          <p className="mt-6 rounded-xl border border-gold/20 bg-gold/5 px-5 py-4 text-sm text-gold/90">
+          <p className="mt-6 rounded-xl border border-clay/20 bg-clay/5 px-5 py-4 text-sm text-clay/90">
             We planned {days.length} of your {trip.days} days — we don&apos;t have enough places
             in {trip.countryName} yet to fill the rest.
           </p>
@@ -157,18 +157,18 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
             const minutes = day.places.reduce((n, p) => n + (p.visitMinutes ?? 120), 0);
             return (
               <Reveal key={day.day} delay={i * 60}>
-                <li className="overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40">
-                  <div className="flex items-baseline justify-between gap-4 border-b border-white/5 px-6 py-4">
+                <li className="overflow-hidden rounded-2xl border border-ink/[0.08] bg-cream">
+                  <div className="flex items-baseline justify-between gap-4 border-b border-ink/[0.08] px-6 py-4">
                     <div className="flex items-baseline gap-4">
                       <span className={`text-xs uppercase tracking-[0.25em] ${accent.text}`}>
                         Day {day.day}
                       </span>
-                      <span className="text-lg text-ivory">{day.cityName}</span>
+                      <span className="text-lg text-forest">{day.cityName}</span>
                     </div>
-                    <span className="text-sm text-soft-gray">{hours(minutes)}</span>
+                    <span className="text-sm text-neutral-600">{hours(minutes)}</span>
                   </div>
 
-                  <ul className="divide-y divide-white/5">
+                  <ul className="divide-y divide-ink/10">
                     {day.places.map((place) => (
                       <li key={place.id} className="flex gap-4 px-6 py-4">
                         <div className="hidden h-20 w-28 shrink-0 overflow-hidden rounded-lg sm:block">
@@ -176,26 +176,26 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                             <img
                               src={photos.get(place.id)!.url}
                               alt=""
-                              className="h-full w-full object-cover"
+                              className="washed h-full w-full object-cover"
                             />
                           ) : (
-                            <div className="h-full w-full bg-gradient-to-br from-space to-midnight" />
+                            <div className="h-full w-full bg-gradient-to-br from-paper to-cream" />
                           )}
                         </div>
                         <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                          <span className="text-ivory">{place.name}</span>
-                          <span className={`text-xs ${KIND_COLOR[place.kind] ?? "text-soft-gray"}`}>
+                          <span className="text-forest">{place.name}</span>
+                          <span className={`text-xs ${KIND_COLOR[place.kind] ?? "text-neutral-600"}`}>
                             {KIND_LABEL[place.kind] ?? place.kind}
                           </span>
                           {place.visitMinutes && (
-                            <span className="text-xs text-soft-gray">
+                            <span className="text-xs text-neutral-600">
                               {hours(place.visitMinutes)}
                             </span>
                           )}
                         </div>
                         {place.summary && (
-                          <p className="mt-1 text-sm leading-relaxed text-soft-gray">
+                          <p className="mt-1 text-sm leading-relaxed text-neutral-600">
                             {place.summary}
                           </p>
                         )}
@@ -205,11 +205,11 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                             const best = season?.bestMonths;
                             if (!best || best.length === 0 || best.includes(travelMonth)) return null;
                             return (
-                              <p className="mt-2 text-sm text-coral">
+                              <p className="mt-2 text-sm text-accent-600">
                                 <span aria-hidden>△</span> Better in{" "}
                                 {best.map(monthName).join(", ")}
                                 {season?.seasonNote && (
-                                  <span className="block text-xs text-soft-gray">
+                                  <span className="block text-xs text-neutral-600">
                                     {season.seasonNote}
                                   </span>
                                 )}
@@ -226,7 +226,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                           .map((ev) => (
                             <p key={ev.id} className={`mt-2 text-sm ${eventTone(ev.name).text}`}>
                               <span aria-hidden>✦</span> {ev.name}{" "}
-                              <span className="text-xs text-soft-gray">
+                              <span className="text-xs text-neutral-600">
                                 {formatRange(ev.startMonth, ev.endMonth)}
                               </span>
                             </p>
@@ -235,12 +235,12 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                         {(collectibles.get(place.id) ?? []).map((item) => (
                           <p
                             key={item.id}
-                            className="mt-2 flex flex-wrap items-baseline gap-x-2 text-sm text-gold"
+                            className="mt-2 flex flex-wrap items-baseline gap-x-2 text-sm text-clay"
                           >
                             <span aria-hidden>{kindOf(item.kind).icon}</span>
                             <span>{item.name}</span>
                             {item.whereToGet && (
-                              <span className="text-xs text-soft-gray">{item.whereToGet}</span>
+                              <span className="text-xs text-neutral-600">{item.whereToGet}</span>
                             )}
                           </p>
                         ))}
@@ -257,13 +257,13 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
         <div className="mt-12 flex flex-wrap items-center gap-4">
           <Link
             href={`/trip/${trip.slug}/collect`}
-            className="rounded-full bg-gold px-6 py-2.5 text-sm font-medium text-space transition hover:bg-gold/90"
+            className="rounded-full bg-clay px-6 py-2.5 text-sm font-medium text-cream transition hover:bg-clay/90"
           >
             Create my passport
           </Link>
           <Link
             href={`/country/${trip.countrySlug}/plan`}
-            className="text-sm text-jade transition hover:text-jade/80"
+            className="text-sm text-clay transition hover:text-clay/80"
           >
             Plan a different trip →
           </Link>

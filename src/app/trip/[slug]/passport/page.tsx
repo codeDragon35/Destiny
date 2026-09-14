@@ -93,16 +93,16 @@ export default async function PassportPage({
   const year = new Date().getFullYear();
 
   return (
-    <main className="min-h-dvh bg-space">
+    <main className="min-h-dvh bg-paper">
       <div className="mx-auto max-w-3xl px-6 py-16 sm:px-10 sm:py-24">
         <div className="flex items-center justify-between gap-4">
-          <Link href={`/trip/${slug}`} className="text-sm text-soft-gray transition hover:text-jade">
+          <Link href={`/trip/${slug}`} className="text-sm text-neutral-600 transition hover:text-clay">
             ← Itinerary
           </Link>
           <SoundToggle motif={country?.motif} />
         </div>
 
-        <header className="relative mt-10 overflow-hidden rounded-2xl border border-gold/30 bg-gradient-to-br from-gold/[0.10] via-midnight to-space p-8 shadow-2xl shadow-gold/5 sm:p-12">
+        <header className="relative mt-10 overflow-hidden rounded-2xl border border-clay/30 bg-gradient-to-br from-gold/[0.10] via-cream to-paper p-8 shadow-2xl shadow-gold/5 sm:p-12">
           <Sparkles />
           {country?.motif && (
             <Motif
@@ -111,33 +111,33 @@ export default async function PassportPage({
             />
           )}
           <div className="relative">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-gold">
+            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-clay">
               <span aria-hidden>✦</span>
               Travel passport
             </div>
             <h1 className="passport-title mt-5 font-display text-4xl font-semibold leading-tight sm:text-6xl">
               My {trip.countryName} Journey
             </h1>
-            <p className="mt-2 text-2xl font-light text-gold/70">{year}</p>
+            <p className="mt-2 text-2xl font-light text-clay/70">{year}</p>
 
             <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm">
-              <span className="text-soft-gray">
-                <span className="font-display text-2xl font-medium text-jade">{visited}</span>
-                <span className="text-soft-gray/60">/{placeIds.length}</span> visited
+              <span className="text-neutral-600">
+                <span className="font-display text-2xl font-medium text-clay">{visited}</span>
+                <span className="text-neutral-600/60">/{placeIds.length}</span> visited
               </span>
-              <span className="text-soft-gray">
-                <span className="font-display text-2xl font-medium text-gold">{collected}</span>
-                <span className="text-soft-gray/60">/{allCollectibles.length}</span> collected
+              <span className="text-neutral-600">
+                <span className="font-display text-2xl font-medium text-clay">{collected}</span>
+                <span className="text-neutral-600/60">/{allCollectibles.length}</span> collected
               </span>
-              <span className="text-soft-gray">
-                <span className="font-display text-2xl font-medium text-ivory">{chapters.size}</span> cities
+              <span className="text-neutral-600">
+                <span className="font-display text-2xl font-medium text-forest">{chapters.size}</span> cities
               </span>
             </div>
           </div>
         </header>
 
         {stops.length > 0 && country && (
-          <section className="mt-8 overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40/60 p-4 sm:p-6">
+          <section className="mt-8 overflow-hidden rounded-2xl border border-ink/[0.08] bg-cream/60 p-4 sm:p-6">
             <RouteMap countryCode={country.code} stops={stops} />
           </section>
         )}
@@ -147,8 +147,8 @@ export default async function PassportPage({
             <Reveal key={chapter.cityName} delay={ci * 80}>
               <section>
                 <div className="flex items-baseline gap-3">
-                  <h2 className="font-display text-2xl font-medium text-ivory">{chapter.cityName}</h2>
-                  <span className="h-px flex-1 bg-white/10" />
+                  <h2 className="font-display text-2xl font-medium text-forest">{chapter.cityName}</h2>
+                  <span className="h-px flex-1 bg-ink/5" />
                 </div>
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -159,7 +159,7 @@ export default async function PassportPage({
                       <div
                         key={place.id}
                         className={`relative overflow-hidden rounded-xl border ${
-                          done ? "border-jade/40" : "border-white/5"
+                          done ? "border-clay/40" : "border-ink/[0.08]"
                         }`}
                       >
                         <div className="relative h-36">
@@ -170,17 +170,17 @@ export default async function PassportPage({
                               className={`h-full w-full object-cover ${done ? "" : "grayscale opacity-40"}`}
                             />
                           ) : (
-                            <div className="h-full w-full bg-gradient-to-br from-midnight to-space" />
+                            <div className="h-full w-full bg-gradient-to-br from-cream to-paper" />
                           )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-midnight via-midnight/30 to-transparent" />
+                          <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/30 to-transparent" />
 
                           {done && (
-                            <span className="stamp-in absolute right-3 top-3 rounded-md border-2 border-jade bg-space/85 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-jade shadow-lg backdrop-blur-sm">
+                            <span className="stamp-in absolute right-3 top-3 rounded-md border-2 border-clay bg-paper/85 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-clay shadow-lg backdrop-blur-sm">
                               Visited
                             </span>
                           )}
                         </div>
-                        <p className={`px-4 py-3 text-sm ${done ? "text-ivory" : "text-soft-gray"}`}>
+                        <p className={`px-4 py-3 text-sm ${done ? "text-forest" : "text-neutral-600"}`}>
                           {place.name}
                         </p>
                       </div>
@@ -197,22 +197,22 @@ export default async function PassportPage({
                           key={item.id}
                           className={`relative flex items-start gap-3 overflow-hidden rounded-xl border px-5 py-4 ${
                             done
-                              ? "border-gold/50 bg-gold/[0.08]"
-                              : "border-dashed border-white/10 opacity-50"
+                              ? "border-clay/50 bg-clay/[0.08]"
+                              : "border-dashed border-ink/12 opacity-50"
                           }`}
                         >
                           {done && <Sparkles />}
                           <span
-                            className={`relative text-lg leading-none ${done ? "text-gold" : "text-soft-gray/40"}`}
+                            className={`relative text-lg leading-none ${done ? "text-clay" : "text-neutral-600/40"}`}
                             aria-hidden
                           >
                             {kindOf(item.kind).icon}
                           </span>
                           <span className="relative">
-                            <span className={done ? "text-ivory" : "text-soft-gray"}>
+                            <span className={done ? "text-forest" : "text-neutral-600"}>
                               {item.name}
                             </span>
-                            <span className="mt-0.5 block text-xs text-soft-gray/70">
+                            <span className="mt-0.5 block text-xs text-neutral-600/70">
                               {done ? "Collected" : "Not collected"}
                             </span>
                           </span>
@@ -229,22 +229,22 @@ export default async function PassportPage({
         {memories.length > 0 && (
           <section className="mt-16">
             <div className="flex items-baseline gap-3">
-              <h2 className="font-display text-2xl font-medium text-ivory">Your memories</h2>
-              <span className="h-px flex-1 bg-white/10" />
+              <h2 className="font-display text-2xl font-medium text-forest">Your memories</h2>
+              <span className="h-px flex-1 bg-ink/5" />
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {memories.map((m, i) => (
                 <Reveal key={m.id} delay={i * 70} className="h-full">
-                  <figure className="h-full overflow-hidden rounded-xl border border-gold/20 bg-midnight">
+                  <figure className="h-full overflow-hidden rounded-xl border border-clay/20 bg-cream">
                     {m.imagePath && (
                       <img
                         src={`/api/uploads/${m.imagePath}`}
                         alt=""
-                        className="h-40 w-full object-cover"
+                        className="washed h-40 w-full object-cover"
                       />
                     )}
                     {m.note && (
-                      <figcaption className="px-4 py-3 text-sm leading-relaxed text-soft-gray">
+                      <figcaption className="px-4 py-3 text-sm leading-relaxed text-neutral-600">
                         {m.note}
                       </figcaption>
                     )}
@@ -258,7 +258,7 @@ export default async function PassportPage({
         <div className="mt-16 text-center">
           <Link
             href={`/trip/${slug}/collect`}
-            className="text-sm text-jade transition hover:text-jade/80"
+            className="text-sm text-clay transition hover:text-clay/80"
           >
             ← Update what you collected
           </Link>

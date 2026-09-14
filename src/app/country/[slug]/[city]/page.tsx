@@ -20,11 +20,11 @@ import { eventTone } from "@/lib/event-tone";
 export const dynamic = "force-dynamic";
 
 const KIND = {
-  attraction: { label: "Attraction", hoverText: "group-hover:text-jade", chip: "bg-space/85 text-jade ring-1 ring-jade/30", ring: "hover:border-jade/40" },
-  nature: { label: "Nature", hoverText: "group-hover:text-mist", chip: "bg-space/85 text-mist ring-1 ring-mist/30", ring: "hover:border-mist/40" },
-  culture: { label: "Culture", hoverText: "group-hover:text-gold", chip: "bg-space/85 text-gold ring-1 ring-gold/30", ring: "hover:border-gold/40" },
-  food: { label: "Food", hoverText: "group-hover:text-coral", chip: "bg-space/85 text-coral ring-1 ring-coral/30", ring: "hover:border-coral/40" },
-  hidden_gem: { label: "Hidden gem", hoverText: "group-hover:text-gold", chip: "bg-space/85 text-gold ring-1 ring-gold/40", ring: "hover:border-gold/50" },
+  attraction: { label: "Attraction", hoverText: "group-hover:text-clay", chip: "bg-paper/85 text-clay ring-1 ring-jade/30", ring: "hover:border-clay/40" },
+  nature: { label: "Nature", hoverText: "group-hover:text-neutral-700", chip: "bg-paper/85 text-neutral-700 ring-1 ring-mist/30", ring: "hover:border-mist/40" },
+  culture: { label: "Culture", hoverText: "group-hover:text-clay", chip: "bg-paper/85 text-clay ring-1 ring-gold/30", ring: "hover:border-clay/40" },
+  food: { label: "Food", hoverText: "group-hover:text-accent-600", chip: "bg-paper/85 text-accent-600 ring-1 ring-coral/30", ring: "hover:border-accent-300/40" },
+  hidden_gem: { label: "Hidden gem", hoverText: "group-hover:text-clay", chip: "bg-paper/85 text-clay ring-1 ring-gold/40", ring: "hover:border-clay/50" },
 } as const;
 
 function kindOf(k: string) {
@@ -71,7 +71,7 @@ export default async function CityPage({
   const totalHours = places.reduce((n, p) => n + (p.visitMinutes ?? 0), 0) / 60;
 
   return (
-    <main className="relative min-h-dvh bg-space">
+    <main className="relative min-h-dvh bg-paper">
       <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
         <SoundToggle motif={country.motif} />
       </div>
@@ -85,13 +85,13 @@ export default async function CityPage({
           <div className="animate-float-in">
             <Link
               href={`/country/${country.slug}`}
-              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-ivory"
+              className="inline-flex items-center gap-2 text-sm text-neutral-600 transition hover:text-forest"
             >
               <span aria-hidden>←</span> {country.name}
             </Link>
-            <div className="mt-6 flex items-center gap-3 text-sm text-mist/70">
+            <div className="mt-6 flex items-center gap-3 text-sm text-neutral-600">
               <span>{places.length} places</span>
-              <span className="h-px w-8 bg-jade/50" />
+              <span className="h-px w-8 bg-clay/50" />
               <span>≈{Math.round(totalHours)}h to see it all</span>
             </div>
           </div>
@@ -118,37 +118,37 @@ export default async function CityPage({
             return (
               <Reveal key={place.id} delay={i * 80}>
                 <article
-                  className={`group h-full overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 transition duration-500 hover:-translate-y-1 ${k.ring}`}
+                  className={`group h-full overflow-hidden rounded-2xl border border-ink/[0.08] bg-cream transition duration-500 hover:-translate-y-1 ${k.ring}`}
                 >
                   <div className="relative h-52 overflow-hidden">
                     {photo ? (
                       <img
                         src={photo.url}
                         alt=""
-                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                        className="washed h-full w-full object-cover transition duration-700 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-midnight via-space to-midnight" />
+                      <div className="h-full w-full bg-gradient-to-br from-cream via-paper to-cream" />
                     )}
-                    <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-midnight to-transparent" />
+                    <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-cream to-transparent" />
                     <span
                       className={`absolute left-4 top-4 rounded-full px-3 py-1 text-xs font-medium backdrop-blur ${k.chip}`}
                     >
                       {k.label}
                     </span>
                     {visit && (
-                      <span className="absolute right-4 top-4 rounded-full bg-space/70 px-3 py-1 text-xs text-mist/90 backdrop-blur">
+                      <span className="absolute right-4 top-4 rounded-full bg-paper/70 px-3 py-1 text-xs text-neutral-700 backdrop-blur">
                         {visit}
                       </span>
                     )}
                   </div>
 
                   <div className="p-6">
-                    <h3 className={`font-display text-xl font-medium text-ivory transition ${k.hoverText}`}>
+                    <h3 className={`font-display text-xl font-medium text-forest transition ${k.hoverText}`}>
                       {place.name}
                     </h3>
                     {place.summary && (
-                      <p className="mt-2 text-sm leading-relaxed text-soft-gray">{place.summary}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-neutral-600">{place.summary}</p>
                     )}
                   </div>
                 </article>
@@ -160,8 +160,8 @@ export default async function CityPage({
 
       {events.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 pb-4 sm:px-10">
-          <h2 className="text-xs uppercase tracking-[0.35em] text-coral">While you&apos;re there</h2>
-          <p className="mt-3 max-w-xl text-sm text-soft-gray">
+          <h2 className="text-xs uppercase tracking-[0.35em] text-accent-600">While you&apos;re there</h2>
+          <p className="mt-3 max-w-xl text-sm text-neutral-600">
             Festivals and seasons worth timing a visit around.
           </p>
           <div className="mt-8 grid gap-5 sm:grid-cols-2">
@@ -176,11 +176,11 @@ export default async function CityPage({
                       <span className={`text-xs uppercase tracking-[0.2em] ${eventTone(ev.name).text}`}>
                         {formatRange(ev.startMonth, ev.endMonth)}
                       </span>
-                      <span className="text-xs text-soft-gray/70">{ev.placeName}</span>
+                      <span className="text-xs text-neutral-600/70">{ev.placeName}</span>
                     </div>
-                    <h3 className="mt-2 text-ivory">{ev.name}</h3>
+                    <h3 className="mt-2 text-forest">{ev.name}</h3>
                     {ev.description && (
-                      <p className="mt-2 text-sm leading-relaxed text-soft-gray">
+                      <p className="mt-2 text-sm leading-relaxed text-neutral-600">
                         {ev.description}
                       </p>
                     )}
@@ -194,8 +194,8 @@ export default async function CityPage({
 
       {collectibles.length > 0 && (
         <section className="mx-auto max-w-6xl px-6 pb-24 sm:px-10">
-          <h2 className="text-xs uppercase tracking-[0.35em] text-gold">Don&apos;t miss</h2>
-          <p className="mt-3 max-w-xl text-sm text-soft-gray">
+          <h2 className="text-xs uppercase tracking-[0.35em] text-clay">Don&apos;t miss</h2>
+          <p className="mt-3 max-w-xl text-sm text-neutral-600">
             Stamps, passports and collectibles you can only pick up here.
           </p>
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

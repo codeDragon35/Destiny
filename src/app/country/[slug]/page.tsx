@@ -25,7 +25,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
   const accent = accentFor(country.motif);
 
   return (
-    <main className="relative min-h-dvh bg-space">
+    <main className="relative min-h-dvh bg-paper">
       <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
         <SoundToggle motif={country.motif} />
       </div>
@@ -39,11 +39,11 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           <div className="animate-float-in">
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-sm text-mist/70 transition hover:text-ivory"
+              className="inline-flex items-center gap-2 text-sm text-neutral-600 transition hover:text-forest"
             >
               <span aria-hidden>←</span> All countries
             </Link>
-            <div className="mt-6 flex items-center gap-3 text-sm text-mist/70">
+            <div className="mt-6 flex items-center gap-3 text-sm text-neutral-600">
               <span className="text-4xl leading-none">{country.emoji}</span>
               <span className={`h-px w-8 ${accent.rule}`} />
               <span>
@@ -68,7 +68,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           </h2>
           <Link
             href={`/country/${country.slug}/plan`}
-            className="rounded-full px-6 py-2.5 text-sm font-medium text-space transition hover:opacity-90"
+            className="rounded-full px-6 py-2.5 text-sm font-medium text-cream transition hover:opacity-90"
             style={{ backgroundColor: accent.hex }}
           >
             Plan a trip
@@ -88,30 +88,30 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
               >
                 <Link
                   href={`/country/${country.slug}/${city.slug}`}
-                  className="group relative block h-full overflow-hidden rounded-2xl border border-white/[0.07] bg-gradient-to-b from-midnight to-dusk/40 transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 hover:border-current"
+                  className="group relative block h-full overflow-hidden rounded-2xl border border-ink/[0.08] bg-cream transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 hover:border-current"
                 >
                   <div className={`relative overflow-hidden ${wide ? "h-72" : "h-56"}`}>
                     {photo ? (
                       <img
                         src={photo.url}
                         alt=""
-                        className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                        className="washed h-full w-full object-cover transition duration-700 group-hover:scale-105"
                       />
                     ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-midnight via-space to-midnight" />
+                      <div className="h-full w-full bg-gradient-to-br from-cream via-paper to-cream" />
                     )}
-                    <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-midnight to-transparent" />
-                    <span className="absolute right-4 top-4 rounded-full bg-space/70 px-3 py-1 text-xs font-medium text-gold backdrop-blur">
+                    <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-cream to-transparent" />
+                    <span className="absolute right-4 top-4 rounded-full bg-paper/70 px-3 py-1 text-xs font-medium text-clay backdrop-blur">
                       {city.placeCount} places
                     </span>
                   </div>
 
                   <div className="p-6">
-                    <h3 className="font-display text-2xl font-medium text-ivory transition group-hover:opacity-90">
+                    <h3 className="font-display text-2xl font-medium text-forest transition group-hover:opacity-90">
                       {city.name}
                     </h3>
                     {city.summary && (
-                      <p className="mt-2 max-w-xl text-sm leading-relaxed text-soft-gray">
+                      <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
                         {city.summary}
                       </p>
                     )}
