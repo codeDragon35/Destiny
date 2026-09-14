@@ -149,9 +149,28 @@ page, and inline under each place in a generated itinerary, so the plan says wha
 Seed data lives in `src/db/seed-data/<country>.ts`, one file per country, collected in `seed.ts`. Adding a
 country is a new file plus one array entry.
 
+## Regions
+
+The hierarchy is **country → region → city → place**. `regions` holds whatever tier the country uses —
+India's 28 states, China's provinces and municipalities — with `kind` naming it ("state", "province",
+"prefecture", "union territory") so the UI can say the right word.
+
+A country may list **every** region even where nothing is mapped beneath it. India lists all 28 states; the
+country page shows mapped ones in clay and the rest faded, which tells a user what exists versus what we
+have verified. `cities.region_id` is nullable, so a city without a region still works.
+
+## Sourcing data from Wikidata
+
+**Prefer the REST API (`wbsearchentities` / `wbgetentities`) over SPARQL for bulk lookups.** The SPARQL
+endpoint at `query.wikidata.org` is aggressively rate-limited — during one outage it dropped to **1 request
+per minute**, which makes a 28-state fetch impossible. The REST API tolerates roughly 2 requests/second with
+a descriptive `User-Agent`. SPARQL is still better for a handful of *precise* label matches, because it
+returns descriptions in one shot; use it for disambiguation, not for volume.
+
 **Verify every Wikidata QID against its label and description before seeding it.** Name search is actively
 dangerous here: "Agra" returns a genus of insects, "Taj Mahal" a 1968 album, and plausible-looking guesses
-resolved to a German band, a French commune and a Swedish novelist. The SPARQL endpoint
+resolved to a German band, a French commune, a Swedish novelist, a tape dispenser, a galaxy and a French
+railway station. "Agra" is a genus of insects; "The Bund" is a Russian political party. The SPARQL endpoint
 (`query.wikidata.org/sparql`) matching on `rdfs:label` with `wdt:P18` is far more reliable than
 `wbsearchentities`, and returns descriptions you can check.
 

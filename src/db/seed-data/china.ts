@@ -7,12 +7,64 @@ const china: SeedCountry = {
   wikidataId: "Q148",
   motif: "dragon",
   emoji: "🇨🇳",
+  regions: [
+    { name: "Beijing", slug: "beijing", kind: "municipality", wikidataId: "Q956" },
+    { name: "Shanghai", slug: "shanghai", kind: "municipality", wikidataId: "Q8686" },
+    { name: "Shaanxi", slug: "shaanxi", kind: "province", wikidataId: "Q47974" },
+    { name: "Hunan", slug: "hunan", kind: "province", wikidataId: "Q45761" },
+  ],
   summary:
     "Imperial capitals, terracotta armies and sandstone pillars — China spans dense history and dramatic landscapes.",
   cities: [
     {
+      name: "Shanghai",
+      slug: "shanghai",
+      region: "shanghai",
+      wikidataId: "Q8686",
+      summary: "Colonial waterfront on one bank, a skyline of towers on the other.",
+      lat: 31.2304,
+      lng: 121.4737,
+      places: [
+        {
+          name: "Yu Garden",
+          slug: "yu-garden",
+          wikidataId: "Q1328025",
+          kind: "culture",
+          summary: "Ming-dynasty garden of rockeries, halls and carp pools in the old city.",
+          lat: 31.2270,
+          lng: 121.4920,
+          visitMinutes: 120,
+          bestMonths: [4, 5, 10, 11],
+          seasonNote: "Go at opening; the lanes outside are shoulder-to-shoulder by midday.",
+          collectibles: [
+            {
+              name: "Garden seal stamp",
+              slug: "yu-garden-stamp",
+              kind: "stamp",
+              description:
+                "Self-service seal stations in the garden halls, stamped into a paper booklet.",
+              whereToGet: "Stamp desks beside the main pavilions",
+            },
+          ],
+        },
+        {
+          name: "The Bund",
+          slug: "the-bund",
+          kind: "attraction",
+          summary:
+            "Mile of 1920s banking houses facing the Pudong skyline across the Huangpu.",
+          lat: 31.2400,
+          lng: 121.4900,
+          visitMinutes: 90,
+          bestMonths: [4, 5, 9, 10, 11],
+          seasonNote: "Best an hour after sunset, when both banks are lit.",
+        },
+      ],
+    },
+    {
       name: "Beijing",
       slug: "beijing",
+      region: "beijing",
       wikidataId: "Q956",
       summary: "The imperial capital: palaces, hutongs and the Great Wall within reach.",
       lat: 39.9042,
@@ -134,6 +186,7 @@ const china: SeedCountry = {
     {
       name: "Xi'an",
       slug: "xian",
+      region: "shaanxi",
       wikidataId: "Q5826",
       summary: "Ancient Silk Road terminus, walled city and home of the Terracotta Army.",
       lat: 34.3416,
@@ -199,6 +252,7 @@ const china: SeedCountry = {
     {
       name: "Zhangjiajie",
       slug: "zhangjiajie",
+      region: "hunan",
       wikidataId: "Q197379",
       summary: "Quartz-sandstone pillars and canyon walkways in subtropical forest.",
       lat: 29.1170,

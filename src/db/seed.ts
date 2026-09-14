@@ -29,11 +29,29 @@ async function seedCountry(
     RETURNING id
   `);
 
-  for (const city of country.cities) {
-    const [insertedCity] = await tx.execute<{ id: string }>(sql`
-      INSERT INTO cities (country_id, name, slug, summary, location, wikidata_id)
+  const regionIds = new Map<string, string>();
+  for (const region of country.regions ?? []) {
+    const [row] = await tx.execute<{ id: string }>(sql`
+      INSERT INTO regions (country_id, name, slug, kind, summary, wikidata_id)
       VALUES (
         ${inserted.id},
+        ${region.name},
+        ${region.slug},
+        ${region.kind},
+        ${region.summary ?? null},
+        ${region.wikidataId ?? null}
+      )
+      RETURNING id
+    `);
+    regionIds.set(region.slug, row.id);
+  }
+
+  for (const city of country.cities) {
+    const [insertedCity] = await tx.execute<{ id: string }>(sql`
+      INSERT INTO cities (country_id, region_id, name, slug, summary, location, wikidata_id)
+      VALUES (
+        ${inserted.id},
+        ${city.region ? (regionIds.get(city.region) ?? null) : null},
         ${city.name},
         ${city.slug},
         ${city.summary},
@@ -109,6 +127,7 @@ async function main() {
 
   for (const country of COUNTRIES) {
     const places = country.cities.reduce((n, c) => n + c.places.length, 0);
+    const regions = country.regions?.length ?? 0;
     const collectibles = country.cities.reduce(
       (n, c) => n + c.places.reduce((m, p) => m + (p.collectibles?.length ?? 0), 0),
       0,
@@ -118,8 +137,8 @@ async function main() {
       0,
     );
     console.log(
-      `${country.emoji} ${country.name}: ${country.cities.length} cities, ${places} places, ` +
-        `${collectibles} collectibles, ${events} events`,
+      `${country.emoji} ${country.name}: ${regions} regions, ${country.cities.length} cities, ` +
+        `${places} places, ${collectibles} collectibles, ${events} events`,
     );
   }
 

@@ -65,6 +65,25 @@ export const countries = pgTable(
   ],
 );
 
+/** State / province / prefecture. India has 28 states; China has provinces. */
+export const regions = pgTable(
+  "regions",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    countryId: uuid("country_id")
+      .notNull()
+      .references(() => countries.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    /** What the country calls this tier: "state", "province", "prefecture", "region". */
+    kind: text("kind").notNull(),
+    summary: text("summary"),
+    wikidataId: text("wikidata_id"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("regions_country_slug_idx").on(t.countryId, t.slug)],
+);
+
 export const cities = pgTable(
   "cities",
   {
@@ -72,6 +91,7 @@ export const cities = pgTable(
     countryId: uuid("country_id")
       .notNull()
       .references(() => countries.id, { onDelete: "cascade" }),
+    regionId: uuid("region_id").references(() => regions.id, { onDelete: "set null" }),
     name: text("name").notNull(),
     slug: text("slug").notNull(),
     summary: text("summary"),

@@ -185,3 +185,67 @@ export async function listHiddenPlaces(limit = 4) {
   `);
   return [...rows];
 }
+
+export type Region = {
+  id: string;
+  name: string;
+  slug: string;
+  kind: string;
+  summary: string | null;
+  wikidataId: string | null;
+  cityCount: number;
+  placeCount: number;
+};
+
+/** Regions of a country, with how much is mapped under each. */
+export async function listRegionsForCountry(countryId: string): Promise<Region[]> {
+  const rows = await db.execute<Region>(sql`
+    SELECT
+      r.id, r.name, r.slug, r.kind, r.summary,
+      r.wikidata_id AS "wikidataId",
+      COUNT(DISTINCT ct.id)::int AS "cityCount",
+      COUNT(p.id)::int AS "placeCount"
+    FROM regions r
+    LEFT JOIN cities ct ON ct.region_id = r.id
+    LEFT JOIN places p ON p.city_id = ct.id
+    WHERE r.country_id = ${countryId}
+    GROUP BY r.id
+    ORDER BY COUNT(p.id) DESC, r.name
+  `);
+  return [...rows];
+}
+
+export async function getRegionBySlug(countryId: string, slug: string) {
+  const rows = await db.execute<Region>(sql`
+    SELECT
+      r.id, r.name, r.slug, r.kind, r.summary,
+      r.wikidata_id AS "wikidataId",
+      COUNT(DISTINCT ct.id)::int AS "cityCount",
+      COUNT(p.id)::int AS "placeCount"
+    FROM regions r
+    LEFT JOIN cities ct ON ct.region_id = r.id
+    LEFT JOIN places p ON p.city_id = ct.id
+    WHERE r.country_id = ${countryId} AND r.slug = ${slug}
+    GROUP BY r.id
+    LIMIT 1
+  `);
+  return rows[0] ?? null;
+}
+
+/** Cities inside one region. */
+export async function listCitiesForRegion(regionId: string): Promise<City[]> {
+  const rows = await db.execute<City>(sql`
+    SELECT
+      c.id, c.name, c.slug, c.summary,
+      ST_Y(c.location) AS lat,
+      ST_X(c.location) AS lng,
+      c.wikidata_id AS "wikidataId",
+      COUNT(p.id)::int AS "placeCount"
+    FROM cities c
+    LEFT JOIN places p ON p.city_id = c.id
+    WHERE c.region_id = ${regionId}
+    GROUP BY c.id
+    ORDER BY c.name
+  `);
+  return [...rows];
+}

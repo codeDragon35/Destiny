@@ -33,9 +33,20 @@ export type SeedPlace = {
   visitMinutes: number;
 };
 
+export type SeedRegion = {
+  name: string;
+  slug: string;
+  /** What the country calls this tier: state, province, prefecture, region. */
+  kind: string;
+  summary?: string;
+  wikidataId?: string;
+};
+
 export type SeedCity = {
   name: string;
   slug: string;
+  /** Slug of the region this city sits in; must match a SeedRegion. */
+  region?: string;
   wikidataId?: string;
   summary: string;
   lat: number;
@@ -51,5 +62,8 @@ export type SeedCountry = {
   emoji: string;
   motif?: string;
   summary: string;
+  /** States / provinces / prefectures. A country may list every one, even
+   *  those with no cities seeded yet — browsing shows what exists. */
+  regions?: SeedRegion[];
   cities: SeedCity[];
 };

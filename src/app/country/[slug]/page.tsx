@@ -5,7 +5,11 @@ import Reveal from "@/components/Reveal";
 import Motif from "@/components/Motif";
 import { accentFor } from "@/lib/accent";
 import SoundToggle from "@/components/SoundToggle";
-import { getCountryBySlug, listCitiesForCountry } from "@/modules/destination/queries";
+import {
+  getCountryBySlug,
+  listCitiesForCountry,
+  listRegionsForCountry,
+} from "@/modules/destination/queries";
 import { getPhoto } from "@/modules/media/wikimedia";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +20,9 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
   if (!country) notFound();
 
   const cities = await listCitiesForCountry(country.id);
+  const regions = await listRegionsForCountry(country.id);
+  const mapped = regions.filter((r) => r.placeCount > 0);
+  const rest = regions.filter((r) => r.placeCount === 0);
   const [hero, ...cityPhotos] = await Promise.all([
     getPhoto("countries", country.id, country.name, country.wikidataId),
     ...cities.map((c) => getPhoto("cities", c.id, `${c.name}, ${country.name}`, c.wikidataId)),
@@ -74,6 +81,41 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
             Plan a trip
           </Link>
         </div>
+
+        {regions.length > 0 && (
+          <div className="mt-10">
+            <h3 className="text-xs uppercase tracking-[0.18em] text-neutral-600">
+              Browse by {regions[0].kind}
+            </h3>
+            <div className="mt-4 flex flex-wrap gap-2">
+              {mapped.map((region) => (
+                <Link
+                  key={region.id}
+                  href={`/country/${country.slug}/region/${region.slug}`}
+                  className="rounded-full border border-clay/40 bg-cream px-4 py-1.5 text-sm text-forest shadow-sm transition hover:border-clay"
+                >
+                  {region.name}
+                  <span className="ml-2 text-xs text-clay">{region.placeCount}</span>
+                </Link>
+              ))}
+              {rest.map((region) => (
+                <Link
+                  key={region.id}
+                  href={`/country/${country.slug}/region/${region.slug}`}
+                  className="rounded-full border border-ink/10 px-4 py-1.5 text-sm text-neutral-500 transition hover:border-ink/25"
+                >
+                  {region.name}
+                </Link>
+              ))}
+            </div>
+            {rest.length > 0 && (
+              <p className="mt-3 text-xs text-neutral-500">
+                {mapped.length} of {regions.length} mapped so far — faded ones have nothing
+                verified yet.
+              </p>
+            )}
+          </div>
+        )}
 
         <div className="mt-10 grid gap-6 md:grid-cols-6">
           {cities.map((city, i) => {
