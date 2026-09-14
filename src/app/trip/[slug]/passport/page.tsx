@@ -8,6 +8,7 @@ import { getProgress } from "@/modules/passport/queries";
 import { listMemories } from "@/modules/passport/memories";
 import { regionsForPlaces } from "@/modules/trip/queries";
 import PassportActions from "@/components/PassportActions";
+import { pageStyleFor } from "@/lib/page-style";
 import { auth } from "@/auth";
 import { getPhoto } from "@/modules/media/wikimedia";
 import { listCitiesForCountry, getCountryBySlug } from "@/modules/destination/queries";
@@ -178,16 +179,24 @@ export default async function PassportPage({
         )}
 
         <div className="mt-14 space-y-14">
-          {[...sections.entries()].map(([regionName, group], si) => (
-            <section key={regionName} className="passport-chapter">
+          {[...sections.entries()].map(([regionName, group], si) => {
+            const style = pageStyleFor(
+              group.flatMap((c) => c.places.map((p) => p.kind)),
+              regionName,
+            );
+            return (
+            <section
+              key={regionName}
+              className={`passport-chapter rounded-md p-6 sm:p-8 ${style.surface}`}
+            >
               <div className="flex flex-wrap items-baseline justify-between gap-3">
-                <h2 className="font-display text-3xl text-forest">{regionName}</h2>
+                <h2 className={`font-display text-3xl ${style.heading}`}>{regionName}</h2>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
-                  Page {String(si + 1).padStart(2, "0")} · {group.length}{" "}
+                  {style.label} · {String(si + 1).padStart(2, "0")} · {group.length}{" "}
                   {group.length === 1 ? "stop" : "stops"}
                 </p>
               </div>
-              <span className="mt-2 block h-px w-full bg-ink/10" />
+              <span className={`mt-2 block h-px w-full ${style.rule}`} />
 
               <div className="mt-6 space-y-10">
                 {group.map((chapter, ci) => (
@@ -268,7 +277,8 @@ export default async function PassportPage({
                 ))}
               </div>
             </section>
-          ))}
+            );
+          })}
         </div>
         {memories.length > 0 && (
           <section className="mt-16">

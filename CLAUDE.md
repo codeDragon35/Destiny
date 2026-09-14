@@ -196,6 +196,18 @@ Trips planned while signed out still work and have a null `user_id` — anyone w
 
 ## Journey Book / passport
 
+**Pages change character with the place.** `src/lib/page-style.ts` picks a page treatment from the kinds of
+place in a chapter — a nature-heavy state gets "Green pages" on pale leaf, a culture-heavy one "Stone pages"
+on warm accent. One book design, different character per destination; do not fork it into separate designs.
+
+**A trip scoped to one or two regions titles itself after them** — "My Meghalaya Journey", not "My India
+Journey". Chapters group by region, so a two-state trip reads as two sections.
+
+**Print and share** come from `PassportActions`: printing uses the browser's own dialog, so "Save as PDF"
+produces the book without shipping a PDF library. The `@media print` rules in `globals.css` drop the app
+chrome and keep a chapter from splitting across sheets — keep `passport-page` and `passport-chapter` on the
+right elements or printing breaks silently.
+
 Two steps, deliberately separate:
 
 1. `/trip/[slug]/collect` — the user ticks what they actually saw and collected.
