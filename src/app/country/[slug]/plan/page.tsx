@@ -1,14 +1,17 @@
 import { notFound, redirect } from "next/navigation";
 import Link from "next/link";
 import { randomUUID } from "node:crypto";
+import Sidebar from "@/components/Sidebar";
 import {
   getCountryBySlug,
+  listPlaceChoices,
   listCitiesForCountry,
   listPlacesForCity,
 } from "@/modules/destination/queries";
 import { planTrip, type Interest } from "@/modules/trip/planner";
 import { saveTrip } from "@/modules/trip/queries";
 import { auth } from "@/auth";
+import { accentFor } from "@/lib/accent";
 
 export const dynamic = "force-dynamic";
 
@@ -24,6 +27,23 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
   const country = await getCountryBySlug(slug);
   if (!country) notFound();
 
+  const choices = await listPlaceChoices(country.id);
+  const accent = accentFor(country.motif);
+
+  // Group by region, then city, so the picker mirrors how people think about a trip.
+  const byRegion = new Map<string, { name: string; cities: Map<string, typeof choices> }>();
+  for (const choice of choices) {
+    const key = choice.regionSlug ?? "elsewhere";
+    const region = byRegion.get(key) ?? {
+      name: choice.regionName ?? "Elsewhere",
+      cities: new Map<string, typeof choices>(),
+    };
+    const city = region.cities.get(choice.cityName) ?? [];
+    city.push(choice);
+    region.cities.set(choice.cityName, city);
+    byRegion.set(key, region);
+  }
+
   async function createTrip(formData: FormData) {
     "use server";
     const target = await getCountryBySlug(slug);
@@ -37,8 +57,10 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
     const budgetRaw = Number(formData.get("budget"));
     const budget = Number.isFinite(budgetRaw) && budgetRaw > 0 ? Math.round(budgetRaw) : null;
 
+    const chosenPlaces = formData.getAll("place").map(String);
+
     const cities = await listCitiesForCountry(target.id);
-    const placesByCity = await Promise.all(
+    let placesByCity = await Promise.all(
       cities.map(async (c) => ({
         cityName: c.name,
         citySlug: c.slug,
@@ -46,9 +68,18 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
       })),
     );
 
+    // Honour an explicit selection; an empty one means "anywhere in the country".
+    if (chosenPlaces.length > 0) {
+      const wanted = new Set(chosenPlaces);
+      placesByCity = placesByCity
+        .map((c) => ({ ...c, places: c.places.filter((p) => wanted.has(p.id)) }))
+        .filter((c) => c.places.length > 0);
+    }
+
     const plan = planTrip({ days, interests, placesByCity });
     const tripSlug = randomUUID().slice(0, 8);
     const session = await auth();
+
     await saveTrip({
       countryId: target.id,
       slug: tripSlug,
@@ -57,16 +88,18 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
       dietary,
       budget,
       plan,
-      userId: session?.user?.id ?? null,
       startDate,
+      userId: session?.user?.id ?? null,
+      placeIds: chosenPlaces,
     });
 
     redirect(`/trip/${tripSlug}`);
   }
 
   return (
-    <main className="min-h-dvh bg-paper">
-      <div className="mx-auto max-w-2xl px-6 py-16 sm:px-10 sm:py-24">
+    <div className="flex min-h-dvh bg-paper">
+      <Sidebar />
+      <main className="min-w-0 flex-1 px-6 py-10 sm:px-10">
         <Link
           href={`/country/${country.slug}`}
           className="text-sm text-neutral-600 transition hover:text-clay"
@@ -74,94 +107,140 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
           ← {country.name}
         </Link>
 
-        <p className="mt-10 text-xs uppercase tracking-[0.35em] text-clay">Plan your trip</p>
-        <h1 className="mt-4 text-4xl font-semibold text-forest sm:text-5xl">
-          Tell us about your trip
+        <p className="mt-6 text-xs uppercase tracking-[0.18em] text-clay">Plan your trip</p>
+        <h1 className="animate-float-in mt-2 font-display text-4xl text-forest sm:text-5xl">
+          Where in {country.name} are you going?
         </h1>
-        <p className="mt-4 text-neutral-600">
-          We&apos;ll build a day-by-day route through {country.name} around what you care about.
+        <p className="mt-3 max-w-xl text-neutral-700">
+          Tick the places you actually want. Leave everything unticked and we&apos;ll choose for
+          you across the whole country.
         </p>
 
-        <form action={createTrip} className="mt-12 space-y-10">
-          <div>
-            <label htmlFor="days" className="block text-sm font-medium text-forest">
-              How many days?
-            </label>
-            <input
-              id="days"
-              name="days"
-              type="number"
-              min={1}
-              max={30}
-              defaultValue={5}
-              className="mt-3 w-32 rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest outline-none transition focus:border-clay"
-            />
+        <form action={createTrip} className="mt-10 max-w-4xl">
+          <div className="space-y-8">
+            {[...byRegion.entries()].map(([key, region]) => (
+              <section key={key} className="rounded-md border border-ink/[0.08] bg-cream p-6 shadow-sm">
+                <h2 className="font-display text-2xl text-forest">{region.name}</h2>
+
+                <div className="mt-4 space-y-5">
+                  {[...region.cities.entries()].map(([cityName, places]) => (
+                    <div key={cityName}>
+                      <p className="text-xs uppercase tracking-wide text-neutral-600">
+                        {cityName}
+                      </p>
+                      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                        {places.map((place) => (
+                          <label
+                            key={place.id}
+                            className="flex cursor-pointer items-start gap-3 rounded-md border border-ink/10 bg-paper px-4 py-3 transition hover:border-clay/50 has-[:checked]:border-clay has-[:checked]:bg-accent-100"
+                          >
+                            <input
+                              type="checkbox"
+                              name="place"
+                              value={place.id}
+                              className="mt-1 h-4 w-4 accent-[#C67139]"
+                            />
+                            <span className="min-w-0">
+                              <span className="block text-sm text-forest">{place.name}</span>
+                              {place.summary && (
+                                <span className="mt-0.5 block text-xs text-neutral-600">
+                                  {place.summary}
+                                </span>
+                              )}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ))}
           </div>
 
-          <div>
-            <label htmlFor="startDate" className="block text-sm font-medium text-forest">
-              When are you going? <span className="text-neutral-600">(optional)</span>
-            </label>
-            <p className="mt-1 text-xs text-neutral-600/70">
-              We&apos;ll flag places that are badly timed and festivals you could catch.
-            </p>
-            <input
-              id="startDate"
-              name="startDate"
-              type="date"
-              className="mt-3 rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest outline-none transition focus:border-clay [color-scheme:dark]"
-            />
-          </div>
+          <section className="mt-8 rounded-md border border-ink/[0.08] bg-cream p-6 shadow-sm">
+            <h2 className="font-display text-2xl text-forest">How do you travel?</h2>
 
-          <fieldset>
-            <legend className="text-sm font-medium text-forest">What do you enjoy?</legend>
-            <div className="mt-3 flex flex-wrap gap-3">
-              {INTERESTS.map((i) => (
-                <label
-                  key={i.value}
-                  className="cursor-pointer rounded-full border border-ink/12 bg-cream px-4 py-2 text-sm text-neutral-600 transition hover:border-clay/50 has-[:checked]:border-clay has-[:checked]:text-clay"
-                >
-                  <input type="checkbox" name={i.value} className="sr-only" />
-                  {i.label}
+            <div className="mt-5 flex flex-wrap gap-6">
+              <div>
+                <label htmlFor="days" className="block text-xs text-neutral-600">
+                  How many days?
                 </label>
-              ))}
+                <input
+                  id="days"
+                  name="days"
+                  type="number"
+                  min={1}
+                  max={30}
+                  defaultValue={5}
+                  className="mt-1.5 w-28 rounded-md border border-ink/10 bg-paper px-3 py-2 text-ink outline-none focus:border-clay"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="startDate" className="block text-xs text-neutral-600">
+                  When are you going?
+                </label>
+                <input
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  className="mt-1.5 rounded-md border border-ink/10 bg-paper px-3 py-2 text-ink outline-none focus:border-clay"
+                />
+              </div>
+
+              <div>
+                <label htmlFor="budget" className="block text-xs text-neutral-600">
+                  Budget
+                </label>
+                <input
+                  id="budget"
+                  name="budget"
+                  type="number"
+                  min={0}
+                  placeholder="100000"
+                  className="mt-1.5 w-40 rounded-md border border-ink/10 bg-paper px-3 py-2 text-ink outline-none placeholder:text-neutral-500 focus:border-clay"
+                />
+              </div>
             </div>
-          </fieldset>
 
-          <div>
-            <label htmlFor="dietary" className="block text-sm font-medium text-forest">
-              Dietary needs <span className="text-neutral-600">(optional)</span>
-            </label>
-            <input
-              id="dietary"
-              name="dietary"
-              placeholder="Vegetarian, halal, gluten-free…"
-              className="mt-3 w-full rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest placeholder:text-neutral-600/50 outline-none transition focus:border-clay"
-            />
-          </div>
+            <fieldset className="mt-6">
+              <legend className="text-xs text-neutral-600">What do you enjoy?</legend>
+              <div className="mt-2 flex flex-wrap gap-2">
+                {INTERESTS.map((i) => (
+                  <label
+                    key={i.value}
+                    className="cursor-pointer rounded-full border border-ink/12 bg-paper px-4 py-1.5 text-sm text-neutral-700 transition hover:border-clay has-[:checked]:border-clay has-[:checked]:bg-accent-100 has-[:checked]:text-forest"
+                  >
+                    <input type="checkbox" name={i.value} className="sr-only" />
+                    {i.label}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
 
-          <div>
-            <label htmlFor="budget" className="block text-sm font-medium text-forest">
-              Budget <span className="text-neutral-600">(optional)</span>
-            </label>
-            <input
-              id="budget"
-              name="budget"
-              type="number"
-              min={0}
-              placeholder="100000"
-              className="mt-3 w-48 rounded-lg border border-ink/12 bg-cream px-4 py-3 text-forest placeholder:text-neutral-600/50 outline-none transition focus:border-clay"
-            />
-          </div>
+            <div className="mt-6">
+              <label htmlFor="dietary" className="block text-xs text-neutral-600">
+                Dietary needs
+              </label>
+              <input
+                id="dietary"
+                name="dietary"
+                placeholder="Vegetarian, halal, gluten-free…"
+                className="mt-1.5 w-full max-w-md rounded-md border border-ink/10 bg-paper px-3 py-2 text-ink outline-none placeholder:text-neutral-500 focus:border-clay"
+              />
+            </div>
+          </section>
 
           <button
             type="submit"
-            className="rounded-full bg-clay px-8 py-3 font-medium text-cream transition hover:bg-clay/90"
+            className="mt-8 rounded-md px-8 py-3 font-display text-cream shadow-md transition hover:opacity-90"
+            style={{ backgroundColor: accent.hex }}
           >
-            Build my itinerary
+            Build my itinerary →
           </button>
         </form>
-      </div>
-    </main>
+      </main>
+    </div>
   );
 }

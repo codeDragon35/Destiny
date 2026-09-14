@@ -6,6 +6,9 @@ import { getTripBySlug } from "@/modules/trip/queries";
 import { collectiblesByPlaceIds, type Collectible } from "@/modules/souvenir/queries";
 import { getProgress } from "@/modules/passport/queries";
 import { listMemories } from "@/modules/passport/memories";
+import { regionsForPlaces } from "@/modules/trip/queries";
+import PassportActions from "@/components/PassportActions";
+import { auth } from "@/auth";
 import { getPhoto } from "@/modules/media/wikimedia";
 import { listCitiesForCountry, getCountryBySlug } from "@/modules/destination/queries";
 import RouteMap from "@/components/RouteMap";
@@ -34,6 +37,7 @@ export default async function PassportPage({
 
   const days = trip.plan.days ?? [];
   const placeIds = days.flatMap((d) => d.places.map((p) => p.id));
+  const session = await auth();
   const [collectibles, progress, memories] = await Promise.all([
     collectiblesByPlaceIds(placeIds),
     getProgress(trip.id),
@@ -87,6 +91,24 @@ export default async function PassportPage({
     }];
   });
 
+  const regionByPlace = await regionsForPlaces(placeIds);
+  // A trip scoped to one or two states should say so rather than naming the country.
+  const regionNames = [...new Set([...regionByPlace.values()])];
+  const scopeLabel =
+    regionNames.length > 0 && regionNames.length <= 2
+      ? regionNames.join(" & ")
+      : trip.countryName;
+
+  // Chapters group under their state, so a two-state trip reads as two sections.
+  const sections = new Map<string, CityChapter[]>();
+  for (const chapter of chapters.values()) {
+    const placeId = chapter.places[0]?.id;
+    const region = (placeId && regionByPlace.get(placeId)) || trip.countryName;
+    const list = sections.get(region) ?? [];
+    list.push(chapter);
+    sections.set(region, list);
+  }
+
   const allCollectibles = [...chapters.values()].flatMap((c) => c.collectibles);
   const visited = progress.places.size;
   const collected = progress.collectibles.size;
@@ -102,39 +124,52 @@ export default async function PassportPage({
           <SoundToggle motif={country?.motif} />
         </div>
 
-        <header className="relative mt-10 overflow-hidden rounded-2xl border border-clay/30 bg-gradient-to-br from-gold/[0.10] via-cream to-paper p-8 shadow-2xl shadow-gold/5 sm:p-12">
+        <header className="passport-page relative mt-10 overflow-hidden rounded-md border border-clay/25 bg-forest p-8 text-cream shadow-lg sm:p-10">
           <Sparkles />
           {country?.motif && (
             <Motif
               motif={country.motif}
-              className="pointer-events-none absolute inset-x-0 -top-2 h-32 w-full opacity-45"
+              className="pointer-events-none absolute inset-x-0 -top-2 h-28 w-full opacity-40"
             />
           )}
           <div className="relative">
-            <div className="flex items-center gap-3 text-xs uppercase tracking-[0.35em] text-clay">
-              <span aria-hidden>✦</span>
-              Travel passport
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-[11px] uppercase tracking-[0.2em] text-cream/60">
+                Travel passport — the book
+              </p>
+              <p className="text-[11px] text-cream/50">
+                {session?.user?.email?.split("@")[0] ?? "traveller"} ·{" "}
+                {trip.countrySlug.slice(0, 2).toUpperCase()}-{trip.slug.slice(0, 4).toUpperCase()}
+              </p>
             </div>
-            <h1 className="passport-title mt-5 font-display text-4xl font-semibold leading-tight sm:text-6xl">
-              My {trip.countryName} Journey
-            </h1>
-            <p className="mt-2 text-2xl font-light text-clay/70">{year}</p>
+
+            <h1 className="mt-4 font-display text-4xl sm:text-5xl">My {scopeLabel} Journey</h1>
+            <p className="mt-1 text-2xl font-light text-clay">{year}</p>
 
             <div className="mt-8 flex flex-wrap gap-x-8 gap-y-3 text-sm">
-              <span className="text-neutral-600">
-                <span className="font-display text-2xl font-medium text-clay">{visited}</span>
-                <span className="text-neutral-600/60">/{placeIds.length}</span> visited
+              <span className="text-cream/70">
+                <span className="font-display text-2xl text-cream">{sections.size}</span> pages
               </span>
-              <span className="text-neutral-600">
-                <span className="font-display text-2xl font-medium text-clay">{collected}</span>
-                <span className="text-neutral-600/60">/{allCollectibles.length}</span> collected
+              <span className="text-cream/70">
+                <span className="font-display text-2xl text-cream">{visited}</span>
+                <span className="text-cream/50">/{placeIds.length}</span> visited
               </span>
-              <span className="text-neutral-600">
-                <span className="font-display text-2xl font-medium text-forest">{chapters.size}</span> cities
+              <span className="text-cream/70">
+                <span className="font-display text-2xl text-clay">{collected}</span>
+                <span className="text-cream/50">/{allCollectibles.length}</span> stamps
               </span>
+              {memories.length > 0 && (
+                <span className="text-cream/70">
+                  <span className="font-display text-2xl text-cream">{memories.length}</span> kept
+                </span>
+              )}
             </div>
           </div>
         </header>
+
+        <div className="mt-6">
+          <PassportActions title={`My ${scopeLabel} Journey`} />
+        </div>
 
         {stops.length > 0 && country && (
           <section className="mt-8 overflow-hidden rounded-2xl border border-ink/[0.08] bg-cream/60 p-4 sm:p-6">
@@ -142,90 +177,99 @@ export default async function PassportPage({
           </section>
         )}
 
-        <div className="mt-14 space-y-12">
-          {[...chapters.values()].map((chapter, ci) => (
-            <Reveal key={chapter.cityName} delay={ci * 80}>
-              <section>
-                <div className="flex items-baseline gap-3">
-                  <h2 className="font-display text-2xl font-medium text-forest">{chapter.cityName}</h2>
-                  <span className="h-px flex-1 bg-ink/5" />
-                </div>
+        <div className="mt-14 space-y-14">
+          {[...sections.entries()].map(([regionName, group], si) => (
+            <section key={regionName} className="passport-chapter">
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <h2 className="font-display text-3xl text-forest">{regionName}</h2>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-neutral-500">
+                  Page {String(si + 1).padStart(2, "0")} · {group.length}{" "}
+                  {group.length === 1 ? "stop" : "stops"}
+                </p>
+              </div>
+              <span className="mt-2 block h-px w-full bg-ink/10" />
 
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  {chapter.places.map((place) => {
-                    const done = progress.places.has(place.id);
-                    const photo = photos.get(place.id);
-                    return (
-                      <div
-                        key={place.id}
-                        className={`relative overflow-hidden rounded-xl border ${
-                          done ? "border-clay/40" : "border-ink/[0.08]"
-                        }`}
-                      >
-                        <div className="relative h-36">
-                          {photo ? (
-                            <img
-                              src={photo.url}
-                              alt=""
-                              className={`h-full w-full object-cover ${done ? "" : "grayscale opacity-40"}`}
-                            />
-                          ) : (
-                            <div className="h-full w-full bg-gradient-to-br from-cream to-paper" />
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-cream via-cream/30 to-transparent" />
+              <div className="mt-6 space-y-10">
+                {group.map((chapter, ci) => (
+                  <Reveal key={chapter.cityName} delay={ci * 80}>
+                    <div className="passport-page">
+                      <h3 className="font-display text-2xl text-forest">{chapter.cityName}</h3>
 
-                          {done && (
-                            <span className="stamp-in absolute right-3 top-3 rounded-md border-2 border-clay bg-paper/85 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-clay shadow-lg backdrop-blur-sm">
-                              Visited
-                            </span>
-                          )}
-                        </div>
-                        <p className={`px-4 py-3 text-sm ${done ? "text-forest" : "text-neutral-600"}`}>
-                          {place.name}
-                        </p>
+                      <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                        {chapter.places.map((place) => {
+                          const done = progress.places.has(place.id);
+                          const photo = photos.get(place.id);
+                          return (
+                            <div
+                              key={place.id}
+                              className={`relative overflow-hidden rounded-md border bg-cream shadow-sm ${
+                                done ? "border-clay/40" : "border-ink/[0.08]"
+                              }`}
+                            >
+                              <div className="relative h-36 bg-surface">
+                                {photo ? (
+                                  <img
+                                    src={photo.url}
+                                    alt=""
+                                    className={`h-full w-full object-cover ${done ? "washed" : "opacity-40 grayscale"}`}
+                                  />
+                                ) : (
+                                  <div className="h-full w-full bg-surface" />
+                                )}
+                                {done && (
+                                  <span className="stamp-in absolute right-3 top-3 rounded-md border-2 border-clay bg-cream/90 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-clay shadow-sm">
+                                    Visited
+                                  </span>
+                                )}
+                              </div>
+                              <p className={`px-4 py-3 text-sm ${done ? "text-forest" : "text-neutral-500"}`}>
+                                {place.name}
+                              </p>
+                            </div>
+                          );
+                        })}
                       </div>
-                    );
-                  })}
-                </div>
 
-                {chapter.collectibles.length > 0 && (
-                  <ul className="mt-4 grid gap-3 sm:grid-cols-2">
-                    {chapter.collectibles.map((item) => {
-                      const done = progress.collectibles.has(item.id);
-                      return (
-                        <li
-                          key={item.id}
-                          className={`relative flex items-start gap-3 overflow-hidden rounded-xl border px-5 py-4 ${
-                            done
-                              ? "border-clay/50 bg-clay/[0.08]"
-                              : "border-dashed border-ink/12 opacity-50"
-                          }`}
-                        >
-                          {done && <Sparkles />}
-                          <span
-                            className={`relative text-lg leading-none ${done ? "text-clay" : "text-neutral-600/40"}`}
-                            aria-hidden
-                          >
-                            {kindOf(item.kind).icon}
-                          </span>
-                          <span className="relative">
-                            <span className={done ? "text-forest" : "text-neutral-600"}>
-                              {item.name}
-                            </span>
-                            <span className="mt-0.5 block text-xs text-neutral-600/70">
-                              {done ? "Collected" : "Not collected"}
-                            </span>
-                          </span>
-                        </li>
-                      );
-                    })}
-                  </ul>
-                )}
-              </section>
-            </Reveal>
+                      {chapter.collectibles.length > 0 && (
+                        <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                          {chapter.collectibles.map((item) => {
+                            const done = progress.collectibles.has(item.id);
+                            return (
+                              <li
+                                key={item.id}
+                                className={`relative flex items-start gap-3 overflow-hidden rounded-md border px-5 py-4 ${
+                                  done
+                                    ? "border-clay/50 bg-accent-100"
+                                    : "border-dashed border-ink/15 opacity-55"
+                                }`}
+                              >
+                                {done && <Sparkles />}
+                                <span
+                                  className={`relative text-lg leading-none ${done ? "text-clay" : "text-neutral-400"}`}
+                                  aria-hidden
+                                >
+                                  {kindOf(item.kind).icon}
+                                </span>
+                                <span className="relative">
+                                  <span className={done ? "text-forest" : "text-neutral-600"}>
+                                    {item.name}
+                                  </span>
+                                  <span className="mt-0.5 block text-xs text-neutral-500">
+                                    {done ? "Collected" : "Not collected"}
+                                  </span>
+                                </span>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </div>
+                  </Reveal>
+                ))}
+              </div>
+            </section>
           ))}
         </div>
-
         {memories.length > 0 && (
           <section className="mt-16">
             <div className="flex items-baseline gap-3">

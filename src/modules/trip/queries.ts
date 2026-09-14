@@ -26,9 +26,10 @@ export async function saveTrip(input: {
   plan: unknown;
   userId?: string | null;
   startDate?: string | null;
+  placeIds?: string[];
 }) {
   await db.execute(sql`
-    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan, user_id, start_date)
+    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan, user_id, start_date, place_ids)
     VALUES (
       ${input.countryId},
       ${input.slug},
@@ -38,7 +39,12 @@ export async function saveTrip(input: {
       ${input.budget},
       ${JSON.stringify(input.plan)}::jsonb,
       ${input.userId ?? null},
-      ${input.startDate ?? null}::date
+      ${input.startDate ?? null}::date,
+      ${
+        input.placeIds && input.placeIds.length > 0
+          ? sql`ARRAY[${sql.join(input.placeIds.map((id) => sql`${id}::uuid`), sql`, `)}]`
+          : null
+      }
     )
   `);
 }
@@ -125,4 +131,26 @@ export async function passportSummary(userId: string) {
     WHERE t.user_id = ${userId}
   `);
   return rows[0] ?? { stamps: 0, countries: 0 };
+}
+
+/**
+ * Regions actually covered by a trip's places, so the passport can title and
+ * chapter itself by where the traveller really went rather than by country.
+ */
+export async function regionsForPlaces(placeIds: string[]) {
+  if (placeIds.length === 0) return new Map<string, string>();
+
+  const rows = await db.execute<{ placeId: string; regionName: string | null }>(sql`
+    SELECT p.id AS "placeId", r.name AS "regionName"
+    FROM places p
+    JOIN cities ct ON ct.id = p.city_id
+    LEFT JOIN regions r ON r.id = ct.region_id
+    WHERE p.id IN (${sql.join(placeIds.map((id) => sql`${id}::uuid`), sql`, `)})
+  `);
+
+  const map = new Map<string, string>();
+  for (const row of rows) {
+    if (row.regionName) map.set(row.placeId, row.regionName);
+  }
+  return map;
 }

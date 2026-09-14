@@ -149,6 +149,10 @@ export const trips = pgTable(
     interests: tripInterest("interests").array().notNull(),
     dietary: text("dietary"),
     budget: integer("budget"),
+    /** Regions the traveller chose to visit; empty means the whole country. */
+    regionIds: uuid("region_ids").array(),
+    /** Specific places the traveller picked; empty means "anything in scope". */
+    placeIds: uuid("place_ids").array(),
     /** Generated plan: [{ day, placeIds[] }]. Denormalised so a saved trip is stable. */
     plan: jsonb("plan").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

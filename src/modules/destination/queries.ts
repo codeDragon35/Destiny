@@ -249,3 +249,35 @@ export async function listCitiesForRegion(regionId: string): Promise<City[]> {
   `);
   return [...rows];
 }
+
+export type PlaceChoice = {
+  id: string;
+  name: string;
+  kind: string;
+  summary: string | null;
+  visitMinutes: number | null;
+  cityName: string;
+  citySlug: string;
+  regionName: string | null;
+  regionSlug: string | null;
+};
+
+/**
+ * Every place in a country, tagged with its city and region so the picker can
+ * group them. Places in cities without a region fall under "Elsewhere".
+ */
+export async function listPlaceChoices(countryId: string): Promise<PlaceChoice[]> {
+  const rows = await db.execute<PlaceChoice>(sql`
+    SELECT
+      p.id, p.name, p.kind, p.summary,
+      p.visit_minutes AS "visitMinutes",
+      ct.name AS "cityName", ct.slug AS "citySlug",
+      r.name AS "regionName", r.slug AS "regionSlug"
+    FROM places p
+    JOIN cities ct ON ct.id = p.city_id
+    LEFT JOIN regions r ON r.id = ct.region_id
+    WHERE ct.country_id = ${countryId}
+    ORDER BY r.name NULLS LAST, ct.name, p.name
+  `);
+  return [...rows];
+}

@@ -230,3 +230,35 @@
     animation: leaf-rustle 6s ease-in-out infinite;
   }
 }
+
+/* The passport is meant to be printed as a book: drop the app chrome, keep the
+   pages, and never split a chapter across sheets. */
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  body {
+    background: #fff;
+  }
+
+  nav,
+  .print\:hidden {
+    display: none !important;
+  }
+
+  .passport-page {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .passport-chapter {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .passport-chapter:first-of-type {
+    break-before: auto;
+    page-break-before: auto;
+  }
+}
