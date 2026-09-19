@@ -17,6 +17,8 @@ import Hero from "@/components/Hero";
 import { eventTone } from "@/lib/event-tone";
 import { accentFor } from "@/lib/accent";
 import SoundToggle from "@/components/SoundToggle";
+import GuidePanel from "@/components/GuidePanel";
+import { guideView } from "@/modules/trip/guide";
 
 export const dynamic = "force-dynamic";
 
@@ -74,6 +76,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
     photoList.find(Boolean) ??
     null;
   const totalPlaces = days.reduce((n, d) => n + d.places.length, 0);
+  const view = guideView(trip);
   const cities = [...new Set(days.map((d) => d.cityName))];
 
   return (
@@ -254,12 +257,13 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
           >
             Create my passport
           </Link>
-          <Link
-            href={`/trip/${trip.slug}/guide`}
-            className="rounded-full border border-forest/30 px-6 py-2.5 font-display text-sm text-forest transition hover:bg-surface"
-          >
-            Ask the guide
-          </Link>
+          <GuidePanel
+            view={view}
+            tripSlug={trip.slug}
+            countryName={trip.countryName}
+            days={trip.days}
+            accentHex={accent.hex}
+          />
           <Link
             href={`/country/${trip.countrySlug}/plan`}
             className="text-sm text-clay transition hover:text-clay/80"

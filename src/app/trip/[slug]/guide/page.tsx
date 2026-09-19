@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import Reveal from "@/components/Reveal";
 import { getTripBySlug } from "@/modules/trip/queries";
-import { budgetSplit, summarise } from "@/modules/trip/guide";
+import { guideView } from "@/modules/trip/guide";
 import { getCountryBySlug } from "@/modules/destination/queries";
 import { accentFor } from "@/lib/accent";
 
@@ -21,19 +21,8 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
   const country = await getCountryBySlug(trip.countrySlug);
   const accent = accentFor(country?.motif);
   const days = trip.plan.days ?? [];
-  const reply = summarise(days, trip.interests);
-  const cities = [...new Set(days.map((d) => d.cityName))];
-  const placeCount = days.reduce((n, d) => n + d.places.length, 0);
-  const split = trip.budget ? budgetSplit(trip.budget) : [];
-
-  const asked = [
-    `I have ${trip.days} days`,
-    trip.budget ? `₹${trip.budget.toLocaleString("en-IN")}` : null,
-    trip.dietary,
-    trip.interests.length > 0 ? trip.interests.join(", ") : null,
-  ]
-    .filter(Boolean)
-    .join(" · ");
+  // Same shape the side panel renders, so the two surfaces cannot drift apart.
+  const { reply, asked, cities, placeCount, split, pace, hiddenNames } = guideView(trip);
 
   return (
     <div className="flex min-h-dvh bg-paper">
@@ -156,9 +145,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 )}
                 <div className="flex justify-between">
                   <dt className="text-neutral-600">Pace</dt>
-                  <dd className="text-forest">
-                    {placeCount / Math.max(1, days.length) < 2 ? "Unhurried" : "Full"}
-                  </dd>
+                  <dd className="text-forest">{pace}</dd>
                 </div>
               </dl>
             </div>
@@ -187,15 +174,10 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
                 Saved from the map
               </p>
               <p className="mt-2 text-sm text-forest">
-                {days.flatMap((d) => d.places).filter((p) => p.kind === "hidden_gem").length} hidden
-                places folded in
+                {hiddenNames.length} hidden places folded in
               </p>
               <p className="mt-1 text-xs text-neutral-700">
-                {days
-                  .flatMap((d) => d.places)
-                  .filter((p) => p.kind === "hidden_gem")
-                  .map((p) => p.name)
-                  .join(", ") || "None on this route yet"}
+                {hiddenNames.join(", ") || "None on this route yet"}
               </p>
             </div>
           </aside>

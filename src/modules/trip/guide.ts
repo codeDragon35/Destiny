@@ -40,3 +40,49 @@ export function summarise(days: PlannedDay[], interests: string[]): GuideReply {
     chips: ["Make it slower", "Add a hot spring night", "Cut the budget", "Swap a city"],
   };
 }
+
+export type GuideView = {
+  reply: GuideReply;
+  asked: string;
+  cities: string[];
+  placeCount: number;
+  hiddenNames: string[];
+  split: { label: string; amount: number }[];
+  pace: "Unhurried" | "Full";
+};
+
+/**
+ * Everything both guide surfaces render. Shared so the side panel and the
+ * full page can never drift apart.
+ */
+export function guideView(trip: {
+  days: number;
+  budget: number | null;
+  dietary: string | null;
+  interests: string[];
+  plan: { days: PlannedDay[] };
+}): GuideView {
+  const days = trip.plan.days ?? [];
+  const cities = [...new Set(days.map((d) => d.cityName))];
+  const placeCount = days.reduce((n, d) => n + d.places.length, 0);
+
+  return {
+    reply: summarise(days, trip.interests),
+    asked: [
+      `I have ${trip.days} days`,
+      trip.budget ? `₹${trip.budget.toLocaleString("en-IN")}` : null,
+      trip.dietary,
+      trip.interests.length > 0 ? trip.interests.join(", ") : null,
+    ]
+      .filter(Boolean)
+      .join(" · "),
+    cities,
+    placeCount,
+    hiddenNames: days
+      .flatMap((d) => d.places)
+      .filter((p) => p.kind === "hidden_gem")
+      .map((p) => p.name),
+    split: trip.budget ? budgetSplit(trip.budget) : [],
+    pace: placeCount / Math.max(1, days.length) < 2 ? "Unhurried" : "Full",
+  };
+}
