@@ -7,12 +7,17 @@ const japan: SeedCountry = {
   wikidataId: "Q17",
   motif: "crane",
   emoji: "🇯🇵",
+  regions: [
+    { name: "Tokyo", slug: "tokyo", kind: "prefecture", wikidataId: "Q1490" },
+    { name: "Kyoto", slug: "kyoto", kind: "prefecture", wikidataId: "Q120730" },
+  ],
   summary:
     "Neon capitals and cedar-shaded shrines — Japan holds its old and new lives side by side.",
   cities: [
     {
       name: "Tokyo",
       slug: "tokyo",
+      region: "tokyo",
       wikidataId: "Q1490",
       summary: "Thirteen million people, endless neighbourhoods, and shrines between the towers.",
       lat: 35.6762,
@@ -89,6 +94,7 @@ const japan: SeedCountry = {
     {
       name: "Kyoto",
       slug: "kyoto",
+      region: "kyoto",
       wikidataId: "Q34600",
       summary: "Eleven centuries of capital city: temples, machiya townhouses and bamboo.",
       lat: 35.0116,

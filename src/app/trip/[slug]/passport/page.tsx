@@ -14,7 +14,6 @@ import { getPhoto } from "@/modules/media/wikimedia";
 import { listCitiesForCountry, getCountryBySlug } from "@/modules/destination/queries";
 import RouteMap from "@/components/RouteMap";
 import Sparkles from "@/components/Sparkles";
-import Motif from "@/components/Motif";
 import SoundToggle from "@/components/SoundToggle";
 
 export const dynamic = "force-dynamic";
@@ -127,12 +126,6 @@ export default async function PassportPage({
 
         <header className="passport-page relative mt-10 overflow-hidden rounded-md border border-clay/25 bg-forest p-8 text-cream shadow-lg sm:p-10">
           <Sparkles />
-          {country?.motif && (
-            <Motif
-              motif={country.motif}
-              className="pointer-events-none absolute inset-x-0 -top-2 h-28 w-full opacity-40"
-            />
-          )}
           <div className="relative">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="text-[11px] uppercase tracking-[0.2em] text-cream/60">

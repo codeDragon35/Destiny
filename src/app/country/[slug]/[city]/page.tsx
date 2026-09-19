@@ -13,7 +13,6 @@ import { eventsForCity, formatRange } from "@/modules/destination/seasons";
 import CollectibleBadge from "@/components/CollectibleBadge";
 import Sparkles from "@/components/Sparkles";
 import SoundToggle from "@/components/SoundToggle";
-import Motif from "@/components/Motif";
 import { accentFor } from "@/lib/accent";
 import { eventTone } from "@/lib/event-tone";
 
@@ -97,12 +96,6 @@ export default async function CityPage({
           </div>
         }
       />
-
-      {country.motif && (
-        <div className="mx-auto max-w-6xl px-6 pt-10 sm:px-10">
-          <Motif motif={country.motif} className="motif-float mx-auto h-20 w-full max-w-2xl opacity-85" />
-        </div>
-      )}
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
         <h2 className={`flex items-center gap-4 text-xs uppercase tracking-[0.35em] ${accent.text}`}>

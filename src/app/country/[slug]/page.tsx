@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
-import Reveal from "@/components/Reveal";
 import { accentFor } from "@/lib/accent";
 import SoundToggle from "@/components/SoundToggle";
 import {
@@ -24,10 +23,8 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
   const regions = await listRegionsForCountry(country.id);
   const mapped = regions.filter((r) => r.placeCount > 0);
   const regionShapes = await regionFeaturesFor(country.name);
-  const [hero, ...cityPhotos] = await Promise.all([
-    getPhoto("countries", country.id, country.name, country.wikidataId),
-    ...cities.map((c) => getPhoto("cities", c.id, `${c.name}, ${country.name}`, c.wikidataId)),
-  ]);
+  // Only the hero photo is rendered here; cities are shown on their region page.
+  const hero = await getPhoto("countries", country.id, country.name, country.wikidataId);
 
   const totalPlaces = cities.reduce((n, c) => n + c.placeCount, 0);
   const accent = accentFor(country.motif);
@@ -106,58 +103,6 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
           </div>
         )}
 
-        <div className="mt-10 grid gap-6 md:grid-cols-6">
-          {cities.map((city, i) => {
-            const photo = cityPhotos[i];
-            // First card runs wide; the rest pair up, so the grid never reads as a uniform table.
-            const wide = i === 0;
-            return (
-              <Reveal
-                key={city.id}
-                delay={i * 90}
-                className={wide ? "md:col-span-6" : "md:col-span-3"}
-              >
-                <Link
-                  href={`/country/${country.slug}/${city.slug}`}
-                  className="group relative block h-full overflow-hidden rounded-2xl border border-ink/[0.08] bg-cream transition duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/20 hover:border-current"
-                >
-                  <div className={`relative overflow-hidden ${wide ? "h-72" : "h-56"}`}>
-                    {photo ? (
-                      <img
-                        src={photo.url}
-                        alt=""
-                        className="washed h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="h-full w-full bg-gradient-to-br from-cream via-paper to-cream" />
-                    )}
-                    <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-cream to-transparent" />
-                    <span className="absolute right-4 top-4 rounded-full bg-paper/70 px-3 py-1 text-xs font-medium text-clay backdrop-blur">
-                      {city.placeCount} places
-                    </span>
-                  </div>
-
-                  <div className="p-6">
-                    <h3 className="font-display text-2xl font-medium text-forest transition group-hover:opacity-90">
-                      {city.name}
-                    </h3>
-                    {city.summary && (
-                      <p className="mt-2 max-w-xl text-sm leading-relaxed text-neutral-600">
-                        {city.summary}
-                      </p>
-                    )}
-                    <span className={`mt-4 inline-flex items-center gap-2 text-sm opacity-0 ${accent.text} transition duration-300 group-hover:opacity-100`}>
-                      Explore {city.name}
-                      <span className="transition group-hover:translate-x-1" aria-hidden>
-                        →
-                      </span>
-                    </span>
-                  </div>
-                </Link>
-              </Reveal>
-            );
-          })}
-        </div>
       </section>
     </main>
   );

@@ -14,7 +14,6 @@ import { kindOf } from "@/components/CollectibleBadge";
 import { getPhoto } from "@/modules/media/wikimedia";
 import { getCountryBySlug } from "@/modules/destination/queries";
 import Hero from "@/components/Hero";
-import Motif from "@/components/Motif";
 import { eventTone } from "@/lib/event-tone";
 import { accentFor } from "@/lib/accent";
 import SoundToggle from "@/components/SoundToggle";
@@ -100,12 +99,6 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
           </div>
         }
       />
-
-      {country?.motif && (
-        <div className="mx-auto max-w-3xl px-6 pt-8 sm:px-10">
-          <Motif motif={country.motif} className="motif-float mx-auto h-16 w-full opacity-70" />
-        </div>
-      )}
 
       <div className="mx-auto max-w-3xl px-6 py-12 sm:px-10">
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-600">

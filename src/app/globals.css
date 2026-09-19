@@ -103,64 +103,6 @@
   }
 }
 
-@keyframes dragon-draw {
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes dragon-drift {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-7px);
-  }
-}
-
-@keyframes fly-across {
-  0% {
-    transform: translateX(-18%) translateY(6px);
-  }
-  50% {
-    transform: translateX(10%) translateY(-10px);
-  }
-  100% {
-    transform: translateX(-18%) translateY(6px);
-  }
-}
-
-@keyframes wing-flap {
-  0%,
-  100% {
-    transform: scaleY(1) translateY(0);
-  }
-  50% {
-    transform: scaleY(0.45) translateY(6px);
-  }
-}
-
-@keyframes fan-sway {
-  0%,
-  100% {
-    transform: rotate(-2.5deg);
-  }
-  50% {
-    transform: rotate(2.5deg);
-  }
-}
-
-@keyframes leaf-rustle {
-  0%,
-  100% {
-    transform: rotate(-1.5deg) translateY(0);
-  }
-  50% {
-    transform: rotate(1.5deg) translateY(-4px);
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .animate-float-in {
     animation: float-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -186,49 +128,6 @@
     animation: stop-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
 
-  .motif-float {
-    animation: dragon-drift 7s ease-in-out infinite;
-  }
-
-  .motif-crane {
-    animation: fly-across 14s ease-in-out infinite;
-  }
-
-  .motif-crane .crane-wing-near {
-    transform-box: fill-box;
-    transform-origin: bottom center;
-    animation: wing-flap 1.6s ease-in-out infinite;
-  }
-
-  .motif-crane .crane-wing-far {
-    transform-box: fill-box;
-    transform-origin: bottom center;
-    animation: wing-flap 1.6s ease-in-out 0.12s infinite;
-  }
-
-  .motif-dragon .dragon-body {
-    stroke-dasharray: 620;
-    stroke-dashoffset: 620;
-    animation: dragon-draw 2.8s ease-out 0.3s forwards;
-  }
-
-  .motif-dragon .dragon-head,
-  .motif-crane .dragon-head {
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-
-  .motif-peacock {
-    transform-box: fill-box;
-    transform-origin: 50% 90%;
-    animation: fan-sway 7s ease-in-out infinite;
-  }
-
-  .motif-laurel {
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: leaf-rustle 6s ease-in-out infinite;
-  }
 }
 
 /* The passport is meant to be printed as a book: drop the app chrome, keep the

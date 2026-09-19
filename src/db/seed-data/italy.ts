@@ -7,12 +7,18 @@ const italy: SeedCountry = {
   motif: "laurel",
   wikidataId: "Q38",
   emoji: "🇮🇹",
+  regions: [
+    { name: "Lazio", slug: "lazio", kind: "region", wikidataId: "Q1282" },
+    { name: "Tuscany", slug: "tuscany", kind: "region", wikidataId: "Q1273" },
+    { name: "Veneto", slug: "veneto", kind: "region", wikidataId: "Q1243" },
+  ],
   summary:
     "Ruins, Renaissance and long lunches — Italy stacks three thousand years into walkable cities.",
   cities: [
     {
       name: "Rome",
       slug: "rome",
+      region: "lazio",
       wikidataId: "Q220",
       summary: "Layer upon layer of empire, still in daily use as a capital city.",
       lat: 41.9028,
@@ -80,6 +86,7 @@ const italy: SeedCountry = {
     {
       name: "Florence",
       slug: "florence",
+      region: "tuscany",
       wikidataId: "Q2044",
       summary: "The Renaissance in one compact, walkable centre.",
       lat: 43.7696,
@@ -125,6 +132,7 @@ const italy: SeedCountry = {
     {
       name: "Venice",
       slug: "venice",
+      region: "veneto",
       wikidataId: "Q641",
       summary: "A city built on 118 islands, with canals where the streets should be.",
       lat: 45.4408,
