@@ -12,7 +12,7 @@ import {
 } from "@/modules/destination/seasons";
 import { kindOf } from "@/components/CollectibleBadge";
 import { getPhoto } from "@/modules/media/wikimedia";
-import { getCountryBySlug } from "@/modules/destination/queries";
+import { getCountryBySlug, activitiesByPlaceIds } from "@/modules/destination/queries";
 import Hero from "@/components/Hero";
 import { eventTone } from "@/lib/event-tone";
 import { accentFor } from "@/lib/accent";
@@ -69,6 +69,16 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
   );
   const photos = new Map(allPlaces.map((pl, i) => [pl.id, photoList[i]]));
   const country = await getCountryBySlug(trip.countrySlug);
+  // Only the activities the traveller actually chose, so the day says what they
+  // are doing at a place rather than only how long it takes.
+  const chosenIds = new Set(trip.activityIds ?? []);
+  const activitiesByPlace = await activitiesByPlaceIds(placeIds);
+  const chosenActivities = new Map(
+    [...activitiesByPlace.entries()].map(([id, list]) => [
+      id,
+      list.filter((a) => chosenIds.has(a.id)),
+    ]),
+  );
   // Lead with the most striking place on the trip, as the city pages do.
   const accent = accentFor(country?.motif);
   const heroPhoto =
@@ -86,7 +96,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
       </div>
 
       <Hero
-        title={`${days.length} days in ${trip.countryName}`}
+        title={`${days.length} ${days.length === 1 ? "day" : "days"} in ${trip.countryName}`}
         photo={heroPhoto}
         seed={trip.slug}
         height="h-[42vh]"
@@ -107,7 +117,9 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-neutral-600">
           <span>{cities.join(" → ")}</span>
           <span className="text-neutral-600/40">·</span>
-          <span>{totalPlaces} places</span>
+          <span>
+            {totalPlaces} {totalPlaces === 1 ? "place" : "places"}
+          </span>
           {collectibleCount > 0 && (
             <>
               <span className="text-neutral-600/40">·</span>
@@ -227,6 +239,25 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
                               </span>
                             </p>
                           ))}
+
+                        {(chosenActivities.get(place.id) ?? []).map((act) => (
+                          <div key={act.id} className="mt-2 border-l-2 border-clay/30 pl-3">
+                            <p className="flex flex-wrap items-baseline gap-x-2 text-sm">
+                              <span className="text-forest">{act.name}</span>
+                              <span className="text-xs text-neutral-600">
+                                {(act.minutes / 60).toFixed(1).replace(/\.0$/, "")}h ·{" "}
+                                {act.effort}
+                                {act.cost ? ` · ₹${act.cost.toLocaleString("en-IN")}` : " · free"}
+                              </span>
+                            </p>
+                            {act.summary && (
+                              <p className="mt-0.5 text-xs text-neutral-600">{act.summary}</p>
+                            )}
+                            {act.bestTime && (
+                              <p className="mt-0.5 text-xs text-clay">{act.bestTime}</p>
+                            )}
+                          </div>
+                        ))}
 
                         {(collectibles.get(place.id) ?? []).map((item) => (
                           <p

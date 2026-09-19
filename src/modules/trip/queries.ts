@@ -13,6 +13,8 @@ export type SavedTrip = {
   countryName: string;
   countrySlug: string;
   userId: string | null;
+  /** Activities the traveller chose, so the itinerary can name them. */
+  activityIds: string[] | null;
   startDate: string | null;
 };
 
@@ -88,6 +90,7 @@ export async function getTripBySlug(slug: string): Promise<SavedTrip | null> {
     SELECT
       t.id, t.slug, t.days, t.interests, t.dietary, t.budget, t.plan,
       t.user_id AS "userId",
+      t.activity_ids AS "activityIds",
       t.start_date AS "startDate",
       c.name AS "countryName", c.slug AS "countrySlug"
     FROM trips t
