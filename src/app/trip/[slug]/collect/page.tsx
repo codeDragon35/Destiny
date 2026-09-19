@@ -6,9 +6,19 @@ import { collectiblesByPlaceIds } from "@/modules/souvenir/queries";
 import { getProgress, setProgress } from "@/modules/passport/queries";
 import { listMemories, addMemory } from "@/modules/passport/memories";
 import { storeImage } from "@/modules/media/storage";
+import { getPhoto } from "@/modules/media/wikimedia";
+import { activitiesByPlaceIds } from "@/modules/destination/queries";
 import { revalidatePath } from "next/cache";
 
 export const dynamic = "force-dynamic";
+
+const KIND_LABEL: Record<string, string> = {
+  attraction: "Attraction",
+  nature: "Nature",
+  culture: "Culture",
+  food: "Food",
+  hidden_gem: "Hidden gem",
+};
 
 export default async function CollectPage({
   params,
@@ -24,19 +34,34 @@ export default async function CollectPage({
 
   const days = trip.plan.days ?? [];
   const placeIds = days.flatMap((d) => d.places.map((p) => p.id));
-  const [collectibles, progress, memories] = await Promise.all([
+  const [collectibles, progress, memories, activitiesByPlace] = await Promise.all([
     collectiblesByPlaceIds(placeIds),
     getProgress(trip.id),
     listMemories(trip.id),
+    activitiesByPlaceIds(placeIds),
   ]);
   const allPlaces = days.flatMap((d) => d.places);
 
+  // Only the activities the traveller planned, so this page mirrors the itinerary.
+  const chosenIds = new Set(trip.activityIds ?? []);
+  const chosenActivities = new Map(
+    [...activitiesByPlace.entries()].map(([id, list]) => [
+      id,
+      list.filter((a) => chosenIds.has(a.id)),
+    ]),
+  );
+
+  const photoList = await Promise.all(
+    allPlaces.map((p) => getPhoto("places", p.id, p.name, p.wikidataId).catch(() => null)),
+  );
+  const photos = new Map(allPlaces.map((p, i) => [p.id, photoList[i]]));
+
   // One section per city, in itinerary order.
-  const cities = new Map<string, { id: string; name: string }[]>();
+  const cities = new Map<string, typeof allPlaces>();
   for (const day of days) {
     const list = cities.get(day.cityName) ?? [];
     for (const place of day.places) {
-      if (!list.some((p) => p.id === place.id)) list.push({ id: place.id, name: place.name });
+      if (!list.some((p) => p.id === place.id)) list.push(place);
     }
     cities.set(day.cityName, list);
   }
@@ -106,21 +131,52 @@ export default async function CollectPage({
                   </div>
 
                   <div className="mt-4 space-y-2">
-                    {places.map((place) => (
-                      <label
-                        key={place.id}
-                        className="flex cursor-pointer items-center gap-3 rounded-xl border border-ink/[0.08] bg-cream px-5 py-3 transition hover:border-clay/40 has-[:checked]:border-clay/50 has-[:checked]:bg-clay/[0.06]"
-                      >
-                        <input
-                          type="checkbox"
-                          name="place"
-                          value={place.id}
-                          defaultChecked={progress.places.has(place.id)}
-                          className="h-4 w-4 accent-jade"
-                        />
-                        <span className="text-neutral-600">{place.name}</span>
-                      </label>
-                    ))}
+                    {places.map((place) => {
+                      const photo = photos.get(place.id);
+                      const acts = chosenActivities.get(place.id) ?? [];
+                      return (
+                        <label
+                          key={place.id}
+                          className="flex cursor-pointer gap-4 overflow-hidden rounded-xl border border-ink/[0.08] bg-cream p-4 transition hover:border-clay/40 has-[:checked]:border-clay/50 has-[:checked]:bg-clay/[0.06]"
+                        >
+                          <input
+                            type="checkbox"
+                            name="place"
+                            value={place.id}
+                            defaultChecked={progress.places.has(place.id)}
+                            className="mt-1 h-4 w-4 shrink-0 accent-[#C67139]"
+                          />
+
+                          <span className="h-16 w-20 shrink-0 overflow-hidden rounded-md bg-surface">
+                            {photo && (
+                              <img src={photo.url} alt="" className="washed h-full w-full object-cover" />
+                            )}
+                          </span>
+
+                          <span className="min-w-0 flex-1">
+                            <span className="flex flex-wrap items-baseline gap-x-2">
+                              <span className="text-forest">{place.name}</span>
+                              <span className="text-xs text-neutral-500">
+                                {KIND_LABEL[place.kind] ?? place.kind}
+                                {place.visitMinutes
+                                  ? ` · ${(place.visitMinutes / 60).toFixed(1).replace(/\.0$/, "")}h`
+                                  : ""}
+                              </span>
+                            </span>
+                            {place.summary && (
+                              <span className="mt-0.5 block text-xs text-neutral-600">
+                                {place.summary}
+                              </span>
+                            )}
+                            {acts.length > 0 && (
+                              <span className="mt-1.5 block text-xs text-clay">
+                                {acts.map((a) => a.name).join(" · ")}
+                              </span>
+                            )}
+                          </span>
+                        </label>
+                      );
+                    })}
                   </div>
 
                   {cityCollectibles.length > 0 && (
@@ -135,7 +191,7 @@ export default async function CollectPage({
                             name="collectible"
                             value={item.id}
                             defaultChecked={progress.collectibles.has(item.id)}
-                            className="mt-1 h-4 w-4 accent-[#F4C95D]"
+                            className="mt-1 h-4 w-4 accent-[#C67139]"
                           />
                           <span>
                             <span className="text-sm text-neutral-600">

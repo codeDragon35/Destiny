@@ -39,12 +39,31 @@ export default async function RouteMap({
   const H = 430;
   const PAD = 14;
 
-  const lngs = rings.flat().map((p) => p[0]);
-  const lats = rings.flat().map((p) => p[1]);
-  const minLng = Math.min(...lngs);
-  const maxLng = Math.max(...lngs);
-  const minLat = Math.min(...lats);
-  const maxLat = Math.max(...lats);
+  // Frame the trip, not the whole country: a Meghalaya trip drawn against all of
+  // India is one dot in an empty panel. The outline still draws, so the stops
+  // keep their geographic context — it is just cropped closer.
+  const countryLngs = rings.flat().map((p) => p[0]);
+  const countryLats = rings.flat().map((p) => p[1]);
+
+  const stopLngs = stops.map((s) => s.lng);
+  const stopLats = stops.map((s) => s.lat);
+  const stopSpan = Math.max(
+    Math.max(...stopLngs) - Math.min(...stopLngs),
+    Math.max(...stopLats) - Math.min(...stopLats),
+  );
+  const countrySpan = Math.max(
+    Math.max(...countryLngs) - Math.min(...countryLngs),
+    Math.max(...countryLats) - Math.min(...countryLats),
+  );
+
+  // Pad generously around tight clusters so a single stop is not a pinpoint.
+  const margin = Math.max(stopSpan * 0.8, countrySpan * 0.08);
+  const zoomed = stopSpan < countrySpan * 0.45;
+
+  const minLng = zoomed ? Math.min(...stopLngs) - margin : Math.min(...countryLngs);
+  const maxLng = zoomed ? Math.max(...stopLngs) + margin : Math.max(...countryLngs);
+  const minLat = zoomed ? Math.min(...stopLats) - margin : Math.min(...countryLats);
+  const maxLat = zoomed ? Math.max(...stopLats) + margin : Math.max(...countryLats);
 
   // Equirectangular, corrected for latitude so the country is not horizontally stretched.
   const midLat = ((minLat + maxLat) / 2) * (Math.PI / 180);
@@ -78,6 +97,8 @@ export default async function RouteMap({
   return (
     <svg
       viewBox={`0 0 ${W} ${H}`}
+      // Zooming can push the outline beyond the frame; clip rather than overflow.
+      style={{ overflow: "hidden" }}
       className="h-auto w-full"
       role="img"
       aria-label={`Route map: ${stops.map((s) => s.name).join(" to ")}`}
@@ -102,13 +123,9 @@ export default async function RouteMap({
             <circle
               cx={p.xy[0]}
               cy={p.xy[1]}
-              r={14}
-              fill="none"
-              stroke="#C67139"
-              strokeWidth={1}
-              opacity={0.4}
-              className="sparkle"
-              style={{ animationDelay: `${i * 500}ms` }}
+              r={12}
+              fill="#C67139"
+              opacity={0.16}
             />
           )}
           <circle
