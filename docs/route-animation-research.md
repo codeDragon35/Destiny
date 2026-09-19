@@ -61,15 +61,24 @@ route, with the mode driving both the icon and the line style: rail as a dashed 
 lifted arc rather than a straight polyline. This mirrors how `src/lib/event-tone.ts` already derives
 presentation from what a thing *is*.
 
-## Open question — blocking
+## Open question — decided, not yet built
 
-**Transport mode is not in the schema.** `planTrip` does not suggest inter-city transport at all, so
-there is currently nothing that says a given leg is a train rather than a flight. Before any of this
-can be built, decide where the mode comes from:
+**Transport mode exists in the planner, not in the database.** `TravelMode` and `TravelLeg` live in
+`src/modules/trip/planner.ts`, and a plan is denormalised into `trips.plan` as JSON — so a leg's mode is
+whatever the planner decided at plan time, not a column anything else can query. Of the three places the
+mode could come from —
 
 - seeded per city-pair,
 - a heuristic on distance, or
-- a user choice at plan time.
+- a user choice at plan time,
+
+— the decision is **a user choice at plan time** (flight / train / bus / own car / motorbike), because the
+same two cities are a different journey depending on how you cross the distance, and the itinerary itself
+should differ accordingly. See "Planned: ask how the traveller is getting there" in `CLAUDE.md`.
+
+Note that `planTrip` has since gained travel costing (`travelEstimate`), which *infers* the mode from
+distance and terrain. So the vehicle on the route line is no longer blocked on having a mode at all — it is
+blocked on having a mode worth trusting, since today a Delhi→Leh flight is costed as a two-day drive.
 
 ## Sources
 
