@@ -262,6 +262,12 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
             Create my passport
           </Link>
           <Link
+            href={`/trip/${trip.slug}/guide`}
+            className="rounded-full border border-forest/30 px-6 py-2.5 font-display text-sm text-forest transition hover:bg-surface"
+          >
+            Ask the guide
+          </Link>
+          <Link
             href={`/country/${trip.countrySlug}/plan`}
             className="text-sm text-clay transition hover:text-clay/80"
           >
