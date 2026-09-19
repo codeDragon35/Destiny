@@ -12,7 +12,6 @@ import { listCollectiblesForCity } from "@/modules/souvenir/queries";
 import { eventsForCity, formatRange } from "@/modules/destination/seasons";
 import CollectibleBadge from "@/components/CollectibleBadge";
 import Sparkles from "@/components/Sparkles";
-import SoundToggle from "@/components/SoundToggle";
 import { accentFor } from "@/lib/accent";
 import { eventTone } from "@/lib/event-tone";
 
@@ -71,10 +70,6 @@ export default async function CityPage({
 
   return (
     <main className="relative min-h-dvh bg-paper">
-      <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
-        <SoundToggle motif={country.motif} />
-      </div>
-
       <Hero
         title={city.name}
         summary={city.summary}

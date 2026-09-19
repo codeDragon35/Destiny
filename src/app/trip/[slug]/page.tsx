@@ -16,7 +16,6 @@ import { getCountryBySlug, activitiesByPlaceIds } from "@/modules/destination/qu
 import Hero from "@/components/Hero";
 import { eventTone } from "@/lib/event-tone";
 import { accentFor } from "@/lib/accent";
-import SoundToggle from "@/components/SoundToggle";
 import GuidePanel from "@/components/GuidePanel";
 import { guideView } from "@/modules/trip/guide";
 
@@ -91,10 +90,6 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
 
   return (
     <main className="relative min-h-dvh bg-paper">
-      <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
-        <SoundToggle motif={country?.motif} />
-      </div>
-
       <Hero
         title={`${days.length} ${days.length === 1 ? "day" : "days"} in ${trip.countryName}`}
         photo={heroPhoto}

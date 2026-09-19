@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
 import { accentFor } from "@/lib/accent";
-import SoundToggle from "@/components/SoundToggle";
 import {
   getCountryBySlug,
   listCitiesForCountry,
@@ -31,10 +30,6 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
 
   return (
     <main className="relative min-h-dvh bg-paper">
-      <div className="absolute right-4 top-4 z-20 sm:right-8 sm:top-6">
-        <SoundToggle motif={country.motif} />
-      </div>
-
       <Hero
         title={country.name}
         summary={country.summary}

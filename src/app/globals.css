@@ -134,16 +134,31 @@
    pages, and never split a chapter across sheets. */
 @media print {
   @page {
-    margin: 16mm;
+    margin: 14mm;
   }
 
+  /* The passport is a keepsake, so it keeps its colours on paper. Browsers drop
+     backgrounds when printing unless asked to preserve them. */
+  html,
   body {
-    background: #fff;
+    background: #f5ead8;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
   nav,
   .print\:hidden {
     display: none !important;
+  }
+
+  /* Uploaded and Wikimedia photos are the point of the book — keep them. */
+  img {
+    max-width: 100%;
   }
 
   .passport-page {

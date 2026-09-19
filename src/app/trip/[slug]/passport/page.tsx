@@ -14,7 +14,6 @@ import { getPhoto } from "@/modules/media/wikimedia";
 import { listCitiesForCountry, getCountryBySlug } from "@/modules/destination/queries";
 import RouteMap from "@/components/RouteMap";
 import Sparkles from "@/components/Sparkles";
-import SoundToggle from "@/components/SoundToggle";
 
 export const dynamic = "force-dynamic";
 
@@ -121,7 +120,6 @@ export default async function PassportPage({
           <Link href={`/trip/${slug}`} className="text-sm text-neutral-600 transition hover:text-clay">
             ← Itinerary
           </Link>
-          <SoundToggle motif={country?.motif} />
         </div>
 
         <header className="passport-page relative mt-10 overflow-hidden rounded-md border border-clay/25 bg-forest p-8 text-cream shadow-lg sm:p-10">

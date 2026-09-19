@@ -251,15 +251,29 @@ key also picks the ambient scale in `SoundToggle`, so a new motif needs an entry
 `c` aliases `cities`, and every country and passport page 500'd — beware shared table aliases when editing
 these queries.
 
-## Ambient sound
+## Planned: regional music player
 
-`SoundToggle` synthesises sparse plucked notes through WebAudio — no audio files ship. The scale is chosen by
-the country's `motif`, so each destination sounds different: China uses a gong pentatonic, and the map in the
-component holds the others. Pass `motif` wherever the toggle is rendered; without it you get the generic
-fallback, which was the original flat drone and is not good enough on its own.
+The synthesised WebAudio drone (`SoundToggle`) was **deleted** — generated tones per country were a gimmick
+and sounded it. Do not reinstate it.
 
-It is **off by default and opt-in**, persisted in `localStorage`: browsers block autoplay, and unrequested
-sound is hostile. Keep it that way.
+The replacement idea, not yet built: when a traveller selects a state, offer **that state's traditional
+music** in a real player. Meghalaya gets Khasi music, Rajasthan gets Manganiyar, Kerala gets Sopana Sangeetam.
+It belongs on region and city pages, tied to the same region tier the rest of the app uses.
+
+Open questions before building it:
+- **Licensing is the hard part.** Traditional recordings are not automatically free to stream. Prefer sources
+  with explicit terms — Wikimedia Commons audio, Archive.org collections, or CC-licensed recordings — and
+  store attribution alongside the track, the way `image_credit` works for photos.
+- Keep it **opt-in and never autoplaying**, for the same reason the drone was: browsers block autoplay and
+  unrequested sound is hostile.
+- A state without a verified, licensed recording shows no player rather than a wrong or generic one — the
+  same rule the photo pipeline follows.
+
+## Planned: user avatars
+
+Travellers should have an avatar rather than the two-letter initials currently shown in the sidebar and on
+the profile. Uploads already work (`src/modules/media/storage.ts`, `/api/uploads/[name]`), so this is mostly
+a `users.image` column — which Auth.js already defines — plus an upload control on the profile page.
 
 ## No page should feel flat
 

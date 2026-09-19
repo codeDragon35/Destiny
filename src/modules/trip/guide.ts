@@ -63,9 +63,12 @@ export function summarise(days: PlannedDay[], interests: string[]): GuideReply {
   return {
     text:
       `Then let's keep you off the rush. I've built a ${days.length}-day loop through ${route}, ` +
-      `with ${shape}. That's ${placeCount} places across ${cities.length} ` +
-      `${cities.length === 1 ? "base" : "bases"}` +
-      (outdoorPlaces > 0 ? `, ${outdoorPlaces} of them outdoors.` : "."),
+      `with ${shape}. That's ${placeCount} ${placeCount === 1 ? "place" : "places"} ` +
+      `across ${cities.length} ${cities.length === 1 ? "base" : "bases"}` +
+      (outdoorPlaces > 0
+        ? `, ${outdoorPlaces === placeCount ? "all" : outdoorPlaces} of ` +
+          `${placeCount === 1 ? "it" : "them"} outdoors.`
+        : "."),
     chips: buildChips(days, cities),
   };
 }
@@ -100,7 +103,7 @@ export function guideView(trip: {
   return {
     reply: summarise(days, trip.interests),
     asked: [
-      `I have ${trip.days} days`,
+      `I have ${trip.days} ${trip.days === 1 ? "day" : "days"}`,
       trip.budget ? `₹${trip.budget.toLocaleString("en-IN")}` : null,
       trip.dietary,
       trip.interests.length > 0 ? trip.interests.join(", ") : null,
