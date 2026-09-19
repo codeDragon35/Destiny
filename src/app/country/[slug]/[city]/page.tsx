@@ -98,10 +98,19 @@ export default async function CityPage({
       />
 
       <section className="mx-auto max-w-6xl px-6 py-20 sm:px-10">
-        <h2 className={`flex items-center gap-4 text-xs uppercase tracking-[0.35em] ${accent.text}`}>
-          What to see
-          <span className="h-px w-16 bg-gradient-to-r from-jade/60 to-transparent" />
-        </h2>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <h2 className={`flex items-center gap-4 text-xs uppercase tracking-[0.35em] ${accent.text}`}>
+            What to see
+            <span className={`h-px w-16 ${accent.rule}`} />
+          </h2>
+          <Link
+            href={`/country/${country.slug}/plan?city=${city.slug}`}
+            className="rounded-full px-6 py-2.5 font-display text-sm text-cream shadow-sm transition hover:opacity-90"
+            style={{ backgroundColor: accent.hex }}
+          >
+            Plan a trip here
+          </Link>
+        </div>
 
         <div className="mt-10 grid gap-6 sm:grid-cols-2">
           {places.map((place, i) => {

@@ -22,13 +22,34 @@ const INTERESTS: { value: Interest; label: string }[] = [
   { value: "hidden_gem", label: "Hidden gems" },
 ];
 
-export default async function PlanPage({ params }: { params: Promise<{ slug: string }> }) {
+export default async function PlanPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ slug: string }>;
+  searchParams: Promise<{ city?: string; region?: string }>;
+}) {
   const { slug } = await params;
+  const { city: cityFilter, region: regionFilter } = await searchParams;
   const country = await getCountryBySlug(slug);
   if (!country) notFound();
 
-  const choices = await listPlaceChoices(country.id);
+  const all = await listPlaceChoices(country.id);
   const accent = accentFor(country.motif);
+
+  // Arriving from a city or state page narrows the picker to just that place,
+  // so a one-city trip does not mean scrolling the whole country.
+  const choices = cityFilter
+    ? all.filter((c) => c.citySlug === cityFilter)
+    : regionFilter
+      ? all.filter((c) => c.regionSlug === regionFilter)
+      : all;
+
+  const scopeName = cityFilter
+    ? choices[0]?.cityName
+    : regionFilter
+      ? choices[0]?.regionName
+      : null;
 
   // Group by region, then city, so the picker mirrors how people think about a trip.
   const byRegion = new Map<string, { name: string; cities: Map<string, typeof choices> }>();
@@ -109,12 +130,21 @@ export default async function PlanPage({ params }: { params: Promise<{ slug: str
 
         <p className="mt-6 text-xs uppercase tracking-[0.18em] text-clay">Plan your trip</p>
         <h1 className="animate-float-in mt-2 font-display text-4xl text-forest sm:text-5xl">
-          Where in {country.name} are you going?
+          {scopeName ? `What will you see in ${scopeName}?` : `Where in ${country.name} are you going?`}
         </h1>
         <p className="mt-3 max-w-xl text-neutral-700">
           Tick the places you actually want. Leave everything unticked and we&apos;ll choose for
-          you across the whole country.
+          you across {scopeName ?? `the whole of ${country.name}`}.
         </p>
+
+        {scopeName && (
+          <Link
+            href={`/country/${country.slug}/plan`}
+            className="mt-3 inline-block text-sm text-clay hover:underline"
+          >
+            Plan across all of {country.name} instead →
+          </Link>
+        )}
 
         <form action={createTrip} className="mt-10 max-w-4xl">
           <div className="space-y-8">

@@ -51,6 +51,16 @@ export default async function RegionPage({
           {region.placeCount} places mapped
         </p>
 
+        {region.placeCount > 0 && (
+          <Link
+            href={`/country/${country.slug}/plan?region=${region.slug}`}
+            className="mt-5 inline-block rounded-full px-6 py-2.5 font-display text-sm text-cream shadow-sm transition hover:opacity-90"
+            style={{ backgroundColor: accent.hex }}
+          >
+            Plan a trip in {region.name}
+          </Link>
+        )}
+
         {cities.length === 0 ? (
           <div className="mt-10 rounded-md border border-ink/[0.08] bg-cream p-8 shadow-sm">
             <p className="text-neutral-700">
