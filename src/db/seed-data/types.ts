@@ -17,6 +17,16 @@ export type SeedCollectible = {
   cost?: number;
 };
 
+export type SeedActivity = {
+  name: string;
+  slug: string;
+  summary: string;
+  effort?: "easy" | "moderate" | "hard";
+  minutes: number;
+  cost?: number;
+  bestTime?: string;
+};
+
 export type SeedPlace = {
   name: string;
   slug: string;
@@ -26,6 +36,8 @@ export type SeedPlace = {
   seasonNote?: string;
   events?: SeedEvent[];
   collectibles?: SeedCollectible[];
+  /** Ways to do this place; the first is treated as the default. */
+  activities?: SeedActivity[];
   kind: "attraction" | "nature" | "culture" | "food" | "hidden_gem";
   summary: string;
   lat: number;

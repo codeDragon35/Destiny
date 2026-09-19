@@ -27,9 +27,10 @@ export async function saveTrip(input: {
   userId?: string | null;
   startDate?: string | null;
   placeIds?: string[];
+  activityIds?: string[];
 }) {
   await db.execute(sql`
-    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan, user_id, start_date, place_ids)
+    INSERT INTO trips (country_id, slug, days, interests, dietary, budget, plan, user_id, start_date, place_ids, activity_ids)
     VALUES (
       ${input.countryId},
       ${input.slug},
@@ -43,6 +44,11 @@ export async function saveTrip(input: {
       ${
         input.placeIds && input.placeIds.length > 0
           ? sql`ARRAY[${sql.join(input.placeIds.map((id) => sql`${id}::uuid`), sql`, `)}]`
+          : null
+      },
+      ${
+        input.activityIds && input.activityIds.length > 0
+          ? sql`ARRAY[${sql.join(input.activityIds.map((id) => sql`${id}::uuid`), sql`, `)}]`
           : null
       }
     )

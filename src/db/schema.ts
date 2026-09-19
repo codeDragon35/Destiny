@@ -32,6 +32,8 @@ export const collectibleKind = pgEnum("collectible_kind", [
   "badge",
 ]);
 
+export const activityEffort = pgEnum("activity_effort", ["easy", "moderate", "hard"]);
+
 export const placeKind = pgEnum("place_kind", [
   "attraction",
   "nature",
@@ -137,6 +139,28 @@ export const places = pgTable(
   ],
 );
 
+/** What you can actually do at a place: the hike, or just the viewpoint. */
+export const activities = pgTable(
+  "activities",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    placeId: uuid("place_id")
+      .notNull()
+      .references(() => places.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    slug: text("slug").notNull(),
+    summary: text("summary"),
+    effort: activityEffort("effort").notNull().default("easy"),
+    /** Drives day packing, so a hike and a viewpoint fill the day differently. */
+    minutes: integer("minutes").notNull(),
+    /** Local currency; null when free. */
+    cost: integer("cost"),
+    bestTime: text("best_time"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("activities_place_slug_idx").on(t.placeId, t.slug)],
+);
+
 export const trips = pgTable(
   "trips",
   {
@@ -153,6 +177,8 @@ export const trips = pgTable(
     regionIds: uuid("region_ids").array(),
     /** Specific places the traveller picked; empty means "anything in scope". */
     placeIds: uuid("place_ids").array(),
+    /** Chosen activity per place; empty means the default for that place. */
+    activityIds: uuid("activity_ids").array(),
     /** Generated plan: [{ day, placeIds[] }]. Denormalised so a saved trip is stable. */
     plan: jsonb("plan").notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

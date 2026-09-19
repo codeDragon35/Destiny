@@ -261,6 +261,7 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
             view={view}
             tripSlug={trip.slug}
             countryName={trip.countryName}
+            countrySlug={trip.countrySlug}
             days={trip.days}
             accentHex={accent.hex}
           />

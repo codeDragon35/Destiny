@@ -99,6 +99,13 @@
       "when": 1789830739633,
       "tag": "0013_memory_tags",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1789836288362,
+      "tag": "0014_activities",
+      "breakpoints": true
     }
   ]
 }

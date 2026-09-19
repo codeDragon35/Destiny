@@ -77,6 +77,25 @@ const india: SeedCountry = {
         {
           name: "Kerala backwaters",
           slug: "kerala-backwaters",
+          activities: [
+            {
+              name: "Overnight houseboat",
+              slug: "overnight-houseboat",
+              summary: "Private boat through the canals, meals cooked aboard.",
+              effort: "easy",
+              minutes: 960,
+              cost: 9000,
+            },
+            {
+              name: "Shikara canoe, half day",
+              slug: "shikara-canoe",
+              summary: "Small punted canoe into the narrow canals a houseboat cannot enter.",
+              effort: "easy",
+              minutes: 240,
+              cost: 1200,
+              bestTime: "Late afternoon, for the light",
+            },
+          ],
           wikidataId: "Q666519",
           kind: "nature",
           summary: "Nine hundred kilometres of linked lagoons and canals behind the coast.",
@@ -158,6 +177,23 @@ const india: SeedCountry = {
         {
           name: "Hampi monuments",
           slug: "hampi-monuments",
+          activities: [
+            {
+              name: "Cycle the ruins",
+              slug: "cycle-ruins",
+              summary: "Hired bicycle between the temple groups across the boulder field.",
+              effort: "moderate",
+              minutes: 420,
+              cost: 300,
+            },
+            {
+              name: "Sacred centre on foot",
+              slug: "sacred-centre",
+              summary: "Virupaksha, the stone chariot and the bazaar, walked.",
+              effort: "easy",
+              minutes: 180,
+            },
+          ],
           wikidataId: "Q26732",
           kind: "culture",
           summary: "Temples, bazaars and a stone chariot spread over 4,000 hectares.",
@@ -347,6 +383,23 @@ const india: SeedCountry = {
         {
           name: "Pangong Tso",
           slug: "pangong-tso",
+          activities: [
+            {
+              name: "Day trip from Leh",
+              slug: "day-trip",
+              summary: "Long drive over Chang La, a few hours at the lake, back by dark.",
+              effort: "moderate",
+              minutes: 720,
+            },
+            {
+              name: "Overnight camp by the lake",
+              slug: "overnight-camp",
+              summary: "Stay at the shore for sunset and sunrise on the water.",
+              effort: "moderate",
+              minutes: 1080,
+              cost: 3500,
+            },
+          ],
           wikidataId: "Q1032254",
           kind: "nature",
           summary: "Endorheic lake at 4,350m that shifts between blue and green through the day.",
@@ -381,6 +434,23 @@ const india: SeedCountry = {
         {
           name: "Golden Temple",
           slug: "golden-temple",
+          activities: [
+            {
+              name: "Langar seva",
+              slug: "langar-seva",
+              summary: "Volunteer in the kitchen that feeds tens of thousands daily.",
+              effort: "moderate",
+              minutes: 120,
+            },
+            {
+              name: "Parikrama and darshan",
+              slug: "parikrama",
+              summary: "Walk the marble circuit and queue for the inner sanctum.",
+              effort: "easy",
+              minutes: 150,
+              bestTime: "Before dawn, when the marble is cool",
+            },
+          ],
           wikidataId: "Q180422",
           kind: "culture",
           summary:
@@ -603,6 +673,23 @@ const india: SeedCountry = {
         {
           name: "Elephant Falls",
           slug: "elephant-falls",
+          activities: [
+            {
+              name: "Walk all three tiers",
+              slug: "three-tiers",
+              summary: "Stepped path down to the lowest fall and back up.",
+              effort: "moderate",
+              minutes: 75,
+              bestTime: "Early morning, before tour buses",
+            },
+            {
+              name: "Top viewpoint only",
+              slug: "top-viewpoint",
+              summary: "Upper platform from the car park — no stairs.",
+              effort: "easy",
+              minutes: 25,
+            },
+          ],
           kind: "nature",
           summary: "Three-tier falls dropping through fern and moss a short drive from the city.",
           lat: 25.5497,
@@ -614,6 +701,23 @@ const india: SeedCountry = {
         {
           name: "Mawlynnong",
           slug: "mawlynnong",
+          activities: [
+            {
+              name: "Village walk and sky viewpoint",
+              slug: "village-and-viewpoint",
+              summary: "Lanes, bamboo dustbins and a climb to the bamboo sky walk.",
+              effort: "moderate",
+              minutes: 150,
+              cost: 50,
+            },
+            {
+              name: "Village walk only",
+              slug: "village-walk",
+              summary: "The swept lanes and church, skipping the climb.",
+              effort: "easy",
+              minutes: 60,
+            },
+          ],
           wikidataId: "Q6794437",
           kind: "hidden_gem",
           summary: "Khasi village known for its bamboo dustbins and swept lanes.",
@@ -648,6 +752,16 @@ const india: SeedCountry = {
         {
           name: "Nohkalikai Falls",
           slug: "nohkalikai-falls",
+          activities: [
+            {
+              name: "Viewpoint and cafe",
+              slug: "viewpoint",
+              summary: "Railed platform looking down the 340m drop.",
+              effort: "easy",
+              minutes: 60,
+              cost: 20,
+            },
+          ],
           wikidataId: "Q3631209",
           kind: "nature",
           summary: "India's tallest plunge waterfall, dropping 340m into a green pool.",
@@ -661,6 +775,24 @@ const india: SeedCountry = {
         {
           name: "Living root bridges",
           slug: "living-root-bridges",
+          activities: [
+            {
+              name: "Double-decker bridge trek",
+              slug: "double-decker-trek",
+              summary: "Roughly 3,000 steps down to Nongriat and back up again.",
+              effort: "hard",
+              minutes: 420,
+              bestTime: "Start at dawn; the climb back is the hard half",
+            },
+            {
+              name: "Single root bridge at Riwai",
+              slug: "riwai-bridge",
+              summary: "Short walk to a living bridge near Mawlynnong.",
+              effort: "easy",
+              minutes: 45,
+              cost: 30,
+            },
+          ],
           wikidataId: "Q18349989",
           kind: "hidden_gem",
           summary:

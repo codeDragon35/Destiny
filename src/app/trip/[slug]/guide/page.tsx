@@ -113,11 +113,11 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
             <div className="mt-5 flex flex-wrap gap-2">
               {reply.chips.map((chip) => (
                 <Link
-                  key={chip}
-                  href={`/country/${trip.countrySlug}/plan`}
+                  key={chip.label}
+                  href={`/country/${trip.countrySlug}/plan${chip.param ? `?${chip.param}` : ""}`}
                   className="rounded-full border border-ink/12 bg-cream px-4 py-1.5 text-sm text-neutral-700 transition hover:border-clay hover:text-forest"
                 >
-                  {chip}
+                  {chip.label}
                 </Link>
               ))}
             </div>

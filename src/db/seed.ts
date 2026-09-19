@@ -102,6 +102,22 @@ async function seedCountry(
         `);
       }
 
+      for (const act of place.activities ?? []) {
+        await tx.execute(sql`
+          INSERT INTO activities (place_id, name, slug, summary, effort, minutes, cost, best_time)
+          VALUES (
+            ${insertedPlace.id},
+            ${act.name},
+            ${act.slug},
+            ${act.summary},
+            ${act.effort ?? "easy"}::activity_effort,
+            ${act.minutes},
+            ${act.cost ?? null},
+            ${act.bestTime ?? null}
+          )
+        `);
+      }
+
       for (const item of place.collectibles ?? []) {
         await tx.execute(sql`
           INSERT INTO collectibles (place_id, name, slug, kind, description, where_to_get, cost)
@@ -132,13 +148,17 @@ async function main() {
       (n, c) => n + c.places.reduce((m, p) => m + (p.collectibles?.length ?? 0), 0),
       0,
     );
+    const activities = country.cities.reduce(
+      (n, c) => n + c.places.reduce((m, p) => m + (p.activities?.length ?? 0), 0),
+      0,
+    );
     const events = country.cities.reduce(
       (n, c) => n + c.places.reduce((m, p) => m + (p.events?.length ?? 0), 0),
       0,
     );
     console.log(
       `${country.emoji} ${country.name}: ${regions} regions, ${country.cities.length} cities, ` +
-        `${places} places, ${collectibles} collectibles, ${events} events`,
+        `${places} places, ${activities} activities, ${collectibles} collectibles, ${events} events`,
     );
   }
 

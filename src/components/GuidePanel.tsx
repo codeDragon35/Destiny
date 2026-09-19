@@ -12,12 +12,14 @@ export default function GuidePanel({
   view,
   tripSlug,
   countryName,
+  countrySlug,
   days,
   accentHex,
 }: {
   view: GuideView;
   tripSlug: string;
   countryName: string;
+  countrySlug: string;
   days: number;
   accentHex: string;
 }) {
@@ -107,6 +109,23 @@ export default function GuidePanel({
                 </div>
               </div>
 
+              {view.chosen.length > 0 && (
+                <div className="rounded-md border border-ink/[0.08] bg-cream p-4 shadow-sm">
+                  <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-600">
+                    What I picked
+                  </p>
+                  <ul className="mt-2 space-y-1.5 text-sm">
+                    {view.chosen.map((d) => (
+                      <li key={d.day}>
+                        <span className="text-neutral-500">Day {d.day}</span>{" "}
+                        <span className="text-forest">{d.places.join(", ")}</span>
+                        <span className="text-neutral-500"> · {d.cityName}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
               {view.split.length > 0 && (
                 <div className="rounded-md border border-ink/[0.08] bg-cream p-4 shadow-sm">
                   <p className="text-[11px] uppercase tracking-[0.16em] text-neutral-600">
@@ -135,12 +154,13 @@ export default function GuidePanel({
 
               <div className="flex flex-wrap gap-2">
                 {view.reply.chips.map((chip) => (
-                  <span
-                    key={chip}
-                    className="rounded-full border border-ink/12 bg-cream px-3 py-1.5 text-xs text-neutral-600"
+                  <a
+                    key={chip.label}
+                    href={`/country/${countrySlug}/plan${chip.param ? `?${chip.param}` : ""}`}
+                    className="rounded-full border border-ink/12 bg-cream px-3 py-1.5 text-xs text-neutral-600 transition hover:border-clay hover:text-forest"
                   >
-                    {chip}
-                  </span>
+                    {chip.label}
+                  </a>
                 ))}
               </div>
             </div>

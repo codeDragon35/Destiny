@@ -294,3 +294,37 @@ export async function listPlaceChoices(countryId: string): Promise<PlaceChoice[]
   `);
   return [...rows];
 }
+
+export type Activity = {
+  id: string;
+  placeId: string;
+  name: string;
+  slug: string;
+  summary: string | null;
+  effort: "easy" | "moderate" | "hard";
+  minutes: number;
+  cost: number | null;
+  bestTime: string | null;
+};
+
+/** Activities for a set of places, keyed by place id. First one is the default. */
+export async function activitiesByPlaceIds(placeIds: string[]) {
+  if (placeIds.length === 0) return new Map<string, Activity[]>();
+
+  const rows = await db.execute<Activity>(sql`
+    SELECT
+      id, place_id AS "placeId", name, slug, summary,
+      effort, minutes, cost, best_time AS "bestTime"
+    FROM activities
+    WHERE place_id IN (${sql.join(placeIds.map((id) => sql`${id}::uuid`), sql`, `)})
+    ORDER BY minutes DESC
+  `);
+
+  const map = new Map<string, Activity[]>();
+  for (const row of rows) {
+    const list = map.get(row.placeId) ?? [];
+    list.push(row);
+    map.set(row.placeId, list);
+  }
+  return map;
+}

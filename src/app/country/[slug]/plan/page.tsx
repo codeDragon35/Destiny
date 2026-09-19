@@ -7,6 +7,7 @@ import {
   listPlaceChoices,
   listCitiesForCountry,
   listPlacesForCity,
+  activitiesByPlaceIds,
 } from "@/modules/destination/queries";
 import { planTrip, type Interest } from "@/modules/trip/planner";
 import { saveTrip } from "@/modules/trip/queries";
@@ -44,6 +45,8 @@ export default async function PlanPage({
     : regionFilter
       ? all.filter((c) => c.regionSlug === regionFilter)
       : all;
+
+  const activities = await activitiesByPlaceIds(choices.map((c) => c.id));
 
   const scopeName = cityFilter
     ? choices[0]?.cityName
@@ -97,6 +100,27 @@ export default async function PlanPage({
         .filter((c) => c.places.length > 0);
     }
 
+    // A chosen activity replaces the place's default duration, so picking the
+    // hike rather than the viewpoint genuinely reshapes the day.
+    const chosenActivityIds = [...formData.entries()]
+      .filter(([k]) => k.startsWith("activity-"))
+      .map(([, v]) => String(v))
+      .filter(Boolean);
+
+    if (chosenActivityIds.length > 0) {
+      const chosen = await activitiesByPlaceIds(
+        placesByCity.flatMap((c) => c.places.map((p) => p.id)),
+      );
+      const wanted = new Set(chosenActivityIds);
+      placesByCity = placesByCity.map((c) => ({
+        ...c,
+        places: c.places.map((p) => {
+          const act = (chosen.get(p.id) ?? []).find((a) => wanted.has(a.id));
+          return act ? { ...p, visitMinutes: act.minutes } : p;
+        }),
+      }));
+    }
+
     const plan = planTrip({ days, interests, placesByCity });
     const tripSlug = randomUUID().slice(0, 8);
     const session = await auth();
@@ -112,6 +136,7 @@ export default async function PlanPage({
       startDate,
       userId: session?.user?.id ?? null,
       placeIds: chosenPlaces,
+      activityIds: chosenActivityIds,
     });
 
     redirect(`/trip/${tripSlug}`);
@@ -160,8 +185,8 @@ export default async function PlanPage({
                       </p>
                       <div className="mt-2 grid gap-2 sm:grid-cols-2">
                         {places.map((place) => (
+                          <div key={place.id}>
                           <label
-                            key={place.id}
                             className="flex cursor-pointer items-start gap-3 rounded-md border border-ink/10 bg-paper px-4 py-3 transition hover:border-clay/50 has-[:checked]:border-clay has-[:checked]:bg-accent-100"
                           >
                             <input
@@ -179,6 +204,40 @@ export default async function PlanPage({
                               )}
                             </span>
                           </label>
+
+                          {(activities.get(place.id) ?? []).length > 0 && (
+                            <fieldset className="mt-1 space-y-1 pl-7">
+                              <legend className="sr-only">How to do {place.name}</legend>
+                              {(activities.get(place.id) ?? []).map((act, ai) => (
+                                <label
+                                  key={act.id}
+                                  className="flex cursor-pointer items-start gap-2 rounded-sm px-2 py-1.5 text-xs transition hover:bg-surface/70"
+                                >
+                                  <input
+                                    type="radio"
+                                    name={`activity-${place.id}`}
+                                    value={act.id}
+                                    defaultChecked={ai === 0}
+                                    className="mt-0.5 h-3 w-3 accent-[#C67139]"
+                                  />
+                                  <span className="min-w-0">
+                                    <span className="text-forest">{act.name}</span>
+                                    <span className="ml-2 text-neutral-500">
+                                      {(act.minutes / 60).toFixed(1).replace(/\.0$/, "")}h ·{" "}
+                                      {act.effort}
+                                      {act.cost ? ` · ₹${act.cost.toLocaleString("en-IN")}` : ""}
+                                    </span>
+                                    {act.summary && (
+                                      <span className="mt-0.5 block text-neutral-600">
+                                        {act.summary}
+                                      </span>
+                                    )}
+                                  </span>
+                                </label>
+                              ))}
+                            </fieldset>
+                          )}
+                          </div>
                         ))}
                       </div>
                     </div>
