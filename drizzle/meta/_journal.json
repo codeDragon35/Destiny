@@ -92,6 +92,13 @@
       "when": 1789413807256,
       "tag": "0012_trip_scope",
       "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1789830739633,
+      "tag": "0013_memory_tags",
+      "breakpoints": true
     }
   ]
 }
