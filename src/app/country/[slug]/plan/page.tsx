@@ -184,7 +184,7 @@ export default async function PlanPage({
                       </p>
                       <div className="mt-2 grid gap-2 sm:grid-cols-2">
                         {places.map((place) => (
-                          <div key={place.id}>
+                          <div key={place.id} className="group/place">
                           <label
                             className="flex cursor-pointer items-start gap-3 rounded-md border border-ink/10 bg-paper px-4 py-3 transition hover:border-clay/50 has-[:checked]:border-clay has-[:checked]:bg-accent-100"
                           >
@@ -205,7 +205,7 @@ export default async function PlanPage({
                           </label>
 
                           {(activities.get(place.id) ?? []).length > 0 && (
-                            <fieldset className="mt-2 space-y-1.5">
+                            <fieldset className="mt-2 hidden space-y-1.5 group-has-[input[name=place]:checked]/place:block">
                               <legend className="mb-1.5 text-[11px] uppercase tracking-wide text-neutral-500">
                                 How do you want to do it? Pick any, or none.
                               </legend>
