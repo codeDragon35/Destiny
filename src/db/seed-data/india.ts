@@ -518,6 +518,7 @@ const india: SeedCountry = {
         {
           name: "Darjeeling Himalayan Railway",
           slug: "darjeeling-railway",
+          wikidataId: "Q463874",
           kind: "attraction",
           summary: "Two-foot-gauge 'toy train' climbing 2,000m through loops and switchbacks.",
           lat: 27.0416,
@@ -540,6 +541,7 @@ const india: SeedCountry = {
         {
           name: "Rumtek Monastery",
           slug: "rumtek-monastery",
+          wikidataId: "Q1546234",
           kind: "culture",
           summary: "Seat of the Karmapa in exile, above the valley outside town.",
           lat: 27.2880,
@@ -640,6 +642,7 @@ const india: SeedCountry = {
         {
           name: "Jaisalmer Fort",
           slug: "jaisalmer-fort",
+          wikidataId: "Q3634368",
           kind: "attraction",
           summary: "One of the few forts in the world still lived in, with houses inside the walls.",
           lat: 26.9124,
@@ -673,6 +676,7 @@ const india: SeedCountry = {
         {
           name: "Elephant Falls",
           slug: "elephant-falls",
+          wikidataId: "Q85758968",
           activities: [
             {
               name: "Walk all three tiers",
