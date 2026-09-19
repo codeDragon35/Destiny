@@ -195,6 +195,8 @@ export type Region = {
   wikidataId: string | null;
   cityCount: number;
   placeCount: number;
+  /** A couple of names worth mentioning, for map tooltips. */
+  highlights: string[];
 };
 
 /** Regions of a country, with how much is mapped under each. */
@@ -204,7 +206,14 @@ export async function listRegionsForCountry(countryId: string): Promise<Region[]
       r.id, r.name, r.slug, r.kind, r.summary,
       r.wikidata_id AS "wikidataId",
       COUNT(DISTINCT ct.id)::int AS "cityCount",
-      COUNT(p.id)::int AS "placeCount"
+      COUNT(p.id)::int AS "placeCount",
+      COALESCE(
+        (ARRAY_AGG(p.name ORDER BY
+          CASE p.kind WHEN 'hidden_gem' THEN 0 WHEN 'nature' THEN 1 ELSE 2 END,
+          p.visit_minutes DESC NULLS LAST)
+         FILTER (WHERE p.name IS NOT NULL))[1:2],
+        ARRAY[]::text[]
+      ) AS highlights
     FROM regions r
     LEFT JOIN cities ct ON ct.region_id = r.id
     LEFT JOIN places p ON p.city_id = ct.id
@@ -221,7 +230,11 @@ export async function getRegionBySlug(countryId: string, slug: string) {
       r.id, r.name, r.slug, r.kind, r.summary,
       r.wikidata_id AS "wikidataId",
       COUNT(DISTINCT ct.id)::int AS "cityCount",
-      COUNT(p.id)::int AS "placeCount"
+      COUNT(p.id)::int AS "placeCount",
+      COALESCE(
+        (ARRAY_AGG(p.name) FILTER (WHERE p.name IS NOT NULL))[1:2],
+        ARRAY[]::text[]
+      ) AS highlights
     FROM regions r
     LEFT JOIN cities ct ON ct.region_id = r.id
     LEFT JOIN places p ON p.city_id = ct.id

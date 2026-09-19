@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Hero from "@/components/Hero";
 import Reveal from "@/components/Reveal";
-import Motif from "@/components/Motif";
 import { accentFor } from "@/lib/accent";
 import SoundToggle from "@/components/SoundToggle";
 import {
@@ -11,6 +10,8 @@ import {
   listRegionsForCountry,
 } from "@/modules/destination/queries";
 import { getPhoto } from "@/modules/media/wikimedia";
+import { regionFeaturesFor } from "@/modules/destination/region-geo";
+import RegionPicker from "@/components/RegionPicker";
 
 export const dynamic = "force-dynamic";
 
@@ -22,7 +23,7 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
   const cities = await listCitiesForCountry(country.id);
   const regions = await listRegionsForCountry(country.id);
   const mapped = regions.filter((r) => r.placeCount > 0);
-  const rest = regions.filter((r) => r.placeCount === 0);
+  const regionShapes = await regionFeaturesFor(country.name);
   const [hero, ...cityPhotos] = await Promise.all([
     getPhoto("countries", country.id, country.name, country.wikidataId),
     ...cities.map((c) => getPhoto("cities", c.id, `${c.name}, ${country.name}`, c.wikidataId)),
@@ -61,12 +62,6 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
         }
       />
 
-      {country.motif && (
-        <div className="relative mx-auto -mt-6 max-w-6xl px-6 sm:px-10">
-          <Motif motif={country.motif} className="motif-float mx-auto h-24 w-full max-w-2xl opacity-95" />
-        </div>
-      )}
-
       <section className="mx-auto max-w-6xl px-6 pb-20 pt-4 sm:px-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h2 className={`flex items-center gap-4 text-xs uppercase tracking-[0.35em] ${accent.text}`}>
@@ -83,37 +78,31 @@ export default async function CountryPage({ params }: { params: Promise<{ slug: 
         </div>
 
         {regions.length > 0 && (
-          <div className="mt-10">
-            <h3 className="text-xs uppercase tracking-[0.18em] text-neutral-600">
-              Browse by {regions[0].kind}
-            </h3>
-            <div className="mt-4 flex flex-wrap gap-2">
-              {mapped.map((region) => (
-                <Link
-                  key={region.id}
-                  href={`/country/${country.slug}/region/${region.slug}`}
-                  className="rounded-full border border-clay/40 bg-cream px-4 py-1.5 text-sm text-forest shadow-sm transition hover:border-clay"
-                >
-                  {region.name}
-                  <span className="ml-2 text-xs text-clay">{region.placeCount}</span>
-                </Link>
-              ))}
-              {rest.map((region) => (
-                <Link
-                  key={region.id}
-                  href={`/country/${country.slug}/region/${region.slug}`}
-                  className="rounded-full border border-ink/10 px-4 py-1.5 text-sm text-neutral-500 transition hover:border-ink/25"
-                >
-                  {region.name}
-                </Link>
-              ))}
-            </div>
-            {rest.length > 0 && (
-              <p className="mt-3 text-xs text-neutral-500">
-                {mapped.length} of {regions.length} mapped so far — faded ones have nothing
-                verified yet.
+          <div className="mt-12">
+            <div className="flex flex-wrap items-baseline justify-between gap-3">
+              <h3 className={`flex items-center gap-4 text-xs uppercase tracking-[0.35em] ${accent.text}`}>
+                Choose a {regions[0].kind}
+                <span className={`h-px w-16 ${accent.rule}`} />
+              </h3>
+              <p className="text-xs text-neutral-500">
+                {mapped.length} of {regions.length} mapped so far
               </p>
-            )}
+            </div>
+
+            <RegionPicker
+              features={regionShapes}
+              regions={regions.map((r) => ({
+                slug: r.slug,
+                name: r.name,
+                kind: r.kind,
+                cityCount: r.cityCount,
+                placeCount: r.placeCount,
+                highlights: r.highlights ?? [],
+              }))}
+              countrySlug={country.slug}
+              accentHex={accent.hex}
+              kind={regions[0].kind}
+            />
           </div>
         )}
 
