@@ -30,15 +30,24 @@ export function budgetSplit(total: number) {
  * Refinements that actually change the plan. Each is a link back into the
  * planner with the relevant control pre-set, rather than a decorative pill.
  */
-function buildChips(days: PlannedDay[], cities: string[]): GuideChip[] {
+function buildChips(
+  days: PlannedDay[],
+  cities: string[],
+  scope: string | null,
+): GuideChip[] {
+  // Every chip keeps the trip's scope. Dropping it sent a Meghalaya traveller
+  // back to "which country?", discarding the choice they had already made.
+  const withScope = (param: string) =>
+    [param, scope].filter(Boolean).join("&");
+
   const chips: GuideChip[] = [
-    { label: "Make it slower", param: `days=${days.length + 2}` },
-    { label: "Make it shorter", param: `days=${Math.max(1, days.length - 1)}` },
+    { label: "Make it slower", param: withScope(`days=${days.length + 2}`) },
+    { label: "Make it shorter", param: withScope(`days=${Math.max(1, days.length - 1)}`) },
   ];
   if (cities.length > 1) {
-    chips.push({ label: "Fewer places", param: `city=${slugify(cities[0])}` });
+    chips.push({ label: "Just one city", param: `city=${slugify(cities[0])}` });
   }
-  chips.push({ label: "Change what I like", param: "" });
+  chips.push({ label: "Change what I like", param: withScope("") });
   return chips;
 }
 
@@ -46,7 +55,11 @@ function slugify(name: string) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-export function summarise(days: PlannedDay[], interests: string[]): GuideReply {
+export function summarise(
+  days: PlannedDay[],
+  interests: string[],
+  scope: string | null = null,
+): GuideReply {
   const cities = [...new Set(days.map((d) => d.cityName))];
   const placeCount = days.reduce((n, d) => n + d.places.length, 0);
   // Count outdoor *places*, not days — the sentence says "places", and counting
@@ -69,7 +82,7 @@ export function summarise(days: PlannedDay[], interests: string[]): GuideReply {
         ? `, ${outdoorPlaces === placeCount ? "all" : outdoorPlaces} of ` +
           `${placeCount === 1 ? "it" : "them"} outdoors.`
         : "."),
-    chips: buildChips(days, cities),
+    chips: buildChips(days, cities, scope),
   };
 }
 
@@ -94,14 +107,18 @@ export function guideView(trip: {
   budget: number | null;
   dietary: string | null;
   interests: string[];
+  regionSlugs?: string[] | null;
   plan: { days: PlannedDay[] };
 }): GuideView {
   const days = trip.plan.days ?? [];
+  // A trip confined to one region keeps that scope when refining.
+  const regions = trip.regionSlugs ?? [];
+  const scope = regions.length === 1 ? `region=${regions[0]}` : null;
   const cities = [...new Set(days.map((d) => d.cityName))];
   const placeCount = days.reduce((n, d) => n + d.places.length, 0);
 
   return {
-    reply: summarise(days, trip.interests),
+    reply: summarise(days, trip.interests, scope),
     asked: [
       `I have ${trip.days} ${trip.days === 1 ? "day" : "days"}`,
       trip.budget ? `₹${trip.budget.toLocaleString("en-IN")}` : null,

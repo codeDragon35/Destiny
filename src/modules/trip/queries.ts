@@ -15,6 +15,8 @@ export type SavedTrip = {
   userId: string | null;
   /** Activities the traveller chose, so the itinerary can name them. */
   activityIds: string[] | null;
+  /** Regions the trip's places sit in, so refinements keep the same scope. */
+  regionSlugs: string[] | null;
   startDate: string | null;
 };
 
@@ -91,6 +93,13 @@ export async function getTripBySlug(slug: string): Promise<SavedTrip | null> {
       t.id, t.slug, t.days, t.interests, t.dietary, t.budget, t.plan,
       t.user_id AS "userId",
       t.activity_ids AS "activityIds",
+      (
+        SELECT ARRAY_AGG(DISTINCT r.slug)
+        FROM places p
+        JOIN cities ct ON ct.id = p.city_id
+        JOIN regions r ON r.id = ct.region_id
+        WHERE p.id = ANY(t.place_ids)
+      ) AS "regionSlugs",
       t.start_date AS "startDate",
       c.name AS "countryName", c.slug AS "countrySlug"
     FROM trips t

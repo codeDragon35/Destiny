@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import Reveal from "@/components/Reveal";
-import { getTripBySlug } from "@/modules/trip/queries";
+import { getTripBySlug, regionsForPlaces } from "@/modules/trip/queries";
 import { collectiblesByPlaceIds } from "@/modules/souvenir/queries";
 import {
   eventsForPlaces,
@@ -72,6 +72,9 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
   // are doing at a place rather than only how long it takes.
   const chosenIds = new Set(trip.activityIds ?? []);
   const activitiesByPlace = await activitiesByPlaceIds(placeIds);
+  const regionLabelByPlace = Object.fromEntries(
+    [...(await regionsForPlaces(placeIds)).entries()],
+  );
   const chosenActivities = new Map(
     [...activitiesByPlace.entries()].map(([id, list]) => [
       id,
@@ -86,12 +89,19 @@ export default async function TripPage({ params }: { params: Promise<{ slug: str
     null;
   const totalPlaces = days.reduce((n, d) => n + d.places.length, 0);
   const view = guideView(trip);
+  // Name where the trip actually goes. "1 day in India" is true but useless
+  // when every stop is in one state.
+  const regionNames = [...new Set(Object.values(regionLabelByPlace))];
+  const scopeLabel =
+    regionNames.length > 0 && regionNames.length <= 2
+      ? regionNames.join(" & ")
+      : trip.countryName;
   const cities = [...new Set(days.map((d) => d.cityName))];
 
   return (
     <main className="relative min-h-dvh bg-paper">
       <Hero
-        title={`${days.length} ${days.length === 1 ? "day" : "days"} in ${trip.countryName}`}
+        title={`${days.length} ${days.length === 1 ? "day" : "days"} in ${scopeLabel}`}
         photo={heroPhoto}
         seed={trip.slug}
         height="h-[42vh]"
