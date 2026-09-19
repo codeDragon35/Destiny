@@ -100,23 +100,22 @@ export default async function PlanPage({
         .filter((c) => c.places.length > 0);
     }
 
-    // A chosen activity replaces the place's default duration, so picking the
-    // hike rather than the viewpoint genuinely reshapes the day.
-    const chosenActivityIds = [...formData.entries()]
-      .filter(([k]) => k.startsWith("activity-"))
-      .map(([, v]) => String(v))
-      .filter(Boolean);
+    // Chosen activities replace the place's default duration and stack, so
+    // doing both the tiers walk and the viewpoint fills more of the day.
+    const chosenActivityIds = formData.getAll("activity").map(String).filter(Boolean);
 
     if (chosenActivityIds.length > 0) {
-      const chosen = await activitiesByPlaceIds(
+      const byPlace = await activitiesByPlaceIds(
         placesByCity.flatMap((c) => c.places.map((p) => p.id)),
       );
       const wanted = new Set(chosenActivityIds);
       placesByCity = placesByCity.map((c) => ({
         ...c,
         places: c.places.map((p) => {
-          const act = (chosen.get(p.id) ?? []).find((a) => wanted.has(a.id));
-          return act ? { ...p, visitMinutes: act.minutes } : p;
+          const picked = (byPlace.get(p.id) ?? []).filter((a) => wanted.has(a.id));
+          if (picked.length === 0) return p;
+          const minutes = picked.reduce((n, a) => n + a.minutes, 0);
+          return { ...p, visitMinutes: minutes };
         }),
       }));
     }
@@ -206,30 +205,38 @@ export default async function PlanPage({
                           </label>
 
                           {(activities.get(place.id) ?? []).length > 0 && (
-                            <fieldset className="mt-1 space-y-1 pl-7">
-                              <legend className="sr-only">How to do {place.name}</legend>
-                              {(activities.get(place.id) ?? []).map((act, ai) => (
+                            <fieldset className="mt-2 space-y-1.5">
+                              <legend className="mb-1.5 text-[11px] uppercase tracking-wide text-neutral-500">
+                                How do you want to do it? Pick any, or none.
+                              </legend>
+                              {(activities.get(place.id) ?? []).map((act) => (
                                 <label
                                   key={act.id}
-                                  className="flex cursor-pointer items-start gap-2 rounded-sm px-2 py-1.5 text-xs transition hover:bg-surface/70"
+                                  className="flex cursor-pointer items-start gap-3 rounded-md border border-ink/10 bg-paper px-3 py-2.5 transition hover:border-clay/50 has-[:checked]:border-clay has-[:checked]:bg-accent-100"
                                 >
                                   <input
-                                    type="radio"
-                                    name={`activity-${place.id}`}
+                                    type="checkbox"
+                                    name="activity"
                                     value={act.id}
-                                    defaultChecked={ai === 0}
-                                    className="mt-0.5 h-3 w-3 accent-[#C67139]"
+                                    className="mt-0.5 h-4 w-4 shrink-0 accent-[#C67139]"
                                   />
                                   <span className="min-w-0">
-                                    <span className="text-forest">{act.name}</span>
-                                    <span className="ml-2 text-neutral-500">
-                                      {(act.minutes / 60).toFixed(1).replace(/\.0$/, "")}h ·{" "}
-                                      {act.effort}
-                                      {act.cost ? ` · ₹${act.cost.toLocaleString("en-IN")}` : ""}
+                                    <span className="flex flex-wrap items-baseline gap-x-2">
+                                      <span className="text-sm text-forest">{act.name}</span>
+                                      <span className="text-xs text-neutral-500">
+                                        {(act.minutes / 60).toFixed(1).replace(/\.0$/, "")}h ·{" "}
+                                        {act.effort}
+                                        {act.cost ? ` · ₹${act.cost.toLocaleString("en-IN")}` : ""}
+                                      </span>
                                     </span>
                                     {act.summary && (
-                                      <span className="mt-0.5 block text-neutral-600">
+                                      <span className="mt-0.5 block text-xs text-neutral-600">
                                         {act.summary}
+                                      </span>
+                                    )}
+                                    {act.bestTime && (
+                                      <span className="mt-0.5 block text-xs text-clay">
+                                        {act.bestTime}
                                       </span>
                                     )}
                                   </span>
